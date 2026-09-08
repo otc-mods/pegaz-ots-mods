@@ -20,6 +20,8 @@ local lastKey = ""
 SORT_MODES = { "list", "name", "count" }
 SORT_LABELS = { list = "server order", name = "name", count = "count, highest first" }
 local sortMode = "list"   -- g_settings 'lootTrackerSort'
+-- automatic recounts use every listed item once; a scripted or edible loot item would be used up, so off by default
+local autoRecount = false -- g_settings 'lootTrackerAutoRecount'
 
 local applySort -- defined below, used by updateCounts
 
@@ -153,6 +155,21 @@ local function setSort(mode)
   applySort()
 end
 
+function toggleAutoRecount()
+  if autoRecount then
+    autoRecount = false
+    g_settings.set('lootTrackerAutoRecount', false)
+    return
+  end
+  local box
+  box = displayGeneralBox(tr('Auto recount'),
+    tr('After every NPC trade and depot visit the tracker would use each listed item once to read its count.\n' ..
+       'Gear and gold are fine, but food, potions and scripted items (scrolls, removers) get used up.\n\nEnable anyway?'),
+    { { text = tr('Enable'), callback = function() box:destroy() autoRecount = true g_settings.set('lootTrackerAutoRecount', true) end },
+      { text = tr('Cancel'), callback = function() box:destroy() end },
+      anchor = AnchorHorizontalCenter }, nil, function() box:destroy() end)
+end
+
 -- title-bar arrow: popup with the sort choices (filters go here later)
 function showMenu()
   local menu = g_ui.createWidget('PopupMenu')
@@ -161,6 +178,7 @@ function showMenu()
   end
   menu:addSeparator()
   menu:addOption("Recount every item", refreshAll)
+  menu:addOption((autoRecount and "[x] " or "[ ] ") .. "Auto recount after trade / depot", toggleAutoRecount)
   local b = window:getChildById('menuButton')
   menu:display({ x = b:getX(), y = b:getY() + b:getHeight() })
 end
@@ -257,11 +275,13 @@ local function onPlayerGoods(money, items)
 end
 
 local function onCloseNpcTrade()
+  if not autoRecount then return end
   scheduleEvent(function() if window and window:isVisible() then refreshAll() end end, 1500)
 end
 
 -- depot closed: items may have moved out of sight -> recount
 local function onContainerClose(container)
+  if not autoRecount then return end
   local name = container and container:getName() or ""
   if name:lower():find("depot") or name:lower():find("locker") then
     scheduleEvent(function() if window and window:isVisible() then refreshAll() end end, 1000)
@@ -303,6 +323,7 @@ end
 
 function init()
   if g_settings.exists('lootTrackerSort') then sortMode = g_settings.getString('lootTrackerSort') end
+  if g_settings.exists('lootTrackerAutoRecount') then autoRecount = g_settings.getBoolean('lootTrackerAutoRecount') end
   connect(g_game, { onTextMessage = onTextMessage, onPlayerGoods = onPlayerGoods, onCloseNpcTrade = onCloseNpcTrade,
                     onGameEnd = function() known = {} end })
   connect(Container, { onClose = onContainerClose })

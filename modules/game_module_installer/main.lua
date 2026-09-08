@@ -4,6 +4,10 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
+VERSION = "1.0.2"  -- keep equal to the catalog entry; the installer records itself with it on first load
+SELF = "game_module_installer"
+SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
+               "modules/game_module_installer/main.lua" }
 
 local window, button
 local index          -- decoded index.json
@@ -23,6 +27,11 @@ local function load()
         installed[name] = { version = rec.version, files = files }
       end
     end
+  end
+  -- the bootstrap one-liner writes no record: adopt ourselves, otherwise we look "bundled" and cannot update
+  if not installed[SELF] then
+    installed[SELF] = { version = VERSION, files = SELF_FILES }
+    g_settings.setNode('moduleInstaller', installed)
   end
 end
 
@@ -77,10 +86,16 @@ local function finishInstall(entry, paths)
   save()
   g_modules.discoverModules()
   local m = g_modules.getModule(entry.name)
+  busy = false
+  if entry.name == SELF and m and m:isLoaded() then
+    -- reloading ourselves destroys this window: leave the callback first
+    setStatus("installer " .. entry.version .. " written, reloading...", '#66ff66')
+    scheduleEvent(function() m:reload() end, 200)
+    return
+  end
   if m then
     if m:isLoaded() then m:reload() else g_modules.ensureModuleLoaded(entry.name) end
   end
-  busy = false
   setStatus(entry.title .. " " .. entry.version .. " installed and loaded.", '#66ff66')
   refreshRows()
 end
@@ -129,6 +144,7 @@ end
 
 local function remove(entry)
   if busy then return setStatus("busy, wait a moment", '#ffdd55') end
+  if entry.name == SELF then return setStatus("to remove the installer delete modules/game_module_installer from your userdata folder", '#ffdd55') end
   local rec = installed[entry.name]
   if not rec then return end
   local m = g_modules.getModule(entry.name)

@@ -193,7 +193,7 @@
   {
    "name": "game_module_installer",
    "type": "module",
-   "version": "1.0.1",
+   "version": "1.0.2",
    "title": "Module installer",
    "description": "This installer: lists the published modules, installs, updates and removes them without a client restart.",
    "screenshot": "screenshots/game_module_installer.png",
@@ -214,8 +214,8 @@
     },
     {
      "path": "modules/game_module_installer/main.lua",
-     "sha1": "cec7e50f48789a681dc0720b4c88be6031d77323",
-     "size": 9745
+     "sha1": "e6f6f65e6543d7eaa075540bfdd04ea7083bfe4f",
+     "size": 10755
     }
    ]
   }

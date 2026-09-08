@@ -15,7 +15,14 @@ for e in cat["entries"]:
     files += e.get("extraFiles", [])
     entry = {k: e[k] for k in ("name", "type", "version", "title", "description") if k in e}
     if "requires" in e: entry["requires"] = e["requires"]
-    if e.get("screenshot") and os.path.exists(e["screenshot"]): entry["screenshot"] = e["screenshot"]
+    if e.get("screenshot") and os.path.exists(e["screenshot"]):
+        entry["screenshot"] = e["screenshot"]
+        with open(e["screenshot"], 'rb') as fh:  # PNG IHDR: width/height big-endian at bytes 16..24
+            head = fh.read(24)
+        if head[:8] == b'\x89PNG\r\n\x1a\n':
+            import struct
+            w, h = struct.unpack('>II', head[16:24])
+            entry["screenshotSize"] = [w, h]
     entry["files"] = []
     for p in sorted(set(files)):
         data = open(p, 'rb').read()

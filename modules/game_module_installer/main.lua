@@ -174,14 +174,27 @@ refreshRows = function()
     if type(entry.screenshot) == 'string' and entry.screenshot:len() > 0 then
       local url = index.base .. entry.screenshot
       row.shot:setTooltip("click to enlarge")
+      local iw, ih = 500, 280
+      if type(entry.screenshotSize) == 'table' and tonumber(entry.screenshotSize[1]) and tonumber(entry.screenshotSize[2]) then
+        iw, ih = tonumber(entry.screenshotSize[1]), tonumber(entry.screenshotSize[2])
+      end
       HTTP.downloadImage(url, function(path, err)
-        if err or not path or not row.shot then return end
-        row.shot.noShot:hide()
-        row.shot:setImageSource(path)
-        row.shot.onMouseRelease = function(widget, mousePos, mouseButton)
+        if err or not path or not row.shotBox then return end
+        row.shotBox.noShot:hide()
+        -- whole picture, proportions kept, never cropped: fit into the box (upscale at most 2x)
+        local scale = math.min(500 / iw, 280 / ih, 2)
+        row.shotBox.shot:setSize({ width = math.floor(iw * scale), height = math.floor(ih * scale) })
+        row.shotBox.shot:setImageSource(path)
+        row.shotBox.onMouseRelease = function(widget, mousePos, mouseButton)
           if mouseButton ~= MouseLeftButton then return false end
-          local w = g_ui.createWidget('InstallerPreview', g_ui.getRootWidget())
+          local root = g_ui.getRootWidget()
+          local maxW, maxH = root:getWidth() - 80, root:getHeight() - 120
+          local s = math.min(1, maxW / iw, maxH / ih) -- native size when it fits, else scaled down
+          local pw, ph = math.floor(iw * s), math.floor(ih * s)
+          local w = g_ui.createWidget('InstallerPreview', root)
           w:setText(entry.title or entry.name)
+          w:setSize({ width = pw + 40, height = ph + 80 })
+          w.image:setSize({ width = pw, height = ph })
           w.image:setImageSource(path)
           w:show() w:raise() w:focus()
           return true

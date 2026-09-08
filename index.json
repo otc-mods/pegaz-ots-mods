@@ -9,6 +9,10 @@
    "title": "Stats",
    "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window.",
    "screenshot": "screenshots/game_hud_stats.png",
+   "screenshotSize": [
+    187,
+    215
+   ],
    "files": [
     {
      "path": "modules/game_hud_stats/README.md",
@@ -44,6 +48,10 @@
    "title": "Autoloot",
    "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add.",
    "screenshot": "screenshots/game_autoloot.png",
+   "screenshotSize": [
+    853,
+    642
+   ],
    "files": [
     {
      "path": "modules/game_autoloot/autoloot.lua",
@@ -77,6 +85,10 @@
     "game_autoloot"
    ],
    "screenshot": "screenshots/game_loot_tracker.png",
+   "screenshotSize": [
+    195,
+    171
+   ],
    "files": [
     {
      "path": "modules/game_loot_tracker/game_loot_tracker.otmod",
@@ -107,6 +119,10 @@
    "title": "Player info",
    "description": "Other players shown as [RP 250] Name (vocation and level from an automatic look).",
    "screenshot": "screenshots/game_player_info.png",
+   "screenshotSize": [
+    426,
+    312
+   ],
    "files": [
     {
      "path": "data/images/topbuttons/playerinfo.png",
@@ -149,13 +165,13 @@
     },
     {
      "path": "modules/game_module_installer/installer.otui",
-     "sha1": "5749e1a227cedf4c2201b3e52b26bbb26efa5794",
-     "size": 3301
+     "sha1": "668328a6e9f06ec547e4aa0863e62d92a0c1bdfb",
+     "size": 3343
     },
     {
      "path": "modules/game_module_installer/main.lua",
-     "sha1": "4eaed265908dd32f6483e138fc18741e27853d05",
-     "size": 8565
+     "sha1": "81d6ac9ffd08e95993c6fa52273e19d074364afc",
+     "size": 9469
     }
    ]
   }

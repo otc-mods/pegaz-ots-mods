@@ -2,6 +2,16 @@
 
 Client modules for the PegazOTS OTClientV8 client (protocol 8.6).
 
+![Module installer](screenshots/game_module_installer.png)
+
+| Module | What it does |
+|---|---|
+| Stats | Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window |
+| Autoloot | Named loot backpacks with item search; Apply sends `!autoloot clear` / `add` |
+| Autoloot tracker | Mini-window listing the items the server loots for you with carried counts |
+| Player info | Other players shown as `[RP 250] Name` (vocation and level from an automatic look) |
+| Module installer | This installer: lists, installs, updates and removes the modules above without a restart |
+
 Install with the in-game module installer (fetches `index.json` from this repo's Pages site), or by hand:
 copy a `modules/<name>` folder into your client's `modules/` directory and restart the client.
 

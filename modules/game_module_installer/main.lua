@@ -4,10 +4,10 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.5"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.0.6"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
-               "modules/game_module_installer/main.lua" }
+               "modules/game_module_installer/main.lua", "modules/game_module_installer/grip.png" }
 
 local window, button
 local index          -- decoded index.json

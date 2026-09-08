@@ -93,6 +93,10 @@ MainWindow
   id: moduleInstallerWindow
   !text: tr('Modules')
   size: 560 640
+  // mouse hit-testing stops at the padding rect, so the frame cannot hold resize grips: shrink the right and
+  // bottom padding to 2 px, push the content back with margins and place the grips in the freed strip
+  padding-right: 2
+  padding-bottom: 2
   @onEscape: modules.game_module_installer.hide()
 
   ScrollablePanel
@@ -116,6 +120,7 @@ MainWindow
     anchors.right: parent.right
     anchors.bottom: status.top
     margin-bottom: 6
+    margin-right: 14
     step: 60
     pixels-scroll: true
 
@@ -125,6 +130,7 @@ MainWindow
     anchors.left: parent.left
     anchors.right: parent.right
     margin-bottom: 6
+    margin-right: 14
     height: 28
     text-align: left
     text-wrap: true
@@ -133,6 +139,7 @@ MainWindow
     id: refresh
     anchors.bottom: parent.bottom
     anchors.left: parent.left
+    margin-bottom: 14
     size: 110 24
     !text: tr('Refresh list')
 
@@ -141,6 +148,7 @@ MainWindow
     anchors.bottom: parent.bottom
     anchors.left: refresh.right
     margin-left: 6
+    margin-bottom: 14
     size: 120 24
     !text: tr('Reload modules')
     !tooltip: tr('Same as Ctrl+Shift+R: reloads every loaded module')
@@ -151,6 +159,7 @@ MainWindow
     anchors.bottom: parent.bottom
     anchors.right: closeButton.left
     margin-right: 6
+    margin-bottom: 14
     size: 110 24
     !text: tr('Open GitHub')
     @onClick: modules.game_module_installer.openRepo()
@@ -159,18 +168,19 @@ MainWindow
     id: closeButton
     anchors.bottom: parent.bottom
     anchors.right: parent.right
+    margin-bottom: 14
+    margin-right: 14
     size: 80 24
     !text: tr('Close')
     @onClick: modules.game_module_installer.hide()
 
-  // anchors refer to the padding rect, 16 px inside the frame: negative margins put the grab zones on the frame
   ResizeBorder
     id: bottomResizeBorder
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    margin-bottom: -16
-    height: 16
+    margin-right: 14
+    height: 8
     minimum: 320
     maximum: 1400
 
@@ -179,8 +189,8 @@ MainWindow
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
-    margin-right: -16
-    width: 16
+    margin-bottom: 14
+    width: 8
     minimum: 460
     maximum: 1600
 
@@ -188,13 +198,10 @@ MainWindow
     id: cornerGrip
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-    margin-right: -15
-    margin-bottom: -15
     size: 14 14
-    background: #ffffff33
-    border-width: 1
-    border-color: #ffffff55
+    image-source: grip.png
+    opacity: 0.7
     !tooltip: tr('Drag to resize')
 
     $hover:
-      background: #ffffff99
+      opacity: 1

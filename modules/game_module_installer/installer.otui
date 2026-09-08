@@ -20,7 +20,7 @@ InstallerPreview < MainWindow
     @onClick: self:getParent():destroy()
 
 InstallerCard < Panel
-  size: 244 224
+  size: 244 210
   border-width: 1
   border-color: #444444
   background-color: #00000044
@@ -69,16 +69,6 @@ InstallerCard < Panel
     color: #cccccc
     font: verdana-9px
 
-  Label
-    id: versions
-    anchors.top: prev.bottom
-    anchors.left: parent.left
-    anchors.right: parent.right
-    height: 12
-    text-align: left
-    font: verdana-9px
-    color: #a0a0a0
-
   Panel
     id: buttons
     anchors.bottom: parent.bottom
@@ -105,38 +95,26 @@ MainWindow
   size: 560 640
   @onEscape: modules.game_module_installer.hide()
 
-  Label
-    id: source
-    anchors.top: parent.top
-    anchors.left: parent.left
-    anchors.right: parent.right
-    text-align: left
-    font: verdana-9px
-    color: #a0a0a0
-    height: 14
-
   ScrollablePanel
     id: list
-    anchors.top: prev.bottom
+    anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: listScroll.left
     anchors.bottom: status.top
-    margin-top: 4
     margin-bottom: 6
     margin-right: 4
     vertical-scrollbar: listScroll
     layout:
       type: grid
-      cell-size: 244 224
+      cell-size: 244 210
       cell-spacing: 6
       flow: true
 
   VerticalScrollBar
     id: listScroll
-    anchors.top: source.bottom
+    anchors.top: parent.top
     anchors.right: parent.right
     anchors.bottom: status.top
-    margin-top: 4
     margin-bottom: 6
     step: 60
     pixels-scroll: true

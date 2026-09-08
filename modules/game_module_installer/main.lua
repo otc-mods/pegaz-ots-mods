@@ -157,8 +157,8 @@ refreshRows = function()
     elseif state == "outdated" then vtext = "installed " .. rec.version .. ", available " .. entry.version
     elseif state == "bundled" then vtext = ""
     end
-    if entry.requires and #entry.requires > 0 then vtext = vtext .. (vtext ~= "" and "  |  " or "") .. "needs: " .. table.concat(entry.requires, ", ") end
-    row.versions:setText(vtext)
+    if entry.requires and #entry.requires > 0 then vtext = vtext .. (vtext ~= "" and "\n" or "") .. "needs: " .. table.concat(entry.requires, ", ") end
+    row.buttons.install:setTooltip(vtext)
     if state == "installed" then
       row.buttons.install:setText("Reinstall")
     elseif state == "outdated" then
@@ -208,7 +208,6 @@ end
 function fetchIndex()
   if not window then return end
   setStatus("fetching list...")
-  window.source:setText(INDEX_URL)
   HTTP.getJSON(INDEX_URL .. "?t=" .. os.time(), function(data, err)
     if err or type(data) ~= 'table' or type(data.entries) ~= 'table' then
       index = nil

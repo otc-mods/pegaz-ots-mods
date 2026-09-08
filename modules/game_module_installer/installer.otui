@@ -1,0 +1,122 @@
+InstallerRow < Panel
+  height: 62
+  margin-top: 3
+  border-width: 1
+  border-color: #444444
+  background-color: #00000044
+  padding: 4
+
+  Label
+    id: title
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: buttons.left
+    height: 16
+    text-align: left
+    color: #ffdd55
+
+  Label
+    id: description
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: buttons.left
+    height: 26
+    text-align: left
+    text-wrap: true
+    color: #cccccc
+    font: verdana-9px
+
+  Label
+    id: versions
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: buttons.left
+    height: 12
+    text-align: left
+    font: verdana-9px
+    color: #a0a0a0
+
+  Panel
+    id: buttons
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 78
+
+    Button
+      id: install
+      anchors.top: parent.top
+      anchors.right: parent.right
+      size: 74 22
+
+    Button
+      id: remove
+      anchors.top: prev.bottom
+      anchors.right: parent.right
+      margin-top: 4
+      size: 74 22
+      !text: tr('Remove')
+
+MainWindow
+  id: moduleInstallerWindow
+  !text: tr('Modules')
+  size: 520 540
+  @onEscape: modules.game_module_installer.hide()
+
+  Label
+    id: source
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: left
+    font: verdana-9px
+    color: #a0a0a0
+    height: 14
+
+  ScrollablePanel
+    id: list
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: listScroll.left
+    anchors.bottom: status.top
+    margin-top: 4
+    margin-bottom: 6
+    margin-right: 4
+    vertical-scrollbar: listScroll
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: listScroll
+    anchors.top: source.bottom
+    anchors.right: parent.right
+    anchors.bottom: status.top
+    margin-top: 4
+    margin-bottom: 6
+    step: 40
+    pixels-scroll: true
+
+  Label
+    id: status
+    anchors.bottom: refresh.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 6
+    height: 28
+    text-align: left
+    text-wrap: true
+
+  Button
+    id: refresh
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 110 24
+    !text: tr('Refresh list')
+
+  Button
+    id: closeButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 24
+    !text: tr('Close')
+    @onClick: modules.game_module_installer.hide()

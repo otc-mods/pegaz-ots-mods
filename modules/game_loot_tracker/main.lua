@@ -2,6 +2,7 @@
 -- module's last "!autoloot" reply, else the selected backpack) with sprite, name and how many you carry.
 -- Count = equipment + open containers, replaced by the server's "Using one of N ..." figure when one arrives.
 -- Clicking a row sends a count probe (uses the item once - harmless for loot, do not use on potions).
+-- Counts only move on facts: a server line or the client seeing more. No answer = last value stays.
 
 REFRESH_MS = 2000
 MIN_CONTENT = 40
@@ -86,9 +87,8 @@ local function fitName(row)
 end
 
 local function updateCounts()
-  -- a probe that got no answer means the item is not in your inventory at all
+  -- a probe that got no answer: keep whatever we knew (an answer can be late or lost), never invent a 0
   if pendingProbe and pendingProbe.due <= g_clock.millis() then
-    serverCounts[pendingProbe.id] = 0
     pendingProbe = nil
   end
   for id, row in pairs(rows) do
@@ -145,6 +145,8 @@ function showMenu()
   for _, m in ipairs(SORT_MODES) do
     menu:addOption((m == sortMode and "* " or "  ") .. "Sort by " .. SORT_LABELS[m], function() setSort(m) end)
   end
+  menu:addSeparator()
+  menu:addOption("Recount every item", refreshAll)
   local b = window:getChildById('menuButton')
   menu:display({ x = b:getX(), y = b:getY() + b:getHeight() })
 end
@@ -230,6 +232,26 @@ local function onTextMessage(mode, text)
   updateCounts()
 end
 
+-- refresh all: probe the rows one after another, 700 ms apart (each probe needs its own answer)
+local refreshQueue, refreshEvent2 = {}, nil
+local function refreshStep()
+  refreshEvent2 = nil
+  if pendingProbe and pendingProbe.due > g_clock.millis() then
+    refreshEvent2 = scheduleEvent(refreshStep, 300)
+    return
+  end
+  local id = table.remove(refreshQueue, 1)
+  if not id then return end
+  if rows[id] then probe(id) end
+  if #refreshQueue > 0 then refreshEvent2 = scheduleEvent(refreshStep, 700) end
+end
+
+function refreshAll()
+  refreshQueue = {}
+  for _, id in ipairs(rows.order or {}) do table.insert(refreshQueue, id) end
+  if #refreshQueue > 0 and not refreshEvent2 then refreshStep() end
+end
+
 local function tick()
   if g_game.isOnline() then rebuild() end
   refreshEvent = scheduleEvent(tick, REFRESH_MS)
@@ -261,6 +283,7 @@ end
 function terminate()
   disconnect(g_game, { onTextMessage = onTextMessage })
   removeEvent(refreshEvent)
+  removeEvent(refreshEvent2)
   if button then button:destroy() button = nil end
   if window then window:destroy() window = nil end
 end

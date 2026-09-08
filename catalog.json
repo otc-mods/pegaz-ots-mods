@@ -35,6 +35,13 @@
         "layouts/retro/images/topbuttons/playerinfo.png",
         "data/images/topbuttons/playerinfo.png"
       ]
+    },
+    {
+      "name": "game_module_installer",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Module installer",
+      "description": "This installer: lists the published modules, installs, updates and removes them without a client restart."
     }
   ]
 }

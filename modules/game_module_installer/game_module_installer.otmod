@@ -1,0 +1,12 @@
+Module
+  name: game_module_installer
+  description: Module installer - install, update and remove published client modules without a restart
+  author: kk
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

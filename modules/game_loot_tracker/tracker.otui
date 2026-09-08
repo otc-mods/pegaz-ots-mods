@@ -45,7 +45,7 @@ LootTrackerRow < Panel
 
 MiniWindow
   id: lootTrackerWindow
-  !text: tr('Autoloot tracker')
+  !text: tr('Autoloot')
   height: 200
   icon: /images/topbuttons/motd
   @onClose: modules.game_loot_tracker.onMiniWindowClose()
@@ -68,6 +68,23 @@ MiniWindow
 
     $pressed:
       image-clip: 56 28 14 14
+
+  UIButton
+    id: refreshButton
+    anchors.top: menuButton.top
+    anchors.right: menuButton.left
+    margin-right: 2
+    size: 14 14
+    image-source: refresh.png
+    image-clip: 0 0 14 14
+    @onClick: modules.game_loot_tracker.refreshAll()
+    !tooltip: tr('Recount every item (uses each once)')
+
+    $hover:
+      image-clip: 0 14 14 14
+
+    $pressed:
+      image-clip: 0 28 14 14
 
   MiniWindowContents
     padding-left: 4

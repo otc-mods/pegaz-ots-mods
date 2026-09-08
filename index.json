@@ -82,13 +82,18 @@
     },
     {
      "path": "modules/game_loot_tracker/main.lua",
-     "sha1": "79d2bffb65931d9843c8d4a549b9bda26d8cee0a",
-     "size": 9861
+     "sha1": "6e121486ea5bdf77c8baebc2e625f7cac872e009",
+     "size": 10758
+    },
+    {
+     "path": "modules/game_loot_tracker/refresh.png",
+     "sha1": "a8f52837757b5c11bf13cfb5a994be21b01c540b",
+     "size": 197
     },
     {
      "path": "modules/game_loot_tracker/tracker.otui",
-     "sha1": "85d7f69a31aa991a6e37556c3d6fa68c7468171e",
-     "size": 1503
+     "sha1": "74b243738fac89a2d54c31e0b524ec56c539af82",
+     "size": 1883
     }
    ]
   },
@@ -123,6 +128,30 @@
      "path": "modules/game_player_info/options.otui",
      "sha1": "335a15c89ab55e9e5d56689fc9fa3918eced723f",
      "size": 874
+    }
+   ]
+  },
+  {
+   "name": "game_module_installer",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Module installer",
+   "description": "This installer: lists the published modules, installs, updates and removes them without a client restart.",
+   "files": [
+    {
+     "path": "modules/game_module_installer/game_module_installer.otmod",
+     "sha1": "00c7680d8bb7b0de99afdb1c993e46b9898f6e63",
+     "size": 346
+    },
+    {
+     "path": "modules/game_module_installer/installer.otui",
+     "sha1": "998808e2871ce635cbf9909053a6416d38e8dd77",
+     "size": 2452
+    },
+    {
+     "path": "modules/game_module_installer/main.lua",
+     "sha1": "ac2c0303faecd3469ae48fda153f2a78436ba028",
+     "size": 7815
     }
    ]
   }

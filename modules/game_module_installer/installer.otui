@@ -20,7 +20,7 @@ InstallerPreview < MainWindow
     @onClick: self:getParent():destroy()
 
 InstallerCard < Panel
-  size: 244 262
+  size: 244 224
   border-width: 1
   border-color: #444444
   background-color: #00000044
@@ -53,8 +53,8 @@ InstallerCard < Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    margin-top: 4
-    height: 16
+    margin-top: 2
+    height: 14
     text-align: left
     color: #ffdd55
 
@@ -63,7 +63,7 @@ InstallerCard < Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 40
+    height: 26
     text-align: left
     text-wrap: true
     color: #cccccc
@@ -74,9 +74,8 @@ InstallerCard < Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 24
+    height: 12
     text-align: left
-    text-wrap: true
     font: verdana-9px
     color: #a0a0a0
 
@@ -128,7 +127,7 @@ MainWindow
     vertical-scrollbar: listScroll
     layout:
       type: grid
-      cell-size: 244 262
+      cell-size: 244 224
       cell-spacing: 6
       flow: true
 

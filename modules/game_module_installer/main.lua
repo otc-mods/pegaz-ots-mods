@@ -155,9 +155,9 @@ refreshRows = function()
     local vtext = "available " .. tostring(entry.version)
     if state == "installed" then vtext = "installed " .. rec.version .. ", up to date"
     elseif state == "outdated" then vtext = "installed " .. rec.version .. ", available " .. entry.version
-    elseif state == "bundled" then vtext = "part of this client build (not managed here)"
+    elseif state == "bundled" then vtext = ""
     end
-    if entry.requires and #entry.requires > 0 then vtext = vtext .. "  |  needs: " .. table.concat(entry.requires, ", ") end
+    if entry.requires and #entry.requires > 0 then vtext = vtext .. (vtext ~= "" and "  |  " or "") .. "needs: " .. table.concat(entry.requires, ", ") end
     row.versions:setText(vtext)
     if state == "installed" then
       row.buttons.install:setText("Reinstall")

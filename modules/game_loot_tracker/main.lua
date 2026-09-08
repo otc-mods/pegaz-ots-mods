@@ -11,8 +11,8 @@ MAX_CONTENT = 700
 local window, contents, button
 local rows = {}          -- id -> row widget
 -- known[id] = { n = count the server confirmed, clientAt = what the client saw at that moment, t = when }
--- shown value = n + (client now - clientAt): looting into / selling from an OPEN container moves the estimate,
--- closed bags contribute nothing until the next confirmation (probe, use line, NPC trade list)
+-- shown value = n only. Open containers are NOT mixed in: a recount taken with a bag open and the bag closed
+-- later would read as a loss. Counts move on server facts only (probe, use line, NPC trade list).
 local known = {}
 local pendingProbe       -- { id=, due= }
 local refreshEvent
@@ -73,7 +73,7 @@ end
 local function estimate(id)
   local k = known[id]
   if not k then return nil end
-  return math.max(0, k.n + (clientCount(id) - k.clientAt))
+  return math.max(0, k.n)
 end
 
 local function probe(id)
@@ -110,14 +110,14 @@ local function updateCounts()
     if row.name:getText() == row.fullName or row.name:getText():sub(-3) == "..." then fitName(row) end
     local client = clientCount(id)
     local est = estimate(id)
-    -- "?" = nothing confirmed yet and the client sees none (closed backpacks); click the row to ask the server
-    local text = est and tostring(est) or (client > 0 and tostring(client) or "?")
+    -- "?" = nothing confirmed yet; click the row to ask the server (open bags are deliberately not shown as the count)
+    local text = est and tostring(est) or "?"
     row.count:setText(text)
     local k = known[id]
     local fresh = k and (g_clock.millis() - k.t) < 10 * 60 * 1000
     row.count:setColor(fresh and '#ffffff' or '#c8c8c8')
-    row:setTooltip((nameOf(id) or ("item " .. id)) .. "\nclient sees: " .. client ..
-      (k and ("\nserver confirmed: " .. k.n .. " (" .. math.floor((g_clock.millis() - k.t) / 60000) .. " min ago), since then " .. (client - k.clientAt >= 0 and "+" or "") .. (client - k.clientAt)) or "") ..
+    row:setTooltip((nameOf(id) or ("item " .. id)) .. "\nin equipment and open bags: " .. client ..
+      (k and ("\nserver confirmed: " .. k.n .. " (" .. math.floor((g_clock.millis() - k.t) / 60000) .. " min ago)") or "\nnot confirmed yet") ..
       "\nclick: recount (uses the item once)")
     ::continue::
   end
@@ -125,7 +125,7 @@ local function updateCounts()
 end
 
 local function shownCount(id)
-  return estimate(id) or clientCount(id)
+  return estimate(id) or -1 -- unknown sorts last
 end
 
 applySort = function()

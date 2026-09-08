@@ -80,7 +80,7 @@
   {
    "name": "game_loot_tracker",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "title": "Autoloot tracker",
    "description": "Mini-window listing the items the server loots for you with carried counts.",
    "requires": [
@@ -100,8 +100,8 @@
     },
     {
      "path": "modules/game_loot_tracker/main.lua",
-     "sha1": "3f5a060cfd256eeb348c8de60156d24183dcadf6",
-     "size": 12468
+     "sha1": "5a4bf75db123b2dbdb34afcc0e7ee02449a02be8",
+     "size": 12368
     },
     {
      "path": "modules/game_loot_tracker/refresh.png",

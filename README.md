@@ -2,7 +2,7 @@
 
 Client modules for the PegazOTS OTClientV8 client (protocol 8.6).
 
-![Module installer](screenshots/game_module_installer.png)
+![Module installer](screenshots/game_module_installer.png?v=4caf15d1cf8d)
 
 | Module | What it does |
 |---|---|

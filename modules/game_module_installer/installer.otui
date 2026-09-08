@@ -20,8 +20,7 @@ InstallerPreview < MainWindow
     @onClick: self:getParent():destroy()
 
 InstallerCard < Panel
-  size: 512 404
-  margin-top: 6
+  size: 244 262
   border-width: 1
   border-color: #444444
   background-color: #00000044
@@ -32,13 +31,13 @@ InstallerCard < Panel
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 282
+    height: 134
     background-color: #00000066
 
     UIWidget
       id: shot
       anchors.centerIn: parent
-      size: 500 280
+      size: 236 132
       image-smooth: true
 
     Label
@@ -64,7 +63,7 @@ InstallerCard < Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 30
+    height: 40
     text-align: left
     text-wrap: true
     color: #cccccc
@@ -104,7 +103,7 @@ InstallerCard < Panel
 MainWindow
   id: moduleInstallerWindow
   !text: tr('Modules')
-  size: 560 720
+  size: 560 640
   @onEscape: modules.game_module_installer.hide()
 
   Label
@@ -128,7 +127,10 @@ MainWindow
     margin-right: 4
     vertical-scrollbar: listScroll
     layout:
-      type: verticalBox
+      type: grid
+      cell-size: 244 262
+      cell-spacing: 6
+      flow: true
 
   VerticalScrollBar
     id: listScroll

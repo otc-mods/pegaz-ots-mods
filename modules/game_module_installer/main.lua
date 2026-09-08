@@ -174,15 +174,15 @@ refreshRows = function()
     if type(entry.screenshot) == 'string' and entry.screenshot:len() > 0 then
       local url = index.base .. entry.screenshot
       row.shot:setTooltip("click to enlarge")
-      local iw, ih = 500, 280
+      local iw, ih = 236, 132
       if type(entry.screenshotSize) == 'table' and tonumber(entry.screenshotSize[1]) and tonumber(entry.screenshotSize[2]) then
         iw, ih = tonumber(entry.screenshotSize[1]), tonumber(entry.screenshotSize[2])
       end
       HTTP.downloadImage(url, function(path, err)
         if err or not path or not row.shotBox then return end
         row.shotBox.noShot:hide()
-        -- whole picture, proportions kept, never cropped: fit into the box (upscale at most 2x)
-        local scale = math.min(500 / iw, 280 / ih, 2)
+        -- whole picture, proportions kept, never cropped: fit into the box, never upscaled
+        local scale = math.min(236 / iw, 132 / ih, 1)
         row.shotBox.shot:setSize({ width = math.floor(iw * scale), height = math.floor(ih * scale) })
         row.shotBox.shot:setImageSource(path)
         row.shotBox.onMouseRelease = function(widget, mousePos, mouseButton)

@@ -157,6 +157,11 @@
    "version": "1.0.0",
    "title": "Module installer",
    "description": "This installer: lists the published modules, installs, updates and removes them without a client restart.",
+   "screenshot": "screenshots/game_module_installer.png",
+   "screenshotSize": [
+    563,
+    644
+   ],
    "files": [
     {
      "path": "modules/game_module_installer/game_module_installer.otmod",

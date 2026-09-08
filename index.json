@@ -1,0 +1,130 @@
+{
+ "version": 1,
+ "base": "https://otc-mods.github.io/pegaz-ots-mods/",
+ "entries": [
+  {
+   "name": "game_hud_stats",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Stats",
+   "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window.",
+   "files": [
+    {
+     "path": "modules/game_hud_stats/README.md",
+     "sha1": "c6a4529b74be3eee5a355904d1c57b77d1c7e25b",
+     "size": 1249
+    },
+    {
+     "path": "modules/game_hud_stats/hud_color_dot.png",
+     "sha1": "ba1df0d16fd34c06586b578980c15bbf56cf5271",
+     "size": 150
+    },
+    {
+     "path": "modules/game_hud_stats/hudstats.lua",
+     "sha1": "01edd3916e8a415bfa9823532e3853e51641bae4",
+     "size": 29799
+    },
+    {
+     "path": "modules/game_hud_stats/hudstats.otmod",
+     "sha1": "39c65e7412b15dd7d89f1a58ef4632236b8a94d5",
+     "size": 327
+    },
+    {
+     "path": "modules/game_hud_stats/hudstats.otui",
+     "sha1": "41b2d950fb526ef19df6e9d2971928fcf74b41eb",
+     "size": 2739
+    }
+   ]
+  },
+  {
+   "name": "game_autoloot",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Autoloot",
+   "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add.",
+   "files": [
+    {
+     "path": "modules/game_autoloot/autoloot.lua",
+     "sha1": "bb587096c6416ac7aa05b42ee073bad37c8e1711",
+     "size": 16912
+    },
+    {
+     "path": "modules/game_autoloot/autoloot.otmod",
+     "sha1": "a8263d048423d99a6f0e4d2014feefc44e2a4d7d",
+     "size": 369
+    },
+    {
+     "path": "modules/game_autoloot/autoloot.otui",
+     "sha1": "7d42c5b791a802540c76106d06993c87d89c381b",
+     "size": 4341
+    },
+    {
+     "path": "modules/game_autoloot/items_860.lua",
+     "sha1": "d53b1f6015099417edbaaaec9c882d54ac4434cf",
+     "size": 223450
+    }
+   ]
+  },
+  {
+   "name": "game_loot_tracker",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Autoloot tracker",
+   "description": "Mini-window listing the items the server loots for you with carried counts.",
+   "requires": [
+    "game_autoloot"
+   ],
+   "files": [
+    {
+     "path": "modules/game_loot_tracker/game_loot_tracker.otmod",
+     "sha1": "abd757a4e904804458b8ed90e8ed2d9b5d0a2429",
+     "size": 422
+    },
+    {
+     "path": "modules/game_loot_tracker/main.lua",
+     "sha1": "79d2bffb65931d9843c8d4a549b9bda26d8cee0a",
+     "size": 9861
+    },
+    {
+     "path": "modules/game_loot_tracker/tracker.otui",
+     "sha1": "85d7f69a31aa991a6e37556c3d6fa68c7468171e",
+     "size": 1503
+    }
+   ]
+  },
+  {
+   "name": "game_player_info",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Player info",
+   "description": "Other players shown as [RP 250] Name (vocation and level from an automatic look).",
+   "files": [
+    {
+     "path": "data/images/topbuttons/playerinfo.png",
+     "sha1": "61667fc4befad3921051b98dea96f7e2e52659a7",
+     "size": 583
+    },
+    {
+     "path": "layouts/retro/images/topbuttons/playerinfo.png",
+     "sha1": "1c5aad45534f70599f07b20448b6c52f482130f6",
+     "size": 907
+    },
+    {
+     "path": "modules/game_player_info/game_player_info.otmod",
+     "sha1": "027cee91e5efc9d62fd3fc46c512dddc40d2c275",
+     "size": 432
+    },
+    {
+     "path": "modules/game_player_info/main.lua",
+     "sha1": "401327bdb18407671f246c50b7d36f11638c01a2",
+     "size": 8954
+    },
+    {
+     "path": "modules/game_player_info/options.otui",
+     "sha1": "335a15c89ab55e9e5d56689fc9fa3918eced723f",
+     "size": 874
+    }
+   ]
+  }
+ ]
+}

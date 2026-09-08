@@ -1,0 +1,38 @@
+MainWindow
+  id: playerInfoOptions
+  !text: tr('Player info')
+  size: 260 150
+  @onEscape: modules.game_player_info.hideOptions()
+
+  CheckBox
+    id: enabled
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    !text: tr('Show info next to player names')
+
+  CheckBox
+    id: showVocation
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 8
+    margin-left: 16
+    !text: tr('Vocation (EK / RP / MS / ED)')
+
+  CheckBox
+    id: showLevel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 4
+    margin-left: 16
+    !text: tr('Level')
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 70 22
+    @onClick: modules.game_player_info.hideOptions()

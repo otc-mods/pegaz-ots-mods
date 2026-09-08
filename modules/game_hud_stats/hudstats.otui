@@ -1,0 +1,139 @@
+HudStatsHeader < GameLabel
+  color: #ffdd55
+  height: 14
+  text-align: center
+  phantom: false
+
+HudGraph < UIGraph
+  height: 40
+  capacity: 900
+  line-width: 1
+  color: #ffdd55
+  margin-top: 3
+  background-color: #383636
+  padding: 3
+  font: verdana-11px-rounded
+  show-labels: false
+  image-source: /images/ui/graph_background
+
+HudGraphLabel < UILabel
+  font: verdana-9px
+  color: #c8c8c8
+  text-auto-resize: true
+  margin-right: 2
+  phantom: true
+
+HudStatsRow < Panel
+  height: 14
+
+  GameLabel
+    id: name
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+
+  GameLabel
+    id: value
+    text-align: topright
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+
+MiniWindow
+  id: hudStatsWindow
+  !text: tr('Stats')
+  height: 330
+  icon: /images/topbuttons/analyzers
+  @onClose: modules.game_hud_stats.onMiniWindowClose()
+  &save: true
+  &autoOpen: 5
+
+  MiniWindowContents
+    padding-left: 5
+    padding-right: 5
+    padding-top: 2
+    layout: verticalBox
+
+HudStatsButtons < Panel
+  height: 74
+  margin-top: 8
+
+  Button
+    id: graphs
+    !text: tr('Graphs')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 20
+    @onClick: modules.game_hud_stats.toggleGraphs()
+
+  Button
+    id: resetSession
+    !text: tr('Reset session')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 6
+    height: 20
+    @onClick: modules.game_hud_stats.resetSession()
+
+  Button
+    id: resetLifetime
+    !text: tr('Reset lifetime')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 6
+    height: 20
+    @onClick: modules.game_hud_stats.confirmResetLifetime()
+
+HudColorDot < UIWidget
+  size: 14 14
+  anchors.top: parent.top
+  image-source: hud_color_dot.png
+  image-smooth: true
+  phantom: false
+
+HudColorPicker < Panel
+  height: 16
+  margin-top: 6
+
+  GameLabel
+    id: help
+    text: (?)
+    color: #c8c8c8
+    anchors.right: parent.right
+    anchors.top: parent.top
+    phantom: false
+
+  Panel
+    id: dots
+    width: 114
+    height: 14
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+
+    HudColorDot
+      id: r
+      anchors.left: parent.left
+    HudColorDot
+      id: g
+      anchors.left: prev.right
+      margin-left: 6
+    HudColorDot
+      id: b
+      anchors.left: prev.right
+      margin-left: 6
+    HudColorDot
+      id: c
+      anchors.left: prev.right
+      margin-left: 6
+    HudColorDot
+      id: m
+      anchors.left: prev.right
+      margin-left: 6
+    HudColorDot
+      id: y
+      anchors.left: prev.right
+      margin-left: 6

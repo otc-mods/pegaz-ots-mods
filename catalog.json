@@ -1,0 +1,40 @@
+{
+  "base": "https://otc-mods.github.io/pegaz-ots-mods/",
+  "entries": [
+    {
+      "name": "game_hud_stats",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Stats",
+      "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window."
+    },
+    {
+      "name": "game_autoloot",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Autoloot",
+      "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add."
+    },
+    {
+      "name": "game_loot_tracker",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Autoloot tracker",
+      "description": "Mini-window listing the items the server loots for you with carried counts.",
+      "requires": [
+        "game_autoloot"
+      ]
+    },
+    {
+      "name": "game_player_info",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Player info",
+      "description": "Other players shown as [RP 250] Name (vocation and level from an automatic look).",
+      "extraFiles": [
+        "layouts/retro/images/topbuttons/playerinfo.png",
+        "data/images/topbuttons/playerinfo.png"
+      ]
+    }
+  ]
+}

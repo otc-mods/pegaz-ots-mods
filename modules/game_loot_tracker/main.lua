@@ -1,0 +1,266 @@
+-- Autoloot tracker: a Stats-like mini-window listing the items the server currently loots (from the autoloot
+-- module's last "!autoloot" reply, else the selected backpack) with sprite, name and how many you carry.
+-- Count = equipment + open containers, replaced by the server's "Using one of N ..." figure when one arrives.
+-- Clicking a row sends a count probe (uses the item once - harmless for loot, do not use on potions).
+
+REFRESH_MS = 2000
+MIN_CONTENT = 40
+MAX_CONTENT = 700
+
+local window, contents, button
+local rows = {}          -- id -> row widget
+local serverCounts = {}  -- id -> n (learned this session)
+local pendingProbe       -- { id=, due= }
+local refreshEvent
+local lastKey = ""
+SORT_MODES = { "list", "name", "count" }
+SORT_LABELS = { list = "server order", name = "name", count = "count, highest first" }
+local sortMode = "list"   -- g_settings 'lootTrackerSort'
+
+local applySort -- defined below, used by updateCounts
+
+local function autoloot() return modules.game_autoloot end
+
+local function currentItems()
+  local al = autoloot()
+  if not al then return {}, "no autoloot module" end
+  local server = al.getServerItems and al.getServerItems() or {}
+  if #server > 0 then
+    local ids = {}
+    for _, e in ipairs(server) do if e.id then table.insert(ids, e.id) end end
+    return ids, "on server"
+  end
+  local items, name = al.getActiveItems()
+  return items or {}, name or "backpack"
+end
+
+local function nameOf(id)
+  local al = autoloot()
+  return (al and al.itemName and al.itemName(id)) or nil
+end
+
+local function clientCount(id)
+  local n = 0
+  local me = g_game.getLocalPlayer()
+  if not me then return 0 end
+  for slot = 1, 10 do -- head .. ammo
+    local it = me:getInventoryItem(slot)
+    if it and it:getId() == id then n = n + it:getCount() end
+  end
+  for _, c in pairs(g_game.getContainers()) do
+    for _, it in ipairs(c:getItems()) do
+      if it:getId() == id then n = n + it:getCount() end
+    end
+  end
+  return n
+end
+
+-- resizable freely: small enough to scroll, large enough to leave empty space below the list
+local function fitHeight()
+  window:setContentMinimumHeight(MIN_CONTENT)
+  window:setContentMaximumHeight(MAX_CONTENT)
+  if window:getHeight() < window:getMinimumHeight() then window:setHeight(window:getMinimumHeight()) end
+end
+
+local function probe(id)
+  if not g_game.isOnline() then return end
+  pendingProbe = { id = id, due = g_clock.millis() + 1500 }
+  local row = rows[id]
+  if row then row.count:setText("..."); row.count:setColor('#ffdd55') end -- asking the server
+  g_game.useInventoryItem(id)
+end
+
+-- cut a name that does not fit its label, with "..." (labels do not do this on their own)
+local function fitName(row)
+  local full = row.fullName or ""
+  local width = row.name:getWidth()
+  if width <= 0 then return end
+  row.name:setText(full)
+  if row.name:getTextSize().width <= width then return end
+  local n = #full
+  while n > 1 do
+    n = n - 1
+    row.name:setText(full:sub(1, n) .. "...")
+    if row.name:getTextSize().width <= width then return end
+  end
+end
+
+local function updateCounts()
+  -- a probe that got no answer means the item is not in your inventory at all
+  if pendingProbe and pendingProbe.due <= g_clock.millis() then
+    serverCounts[pendingProbe.id] = 0
+    pendingProbe = nil
+  end
+  for id, row in pairs(rows) do
+    if id == "order" then goto continue end
+    if pendingProbe and pendingProbe.id == id then goto continue end -- keep the "..." until the answer or timeout
+    if row.name:getText() == row.fullName or row.name:getText():sub(-3) == "..." then fitName(row) end
+    local client = clientCount(id)
+    local server = serverCounts[id]
+    if server and client > server then server = client; serverCounts[id] = client end -- the client never overcounts
+    -- "?" = nothing confirmed yet and the client sees none (closed backpacks); click the row to ask the server
+    local text = server and tostring(server) or (client > 0 and tostring(client) or "?")
+    row.count:setText(text)
+    row.count:setColor(server and '#ffffff' or '#c8c8c8')
+    row:setTooltip((nameOf(id) or ("item " .. id)) .. "\nclient sees: " .. client .. (server and ("\nserver said: " .. server) or "") .. "\nclick: recount (uses the item once)")
+    ::continue::
+  end
+  if sortMode == "count" then applySort() end
+end
+
+local function shownCount(id)
+  local server = serverCounts[id]
+  if server then return server end
+  return clientCount(id)
+end
+
+applySort = function()
+  local ordered = {}
+  for id, row in pairs(rows) do if id ~= "order" then table.insert(ordered, id) end end
+  if sortMode == "name" then
+    table.sort(ordered, function(a, b) return (nameOf(a) or tostring(a)):lower() < (nameOf(b) or tostring(b)):lower() end)
+  elseif sortMode == "count" then
+    table.sort(ordered, function(a, b)
+      local ca, cb = shownCount(a), shownCount(b)
+      if ca ~= cb then return ca > cb end
+      return (nameOf(a) or tostring(a)):lower() < (nameOf(b) or tostring(b)):lower()
+    end)
+  else
+    local pos = {}
+    for i, id in ipairs(rows.order or {}) do pos[id] = i end
+    table.sort(ordered, function(a, b) return (pos[a] or 0) < (pos[b] or 0) end)
+  end
+  for i, id in ipairs(ordered) do contents:moveChildToIndex(rows[id], i) end
+end
+
+local function setSort(mode)
+  sortMode = mode
+  g_settings.set('lootTrackerSort', sortMode)
+  applySort()
+end
+
+-- title-bar arrow: popup with the sort choices (filters go here later)
+function showMenu()
+  local menu = g_ui.createWidget('PopupMenu')
+  for _, m in ipairs(SORT_MODES) do
+    menu:addOption((m == sortMode and "* " or "  ") .. "Sort by " .. SORT_LABELS[m], function() setSort(m) end)
+  end
+  local b = window:getChildById('menuButton')
+  menu:display({ x = b:getX(), y = b:getY() + b:getHeight() })
+end
+
+local function rebuild()
+  if not window then return end
+  local ids, source = currentItems()
+  local key = source .. ":" .. table.concat(ids, ",")
+  if key ~= lastKey then
+    lastKey = key
+    contents:destroyChildren()
+    rows = {}
+    rows.order = ids
+    if #ids == 0 then
+      local l = g_ui.createWidget('Label', contents)
+      l:setText("nothing on the autoloot list (" .. source .. ")")
+      l:setTextAlign(AlignCenter)
+      l:setHeight(30)
+    end
+    for _, id in ipairs(ids) do
+      local row = g_ui.createWidget('LootTrackerRow', contents)
+      row.item:setItemId(id)
+      row.fullName = nameOf(id) or "(no name)"
+      row.name:setText(row.fullName)
+      row.itemId:setText("id " .. id)
+      row.onMouseRelease = function(widget, mousePos, mouseButton)
+        if mouseButton == MouseLeftButton or mouseButton == MouseRightButton then probe(id) return true end
+        return false
+      end
+      rows[id] = row
+    end
+    applySort()
+    fitHeight()
+  end
+  updateCounts()
+end
+
+-- server "Using one of 12 gold coins..." / "Using the last gold coin..." -----------------------
+local function idFromName(name)
+  local al = autoloot()
+  if not al or not al.AutolootNames then return nil end
+  local low = name:lower()
+  local cands = { low, (low:gsub("s$", "")), (low:gsub("es$", "")), (low:gsub("ies$", "y")) }
+  for id in pairs(rows) do
+    local n = id ~= "order" and nameOf(id) or nil
+    if n then
+      local nl = n:lower()
+      for _, c in ipairs(cands) do if c == nl then return id end end
+    end
+  end
+  return nil
+end
+
+-- does the server's (plural) name belong to this item? nil when the item has no known name
+local function nameBelongs(reported, id)
+  local n = nameOf(id)
+  if not n then return nil end
+  local r, k = reported:lower(), n:lower()
+  return r == k or r == k .. "s" or r == k .. "es" or r:gsub("s$", "") == k or r:gsub("es$", "") == k or r:gsub("ies$", "y") == k
+end
+
+local function onTextMessage(mode, text)
+  if type(text) ~= 'string' then return end
+  local count, name = text:match("^Using one of (%d+) (.+)%.%.%.$")
+  if not count then
+    name = text:match("^Using the last (.+)%.%.%.$")
+    if name then count = 1 end
+  end
+  if not name then return end
+  count = tonumber(count)
+  local id = idFromName(name)
+  if pendingProbe and pendingProbe.due > g_clock.millis() then
+    local belongs = nameBelongs(name, pendingProbe.id)
+    -- the probe's answer must name the probed item; an item without any known name accepts an unmatched line
+    if belongs == true or (belongs == nil and id == nil) then
+      serverCounts[pendingProbe.id] = count          -- probe answer: nothing consumed
+      pendingProbe = nil
+      updateCounts()
+      return
+    end
+  end
+  if id then serverCounts[id] = math.max(0, count - 1) end -- somebody's real use: one consumed
+  updateCounts()
+end
+
+local function tick()
+  if g_game.isOnline() then rebuild() end
+  refreshEvent = scheduleEvent(tick, REFRESH_MS)
+end
+
+function toggle()
+  if window:isVisible() then window:close() else window:open() end
+end
+
+function onMiniWindowClose()
+  if button then button:setOn(false) end
+end
+
+function init()
+  if g_settings.exists('lootTrackerSort') then sortMode = g_settings.getString('lootTrackerSort') end
+  connect(g_game, { onTextMessage = onTextMessage, onGameEnd = function() serverCounts = {} end })
+  local root = modules.game_interface.getRootPanel()
+  local parent = root:recursiveGetChildById('leftPanel2') or modules.game_interface.getLeftPanel()
+  window = g_ui.loadUI('tracker', parent)
+  contents = window:getChildById('contentsPanel')
+  button = modules.client_topmenu.addRightGameToggleButton('lootTrackerButton', tr('Autoloot tracker'), '/images/topbuttons/motd', toggle, false, 1004)
+  window.onOpen = function() if button then button:setOn(true) end end
+  window:setup()
+  if button then button:setOn(window:isVisible()) end
+  lastKey = ""
+  tick()
+end
+
+function terminate()
+  disconnect(g_game, { onTextMessage = onTextMessage })
+  removeEvent(refreshEvent)
+  if button then button:destroy() button = nil end
+  if window then window:destroy() window = nil end
+end

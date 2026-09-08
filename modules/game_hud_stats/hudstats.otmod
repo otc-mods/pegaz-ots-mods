@@ -1,0 +1,11 @@
+Module
+  name: game_hud_stats
+  description: Stats window - exp/h, raw exp/h, dps, hps, mps, damage received, kills, with graphs
+  author: PegazOTS
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu ]
+  scripts: [ hudstats ]
+  @onLoad: init()
+  @onUnload: terminate()

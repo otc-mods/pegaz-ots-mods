@@ -1,0 +1,12 @@
+Module
+  name: game_player_info
+  description: Player info overlay - other players shown as [RP 250] Name (vocation + level from auto-look, levels refreshed from chat)
+  author: kk
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu, game_console, game_textmessage, game_minimap, game_battle ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

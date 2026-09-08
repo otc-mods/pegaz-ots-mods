@@ -1,0 +1,220 @@
+AutolootItem < Item
+  virtual: true
+  &selectable: true
+
+AutolootSlot < Item
+  virtual: true
+  size: 34 34
+
+AutolootMiniSlot < Item
+  virtual: true
+  size: 22 22
+  padding: 0
+
+AutolootGrid < ScrollablePanel
+  layout:
+    type: grid
+    cell-size: 34 34
+    flow: true
+
+AutolootBackpack < Panel
+  size: 122 112
+  border-width: 1
+  border-color: #555555
+  background-color: #00000055
+
+  $on:
+    border-color: #ffdd55
+    background-color: #ffdd5522
+
+  Label
+    id: name
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 14
+    text-align: center
+    text-auto-resize: false
+
+  Panel
+    id: slots
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 4
+    size: 110 66
+    layout:
+      type: grid
+      cell-size: 22 22
+      flow: true
+
+  Label
+    id: count
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 12
+    text-align: center
+    font: verdana-9px
+    color: #aaaaaa
+
+AutolootServerBag < AutolootBackpack
+  border-color: #6688cc
+  background-color: #223355aa
+
+  $on:
+    border-color: #6688cc
+    background-color: #223355aa
+
+MainWindow
+  id: autolootWindow
+  !text: tr('Autoloot')
+  size: 850 640
+  @onEscape: modules.game_autoloot.hide()
+
+  Label
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: left
+    !text: tr('Items (type to filter by name or id). Left click: put into the selected backpack. Right click: set name.')
+    text-wrap: true
+    height: 28
+
+  TextEdit
+    id: search
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+
+  AutolootGrid
+    id: results
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: resultsScroll.left
+    margin-top: 5
+    height: 272
+    vertical-scrollbar: resultsScroll
+
+  VerticalScrollBar
+    id: resultsScroll
+    anchors.top: search.bottom
+    anchors.right: parent.right
+    margin-top: 5
+    height: 272
+    step: 34
+    pixels-scroll: true
+
+  Label
+    id: resultsInfo
+    anchors.top: results.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    text-align: center
+    color: #aaaaaa
+
+  HorizontalSeparator
+    id: sep1
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+
+  Label
+    id: bagsLabel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 6
+    text-align: left
+    !text: tr('Backpacks: click a bag to select it, click an item in a bag to take it out. Grey slots are not unlocked on the server.')
+    text-wrap: true
+    height: 28
+
+  Button
+    id: prevBag
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 4
+    size: 22 112
+    text: <
+
+  Button
+    id: nextBag
+    anchors.top: prev.top
+    anchors.right: parent.right
+    size: 22 112
+    text: >
+
+  Panel
+    id: carousel
+    anchors.top: prevBag.top
+    anchors.left: prevBag.right
+    anchors.right: nextBag.left
+    margin-left: 4
+    margin-right: 4
+    height: 112
+    layout:
+      type: horizontalBox
+      spacing: 4
+
+  Button
+    id: newBag
+    anchors.top: carousel.bottom
+    anchors.left: parent.left
+    margin-top: 6
+    size: 80 22
+    !text: tr('New')
+
+  Button
+    id: renameBag
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 6
+    size: 80 22
+    !text: tr('Rename')
+
+  Button
+    id: deleteBag
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 6
+    size: 80 22
+    !text: tr('Delete')
+
+  Button
+    id: clearBag
+    anchors.top: prev.top
+    anchors.right: parent.right
+    size: 80 22
+    !text: tr('Clear')
+
+  Button
+    id: closeButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 24
+    !text: tr('Close')
+    @onClick: modules.game_autoloot.hide()
+
+  Button
+    id: apply
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 8
+    size: 110 24
+    !text: tr('Apply')
+
+  Label
+    id: status
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    margin-right: 8
+    text-align: left
+    text-wrap: true
+    height: 24

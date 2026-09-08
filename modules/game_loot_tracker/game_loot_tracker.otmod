@@ -1,0 +1,12 @@
+Module
+  name: game_loot_tracker
+  description: Autoloot tracker - mini-window listing the items the server loots for you with sprite, name and carried count
+  author: kk
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu, game_console, game_textmessage, game_minimap, game_battle ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

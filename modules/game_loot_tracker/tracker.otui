@@ -1,0 +1,76 @@
+LootTrackerRow < Panel
+  height: 34
+  margin-top: 2
+
+  Item
+    id: item
+    anchors.top: parent.top
+    anchors.left: parent.left
+    virtual: true
+    phantom: true
+
+  Label
+    id: count
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    width: 34
+    text-align: right
+    color: #ffffff
+    phantom: true
+
+  Label
+    id: name
+    anchors.left: item.right
+    anchors.right: count.left
+    anchors.top: parent.top
+    margin-left: 6
+    margin-right: 4
+    margin-top: 2
+    height: 16
+    text-align: left
+    phantom: true
+
+  Label
+    id: itemId
+    anchors.left: item.right
+    anchors.right: count.left
+    anchors.top: prev.bottom
+    margin-left: 6
+    margin-right: 4
+    height: 12
+    font: verdana-9px
+    color: #a0a0a0
+    text-align: left
+    phantom: true
+
+MiniWindow
+  id: lootTrackerWindow
+  !text: tr('Autoloot tracker')
+  height: 200
+  icon: /images/topbuttons/motd
+  @onClose: modules.game_loot_tracker.onMiniWindowClose()
+  &save: true
+  &autoOpen: 6
+
+  UIButton
+    id: menuButton
+    anchors.top: lockButton.top
+    anchors.right: lockButton.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 56 0 14 14
+    @onClick: modules.game_loot_tracker.showMenu()
+    !tooltip: tr('Sort and filters')
+
+    $hover:
+      image-clip: 56 14 14 14
+
+    $pressed:
+      image-clip: 56 28 14 14
+
+  MiniWindowContents
+    padding-left: 4
+    padding-right: 4
+    padding-top: 2
+    layout: verticalBox

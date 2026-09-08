@@ -1,0 +1,12 @@
+Module
+  name: game_autoloot
+  description: Autoloot list editor for the server's !autoloot command (named loot lists, item search, one-click apply)
+  author: kk
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu ]
+  scripts: [ items_860, autoloot ]
+  @onLoad: init()
+  @onUnload: terminate()

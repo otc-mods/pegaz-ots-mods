@@ -4,7 +4,7 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.3"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.0.4"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua" }
@@ -261,6 +261,12 @@ end
 
 function toggle()
   if window:isVisible() then hide() else show() end
+end
+
+-- what Ctrl+Shift+R does; deferred so this window (which the reload destroys) leaves the click handler first
+function reloadAll()
+  setStatus("reloading all modules...", '#ffdd55')
+  scheduleEvent(function() g_modules.reloadModules() end, 50)
 end
 
 function init()

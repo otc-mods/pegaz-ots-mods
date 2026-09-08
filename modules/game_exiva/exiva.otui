@@ -101,9 +101,8 @@ MiniWindow
 
     Label
       id: hint
-      height: 40
-      font: verdana-9px
-      color: #a0a0a0
+      height: 64
+      color: #c0c0c0
       text-wrap: true
       text-align: left
       !text: tr('Say exiva "Name" - the reply is drawn on the minimap. Move sideways and exiva again to narrow it down.')

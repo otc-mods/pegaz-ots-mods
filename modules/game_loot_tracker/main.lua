@@ -20,9 +20,7 @@ local lastKey = ""
 SORT_MODES = { "list", "name", "count" }
 SORT_LABELS = { list = "server order", name = "name", count = "count, highest first" }
 local sortMode = "list"   -- g_settings 'lootTrackerSort'
--- automatic recounts use every listed item once; a scripted or edible loot item would be used up, so off by default
-local autoRecount = false -- g_settings 'lootTrackerAutoRecount'
-AUTO_RECOUNT_MS = 30000   -- while on: recount everything this often during the hunt, plus after trades and depot visits
+AUTO_RECOUNT_MS = 30000   -- recount everything this often while the window is open, plus after trades and depot visits
 local lastAutoRecount = 0
 
 local applySort -- defined below, used by updateCounts
@@ -157,29 +155,12 @@ local function setSort(mode)
   applySort()
 end
 
-function toggleAutoRecount()
-  if autoRecount then
-    autoRecount = false
-    g_settings.set('lootTrackerAutoRecount', false)
-    return
-  end
-  local box
-  box = displayGeneralBox(tr('Auto recount'),
-    tr('Every ' .. math.floor(AUTO_RECOUNT_MS / 1000) .. ' seconds (and after trades and depot visits) the tracker would use each listed item once to read its count.\n' ..
-       'Gear and gold are fine, but food, potions and scripted items (scrolls, removers) get used up.\n\nEnable anyway?'),
-    { { text = tr('Enable'), callback = function() box:destroy() autoRecount = true g_settings.set('lootTrackerAutoRecount', true) end },
-      { text = tr('Cancel'), callback = function() box:destroy() end },
-      anchor = AnchorHorizontalCenter }, nil, function() box:destroy() end)
-end
-
 -- title-bar arrow: popup with the sort choices (filters go here later)
 function showMenu()
   local menu = g_ui.createWidget('PopupMenu')
   for _, m in ipairs(SORT_MODES) do
     menu:addOption((m == sortMode and "* " or "  ") .. "Sort by " .. SORT_LABELS[m], function() setSort(m) end)
   end
-  menu:addSeparator()
-  menu:addOption((autoRecount and "[x] " or "[ ] ") .. "Auto recount every " .. math.floor(AUTO_RECOUNT_MS / 1000) .. "s (uses items)", toggleAutoRecount)
   local b = window:getChildById('menuButton')
   menu:display({ x = b:getX(), y = b:getY() + b:getHeight() })
 end
@@ -195,9 +176,10 @@ local function rebuild()
     rows.order = ids
     if #ids == 0 then
       local l = g_ui.createWidget('Label', contents)
-      l:setText("nothing on the autoloot list (" .. source .. ")")
+      l:setText("Autoloot list is empty.\nAdd items in the Autoloot window.")
+      l:setTextWrap(true)
       l:setTextAlign(AlignCenter)
-      l:setHeight(30)
+      l:setHeight(44)
     end
     for _, id in ipairs(ids) do
       local row = g_ui.createWidget('LootTrackerRow', contents)
@@ -276,13 +258,11 @@ local function onPlayerGoods(money, items)
 end
 
 local function onCloseNpcTrade()
-  if not autoRecount then return end
   scheduleEvent(function() if window and window:isVisible() then refreshAll() end end, 1500)
 end
 
 -- depot closed: items may have moved out of sight -> recount
 local function onContainerClose(container)
-  if not autoRecount then return end
   local name = container and container:getName() or ""
   if name:lower():find("depot") or name:lower():find("locker") then
     scheduleEvent(function() if window and window:isVisible() then refreshAll() end end, 1000)
@@ -312,8 +292,7 @@ end
 local function tick()
   if g_game.isOnline() then
     rebuild()
-    if autoRecount and window and window:isVisible() and #refreshQueue == 0
-       and g_clock.millis() - lastAutoRecount >= AUTO_RECOUNT_MS then
+    if window and window:isVisible() and #refreshQueue == 0 and g_clock.millis() - lastAutoRecount >= AUTO_RECOUNT_MS then
       lastAutoRecount = g_clock.millis()
       refreshAll()
     end
@@ -331,7 +310,6 @@ end
 
 function init()
   if g_settings.exists('lootTrackerSort') then sortMode = g_settings.getString('lootTrackerSort') end
-  if g_settings.exists('lootTrackerAutoRecount') then autoRecount = g_settings.getBoolean('lootTrackerAutoRecount') end
   connect(g_game, { onTextMessage = onTextMessage, onPlayerGoods = onPlayerGoods, onCloseNpcTrade = onCloseNpcTrade,
                     onGameEnd = function() known = {} end })
   connect(Container, { onClose = onContainerClose })

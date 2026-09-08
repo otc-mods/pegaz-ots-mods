@@ -20,7 +20,7 @@
     {
       "name": "game_loot_tracker",
       "type": "module",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "title": "Autoloot tracker",
       "description": "Mini-window listing the items the server loots for you with carried counts.",
       "requires": [
@@ -43,7 +43,7 @@
     {
       "name": "game_exiva",
       "type": "module",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "title": "Exiva",
       "description": "Exiva replies drawn on the minimap: ring sectors, several casts intersected, masked to explored tiles.",
       "screenshot": "screenshots/game_exiva.png"

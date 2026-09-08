@@ -80,7 +80,7 @@
   {
    "name": "game_loot_tracker",
    "type": "module",
-   "version": "1.0.3",
+   "version": "1.0.4",
    "title": "Autoloot tracker",
    "description": "Mini-window listing the items the server loots for you with carried counts.",
    "requires": [
@@ -100,8 +100,8 @@
     },
     {
      "path": "modules/game_loot_tracker/main.lua",
-     "sha1": "eff8b113ecb4d9608b50985d1491e108c02f4ae5",
-     "size": 14003
+     "sha1": "31e4edca10fc0a92b07c17db0e0563bd82861420",
+     "size": 12675
     },
     {
      "path": "modules/game_loot_tracker/refresh.png",
@@ -158,7 +158,7 @@
   {
    "name": "game_exiva",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "title": "Exiva",
    "description": "Exiva replies drawn on the minimap: ring sectors, several casts intersected, masked to explored tiles.",
    "screenshot": "screenshots/game_exiva.png",
@@ -170,8 +170,8 @@
    "files": [
     {
      "path": "modules/game_exiva/exiva.otui",
-     "sha1": "f65d2917368d44984a4141c66c156d8d585d7e16",
-     "size": 2214
+     "sha1": "22a3e3b32a031ee6899b92642dbef15de2130e11",
+     "size": 2190
     },
     {
      "path": "modules/game_exiva/game_exiva.otmod",

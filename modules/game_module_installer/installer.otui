@@ -151,7 +151,8 @@ MainWindow
     margin-bottom: 14
     size: 120 24
     !text: tr('Reload modules')
-    !tooltip: tr('Same as Ctrl+Shift+R: reloads every loaded module')
+    color: #ff6666
+    !tooltip: tr('Same as Ctrl+Shift+R: reloads every loaded module. Freezes the client for a few seconds - dangerous while the bot hunts.')
     @onClick: modules.game_module_installer.reloadAll()
 
   Button

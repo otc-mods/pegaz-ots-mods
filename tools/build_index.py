@@ -23,6 +23,9 @@ for e in cat["entries"]:
             import struct
             w, h = struct.unpack('>II', head[16:24])
             entry["screenshotSize"] = [w, h]
+        # the client caches images per URL for the whole session (and Pages caches too): the installer
+        # appends this hash to the URL so a changed screenshot is a new URL
+        entry["screenshotSha1"] = hashlib.sha1(open(e["screenshot"], 'rb').read()).hexdigest()
     entry["files"] = []
     for p in sorted(set(files)):
         data = open(p, 'rb').read()

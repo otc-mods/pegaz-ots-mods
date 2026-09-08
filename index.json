@@ -13,6 +13,7 @@
     187,
     215
    ],
+   "screenshotSha1": "424b2d274c40fd14c6b3d9af07e1fa6ce5a870c2",
    "files": [
     {
      "path": "modules/game_hud_stats/README.md",
@@ -52,6 +53,7 @@
     850,
     640
    ],
+   "screenshotSha1": "cea86ddcac5faf77adef123288a3f0b98aaae406",
    "files": [
     {
      "path": "modules/game_autoloot/autoloot.lua",
@@ -89,6 +91,7 @@
     195,
     171
    ],
+   "screenshotSha1": "dc5ad87adcc2a7132876e5233f2b19dee1d938a7",
    "files": [
     {
      "path": "modules/game_loot_tracker/game_loot_tracker.otmod",
@@ -123,6 +126,7 @@
     188,
     170
    ],
+   "screenshotSha1": "48209d6ff2829d1150cb10dbdac808c9b1c6d175",
    "files": [
     {
      "path": "data/images/topbuttons/playerinfo.png",
@@ -162,6 +166,7 @@
     527,
     588
    ],
+   "screenshotSha1": "053f365392bb310b942b6148ba5ff5e563541b73",
    "files": [
     {
      "path": "modules/game_exiva/exiva.otui",
@@ -193,7 +198,7 @@
   {
    "name": "game_module_installer",
    "type": "module",
-   "version": "1.0.7",
+   "version": "1.0.8",
    "title": "Module installer",
    "description": "This installer: lists the published modules, installs, updates and removes them without a client restart.",
    "screenshot": "screenshots/game_module_installer.png",
@@ -201,6 +206,7 @@
     800,
     537
    ],
+   "screenshotSha1": "2f28d1d9799de607be6ead88454f5da9950f1975",
    "files": [
     {
      "path": "modules/game_module_installer/game_module_installer.otmod",
@@ -219,8 +225,8 @@
     },
     {
      "path": "modules/game_module_installer/main.lua",
-     "sha1": "d57e49c9b7796961195a48d2dcf7cef227cd20e1",
-     "size": 12856
+     "sha1": "cab068b6da9b65411da551012788de7d5e355453",
+     "size": 13171
     }
    ]
   }

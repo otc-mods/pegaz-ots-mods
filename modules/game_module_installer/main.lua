@@ -4,7 +4,7 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.7"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.0.8"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua", "modules/game_module_installer/grip.png" }
@@ -191,7 +191,10 @@ refreshRows = function()
     row.buttons.install.onClick = function() install(entry) end
     row.buttons.remove.onClick = function() remove(entry) end
     if type(entry.screenshot) == 'string' and entry.screenshot:len() > 0 then
+      -- HTTP.downloadImage caches by URL for the whole session and GitHub Pages caches as well: a changed
+      -- screenshot must be a new URL, else the old picture gets fitted into the new proportions
       local url = index.base .. entry.screenshot
+      if type(entry.screenshotSha1) == 'string' then url = url .. "?v=" .. entry.screenshotSha1:sub(1, 12) end
       row.shotBox:setTooltip("click to enlarge")
       local iw, ih = 236, 132
       if type(entry.screenshotSize) == 'table' and tonumber(entry.screenshotSize[1]) and tonumber(entry.screenshotSize[2]) then

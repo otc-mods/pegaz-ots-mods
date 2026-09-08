@@ -4,7 +4,7 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.4"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.0.5"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua" }
@@ -269,6 +269,31 @@ function reloadAll()
   scheduleEvent(function() g_modules.reloadModules() end, 50)
 end
 
+MIN_W, MIN_H, MAX_W, MAX_H = 460, 320, 1600, 1400
+
+-- bottom-right grip: drag resizes both ways. The first drag breaks the centre anchors so the top-left corner
+-- stays put and the grip follows the mouse (a centred window would grow half as fast on each side).
+function setupCornerGrip()
+  local grip = window:getChildById('cornerGrip')
+  if not grip then return end
+  grip.onMousePress = function(w, pos, mouseButton)
+    if mouseButton ~= MouseLeftButton then return false end
+    local r = window:getRect()
+    window:breakAnchors()
+    window:setRect(r)
+    w.drag = { x = pos.x, y = pos.y, w = r.width, h = r.height }
+    return true
+  end
+  grip.onMouseMove = function(w, pos)
+    local d = w.drag
+    if not d then return false end
+    window:setWidth(math.min(math.max(d.w + pos.x - d.x, MIN_W), MAX_W))
+    window:setHeight(math.min(math.max(d.h + pos.y - d.y, MIN_H), MAX_H))
+    return true
+  end
+  grip.onMouseRelease = function(w) w.drag = nil return false end
+end
+
 function init()
   load()
   window = g_ui.displayUI('installer')
@@ -280,6 +305,7 @@ function init()
   button:setOn(false)
   window.refresh.onClick = fetchIndex
   window.onClose = hide
+  setupCornerGrip()
 end
 
 function terminate()

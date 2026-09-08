@@ -183,3 +183,18 @@ MainWindow
     width: 16
     minimum: 460
     maximum: 1600
+
+  UIWidget
+    id: cornerGrip
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-right: -15
+    margin-bottom: -15
+    size: 14 14
+    background: #ffffff33
+    border-width: 1
+    border-color: #ffffff55
+    !tooltip: tr('Drag to resize')
+
+    $hover:
+      background: #ffffff99

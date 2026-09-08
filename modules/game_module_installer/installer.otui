@@ -151,3 +151,19 @@ MainWindow
     size: 80 24
     !text: tr('Close')
     @onClick: modules.game_module_installer.hide()
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    minimum: 320
+    maximum: 1400
+
+  ResizeBorder
+    id: rightResizeBorder
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    minimum: 300
+    maximum: 1600

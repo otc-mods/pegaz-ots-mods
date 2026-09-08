@@ -4,7 +4,7 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.2"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.0.3"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua" }
@@ -253,6 +253,8 @@ function show()
 end
 
 function hide()
+  g_settings.set('moduleInstallerW', window:getWidth())
+  g_settings.set('moduleInstallerH', window:getHeight())
   window:hide()
   if button then button:setOn(false) end
 end
@@ -265,6 +267,9 @@ function init()
   load()
   window = g_ui.displayUI('installer')
   window:hide()
+  if g_settings.exists('moduleInstallerW') and g_settings.exists('moduleInstallerH') then
+    window:resize(g_settings.getNumber('moduleInstallerW'), g_settings.getNumber('moduleInstallerH'))
+  end
   button = modules.client_topmenu.addRightGameToggleButton('moduleInstallerButton', tr('Modules'), '/images/topbuttons/modulemanager', toggle, false, 1005)
   button:setOn(false)
   window.refresh.onClick = fetchIndex

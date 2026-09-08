@@ -49,8 +49,8 @@
    "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add.",
    "screenshot": "screenshots/game_autoloot.png",
    "screenshotSize": [
-    853,
-    642
+    850,
+    640
    ],
    "files": [
     {
@@ -159,8 +159,8 @@
    "description": "This installer: lists the published modules, installs, updates and removes them without a client restart.",
    "screenshot": "screenshots/game_module_installer.png",
    "screenshotSize": [
-    563,
-    644
+    560,
+    638
    ],
    "files": [
     {

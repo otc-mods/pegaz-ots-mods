@@ -8,6 +8,7 @@
    "version": "1.0.0",
    "title": "Stats",
    "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window.",
+   "screenshot": "screenshots/game_hud_stats.png",
    "files": [
     {
      "path": "modules/game_hud_stats/README.md",
@@ -42,6 +43,7 @@
    "version": "1.0.0",
    "title": "Autoloot",
    "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add.",
+   "screenshot": "screenshots/game_autoloot.png",
    "files": [
     {
      "path": "modules/game_autoloot/autoloot.lua",
@@ -74,6 +76,7 @@
    "requires": [
     "game_autoloot"
    ],
+   "screenshot": "screenshots/game_loot_tracker.png",
    "files": [
     {
      "path": "modules/game_loot_tracker/game_loot_tracker.otmod",
@@ -103,6 +106,7 @@
    "version": "1.0.0",
    "title": "Player info",
    "description": "Other players shown as [RP 250] Name (vocation and level from an automatic look).",
+   "screenshot": "screenshots/game_player_info.png",
    "files": [
     {
      "path": "data/images/topbuttons/playerinfo.png",

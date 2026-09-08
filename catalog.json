@@ -6,14 +6,16 @@
       "type": "module",
       "version": "1.0.0",
       "title": "Stats",
-      "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window."
+      "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window.",
+      "screenshot": "screenshots/game_hud_stats.png"
     },
     {
       "name": "game_autoloot",
       "type": "module",
       "version": "1.0.0",
       "title": "Autoloot",
-      "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add."
+      "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add.",
+      "screenshot": "screenshots/game_autoloot.png"
     },
     {
       "name": "game_loot_tracker",
@@ -23,7 +25,8 @@
       "description": "Mini-window listing the items the server loots for you with carried counts.",
       "requires": [
         "game_autoloot"
-      ]
+      ],
+      "screenshot": "screenshots/game_loot_tracker.png"
     },
     {
       "name": "game_player_info",
@@ -34,7 +37,8 @@
       "extraFiles": [
         "layouts/retro/images/topbuttons/playerinfo.png",
         "data/images/topbuttons/playerinfo.png"
-      ]
+      ],
+      "screenshot": "screenshots/game_player_info.png"
     },
     {
       "name": "game_module_installer",

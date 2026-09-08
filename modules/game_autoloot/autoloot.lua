@@ -388,7 +388,10 @@ local function onTextMessage(mode, text)
   end
   if g_clock.millis() > collectUntil then return end
   if text:lower():find("pusta") then return end
-  local body = text:gsub("^[^:]*:%s*", "")          -- drop a "Lista: " style prefix
+  -- only the list line itself: "Lista: demonic essence, golden armor." (anything else in the window is noise)
+  local body = text:match("^Lista:%s*(.+)$")
+  if not body then return end
+  collectUntil = 0
   for part in body:gmatch("[^,;\n]+") do
     local name = part:gsub("^%s+", ""):gsub("[%s%.]+$", "")
     if name:len() > 0 then

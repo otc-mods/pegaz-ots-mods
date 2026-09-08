@@ -55,8 +55,8 @@
    "files": [
     {
      "path": "modules/game_autoloot/autoloot.lua",
-     "sha1": "bb587096c6416ac7aa05b42ee073bad37c8e1711",
-     "size": 16912
+     "sha1": "deee2060573231a70e8c0ab1639da4269e9fdb3c",
+     "size": 17032
     },
     {
      "path": "modules/game_autoloot/autoloot.otmod",

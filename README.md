@@ -10,6 +10,7 @@ Client modules for the PegazOTS OTClientV8 client (protocol 8.6).
 | Autoloot | Named loot backpacks with item search; Apply sends `!autoloot clear` / `add` |
 | Autoloot tracker | Mini-window listing the items the server loots for you with carried counts |
 | Player info | Other players shown as `[RP 250] Name` (vocation and level from an automatic look) |
+| Exiva | Exiva replies drawn on the minimap: ring sectors, several casts intersected, masked to explored tiles |
 | Module installer | This installer: lists, installs, updates and removes the modules above without a restart |
 
 Install with the in-game module installer (fetches `index.json` from this repo's Pages site), or by hand:

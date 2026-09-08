@@ -1,0 +1,109 @@
+ExivaOverlay < UIWidget
+  phantom: true
+  focusable: false
+  image-smooth: false
+
+ExivaDot < UIWidget
+  phantom: true
+  focusable: false
+  size: 5 5
+  border: 1 #000000
+
+ExivaLabel < UILabel
+  phantom: true
+  focusable: false
+  font: verdana-11px-rounded
+  text-auto-resize: true
+  color: #ffffff
+
+ExivaRow < Panel
+  height: 30
+  margin-top: 2
+
+  UIWidget
+    id: swatch
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 10 10
+    border: 1 #000000
+    phantom: true
+
+  UIButton
+    id: removeButton
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 0 0 14 14
+    !tooltip: tr('Forget this player')
+
+    $hover:
+      image-clip: 0 14 14 14
+
+    $pressed:
+      image-clip: 0 28 14 14
+
+  Label
+    id: name
+    anchors.left: swatch.right
+    anchors.right: removeButton.left
+    anchors.top: parent.top
+    margin-left: 6
+    margin-right: 4
+    height: 15
+    text-align: left
+    phantom: true
+
+  Label
+    id: info
+    anchors.left: swatch.right
+    anchors.right: removeButton.left
+    anchors.top: prev.bottom
+    margin-left: 6
+    margin-right: 4
+    height: 12
+    font: verdana-9px
+    color: #a0a0a0
+    text-align: left
+    phantom: true
+
+MiniWindow
+  id: exivaWindow
+  !text: tr('Exiva')
+  height: 120
+  icon: /images/topbuttons/ciclopedia
+  @onClose: modules.game_exiva.onMiniWindowClose()
+  &save: true
+  &autoOpen: 7
+
+  UIButton
+    id: menuButton
+    anchors.top: lockButton.top
+    anchors.right: lockButton.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 56 0 14 14
+    @onClick: modules.game_exiva.showMenu()
+    !tooltip: tr('Options')
+
+    $hover:
+      image-clip: 56 14 14 14
+
+    $pressed:
+      image-clip: 56 28 14 14
+
+  MiniWindowContents
+    padding-left: 4
+    padding-right: 4
+    padding-top: 2
+    layout: verticalBox
+
+    Label
+      id: hint
+      height: 40
+      font: verdana-9px
+      color: #a0a0a0
+      text-wrap: true
+      text-align: left
+      !text: tr('Say exiva "Name" - the reply is drawn on the minimap. Move sideways and exiva again to narrow it down.')

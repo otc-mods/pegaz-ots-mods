@@ -1,0 +1,12 @@
+Module
+  name: game_exiva
+  description: Exiva map overlay - server replies drawn on the minimap as ring sectors, intersected and masked to explored tiles
+  author: kk
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu, game_console, game_textmessage, game_minimap, game_battle ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

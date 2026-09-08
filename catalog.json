@@ -41,6 +41,14 @@
       "screenshot": "screenshots/game_player_info.png"
     },
     {
+      "name": "game_exiva",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Exiva",
+      "description": "Exiva replies drawn on the minimap: ring sectors, several casts intersected, masked to explored tiles.",
+      "screenshot": "screenshots/game_exiva.png"
+    },
+    {
       "name": "game_module_installer",
       "type": "module",
       "version": "1.0.0",

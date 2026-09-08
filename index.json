@@ -152,6 +152,45 @@
    ]
   },
   {
+   "name": "game_exiva",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Exiva",
+   "description": "Exiva replies drawn on the minimap: ring sectors, several casts intersected, masked to explored tiles.",
+   "screenshot": "screenshots/game_exiva.png",
+   "screenshotSize": [
+    527,
+    588
+   ],
+   "files": [
+    {
+     "path": "modules/game_exiva/exiva.otui",
+     "sha1": "f65d2917368d44984a4141c66c156d8d585d7e16",
+     "size": 2214
+    },
+    {
+     "path": "modules/game_exiva/game_exiva.otmod",
+     "sha1": "20d8a6d0eccb5fd00203255117befaa519c70a11",
+     "size": 419
+    },
+    {
+     "path": "modules/game_exiva/geometry.lua",
+     "sha1": "cb3e3b7c67981d49e3412ecca4648502a941183b",
+     "size": 7526
+    },
+    {
+     "path": "modules/game_exiva/main.lua",
+     "sha1": "e60c660a2f0705110402894cbcb1c0aadc1ee590",
+     "size": 13535
+    },
+    {
+     "path": "modules/game_exiva/png.lua",
+     "sha1": "3bc1bb6e72d1073441ecf87dd68d1990b3d89c37",
+     "size": 2346
+    }
+   ]
+  },
+  {
    "name": "game_module_installer",
    "type": "module",
    "version": "1.0.0",

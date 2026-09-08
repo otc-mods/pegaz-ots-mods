@@ -47,7 +47,9 @@ local function ensureDirs(path)
   for seg in path:gmatch("[^/]+") do
     if seg:find("%.") and acc ~= "" and path:sub(-#seg) == seg then break end -- last segment = file
     acc = acc .. "/" .. seg
-    if not g_resources.directoryExists(acc) then g_resources.makeDir(acc) end
+    -- always create: directoryExists also sees the client's own data/ and layouts/ folders, which do not exist
+    -- in the write dir, and PhysFS refuses to write into a directory missing there
+    g_resources.makeDir(acc)
   end
 end
 

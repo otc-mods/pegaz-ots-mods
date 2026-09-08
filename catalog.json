@@ -51,7 +51,7 @@
     {
       "name": "game_module_installer",
       "type": "module",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "title": "Module installer",
       "description": "This installer: lists the published modules, installs, updates and removes them without a client restart.",
       "screenshot": "screenshots/game_module_installer.png"

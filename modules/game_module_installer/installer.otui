@@ -137,6 +137,14 @@ MainWindow
     !text: tr('Refresh list')
 
   Button
+    id: github
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 120 24
+    !text: tr('Open GitHub')
+    @onClick: modules.game_module_installer.openRepo()
+
+  Button
     id: closeButton
     anchors.bottom: parent.bottom
     anchors.right: parent.right

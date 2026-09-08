@@ -2,6 +2,7 @@
 -- client's data directory (merged into the resource tree) and hot-loads them. No restart needed.
 
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
+REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
 
 local window, button
@@ -219,6 +220,10 @@ function fetchIndex()
     refreshRows()
     setStatus(#index.entries .. " module(s) listed.")
   end)
+end
+
+function openRepo()
+  g_platform.openUrl(REPO_URL)
 end
 
 function show()

@@ -149,8 +149,8 @@
     },
     {
      "path": "modules/game_module_installer/installer.otui",
-     "sha1": "8b69f9119c9f8650508f7220910ccf03818878a7",
-     "size": 5074
+     "sha1": "5749e1a227cedf4c2201b3e52b26bbb26efa5794",
+     "size": 3301
     },
     {
      "path": "modules/game_module_installer/main.lua",

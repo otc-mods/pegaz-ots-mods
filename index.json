@@ -82,8 +82,8 @@
     },
     {
      "path": "modules/game_loot_tracker/main.lua",
-     "sha1": "6e121486ea5bdf77c8baebc2e625f7cac872e009",
-     "size": 10758
+     "sha1": "3f5a060cfd256eeb348c8de60156d24183dcadf6",
+     "size": 12468
     },
     {
      "path": "modules/game_loot_tracker/refresh.png",
@@ -145,13 +145,13 @@
     },
     {
      "path": "modules/game_module_installer/installer.otui",
-     "sha1": "998808e2871ce635cbf9909053a6416d38e8dd77",
-     "size": 2452
+     "sha1": "0957c340c56a9f7c34e80c8139776c497f3a491b",
+     "size": 3126
     },
     {
      "path": "modules/game_module_installer/main.lua",
-     "sha1": "ac2c0303faecd3469ae48fda153f2a78436ba028",
-     "size": 7815
+     "sha1": "39fc077c617482e64942b8ecdea7596b957be45c",
+     "size": 8687
     }
    ]
   }

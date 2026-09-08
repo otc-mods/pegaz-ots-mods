@@ -10,7 +10,10 @@ MAX_CONTENT = 700
 
 local window, contents, button
 local rows = {}          -- id -> row widget
-local serverCounts = {}  -- id -> n (learned this session)
+-- known[id] = { n = count the server confirmed, clientAt = what the client saw at that moment, t = when }
+-- shown value = n + (client now - clientAt): looting into / selling from an OPEN container moves the estimate,
+-- closed bags contribute nothing until the next confirmation (probe, use line, NPC trade list)
+local known = {}
 local pendingProbe       -- { id=, due= }
 local refreshEvent
 local lastKey = ""
@@ -63,6 +66,16 @@ local function fitHeight()
   if window:getHeight() < window:getMinimumHeight() then window:setHeight(window:getMinimumHeight()) end
 end
 
+local function confirm(id, n)
+  known[id] = { n = math.max(0, n), clientAt = clientCount(id), t = g_clock.millis() }
+end
+
+local function estimate(id)
+  local k = known[id]
+  if not k then return nil end
+  return math.max(0, k.n + (clientCount(id) - k.clientAt))
+end
+
 local function probe(id)
   if not g_game.isOnline() then return end
   pendingProbe = { id = id, due = g_clock.millis() + 1500 }
@@ -96,22 +109,23 @@ local function updateCounts()
     if pendingProbe and pendingProbe.id == id then goto continue end -- keep the "..." until the answer or timeout
     if row.name:getText() == row.fullName or row.name:getText():sub(-3) == "..." then fitName(row) end
     local client = clientCount(id)
-    local server = serverCounts[id]
-    if server and client > server then server = client; serverCounts[id] = client end -- the client never overcounts
+    local est = estimate(id)
     -- "?" = nothing confirmed yet and the client sees none (closed backpacks); click the row to ask the server
-    local text = server and tostring(server) or (client > 0 and tostring(client) or "?")
+    local text = est and tostring(est) or (client > 0 and tostring(client) or "?")
     row.count:setText(text)
-    row.count:setColor(server and '#ffffff' or '#c8c8c8')
-    row:setTooltip((nameOf(id) or ("item " .. id)) .. "\nclient sees: " .. client .. (server and ("\nserver said: " .. server) or "") .. "\nclick: recount (uses the item once)")
+    local k = known[id]
+    local fresh = k and (g_clock.millis() - k.t) < 10 * 60 * 1000
+    row.count:setColor(fresh and '#ffffff' or '#c8c8c8')
+    row:setTooltip((nameOf(id) or ("item " .. id)) .. "\nclient sees: " .. client ..
+      (k and ("\nserver confirmed: " .. k.n .. " (" .. math.floor((g_clock.millis() - k.t) / 60000) .. " min ago), since then " .. (client - k.clientAt >= 0 and "+" or "") .. (client - k.clientAt)) or "") ..
+      "\nclick: recount (uses the item once)")
     ::continue::
   end
   if sortMode == "count" then applySort() end
 end
 
 local function shownCount(id)
-  local server = serverCounts[id]
-  if server then return server end
-  return clientCount(id)
+  return estimate(id) or clientCount(id)
 end
 
 applySort = function()
@@ -222,14 +236,36 @@ local function onTextMessage(mode, text)
     local belongs = nameBelongs(name, pendingProbe.id)
     -- the probe's answer must name the probed item; an item without any known name accepts an unmatched line
     if belongs == true or (belongs == nil and id == nil) then
-      serverCounts[pendingProbe.id] = count          -- probe answer: nothing consumed
+      confirm(pendingProbe.id, count)                -- probe answer: nothing consumed
       pendingProbe = nil
       updateCounts()
       return
     end
   end
-  if id then serverCounts[id] = math.max(0, count - 1) end -- somebody's real use: one consumed
+  if id then confirm(id, count - 1) end             -- somebody's real use: one consumed
   updateCounts()
+end
+
+-- NPC trade: the server sends exact totals of everything the NPC buys -> confirm those; and after the trade
+-- window closes, recount the list (selling changed numbers we could not see)
+local function onPlayerGoods(money, items)
+  for _, it in pairs(items or {}) do
+    local id = it[1] and it[1]:getId()
+    if id and rows[id] then confirm(id, it[2] or 0) end
+  end
+  updateCounts()
+end
+
+local function onCloseNpcTrade()
+  scheduleEvent(function() if window and window:isVisible() then refreshAll() end end, 1500)
+end
+
+-- depot closed: items may have moved out of sight -> recount
+local function onContainerClose(container)
+  local name = container and container:getName() or ""
+  if name:lower():find("depot") or name:lower():find("locker") then
+    scheduleEvent(function() if window and window:isVisible() then refreshAll() end end, 1000)
+  end
 end
 
 -- refresh all: probe the rows one after another, 700 ms apart (each probe needs its own answer)
@@ -267,7 +303,9 @@ end
 
 function init()
   if g_settings.exists('lootTrackerSort') then sortMode = g_settings.getString('lootTrackerSort') end
-  connect(g_game, { onTextMessage = onTextMessage, onGameEnd = function() serverCounts = {} end })
+  connect(g_game, { onTextMessage = onTextMessage, onPlayerGoods = onPlayerGoods, onCloseNpcTrade = onCloseNpcTrade,
+                    onGameEnd = function() known = {} end })
+  connect(Container, { onClose = onContainerClose })
   local root = modules.game_interface.getRootPanel()
   local parent = root:recursiveGetChildById('leftPanel2') or modules.game_interface.getLeftPanel()
   window = g_ui.loadUI('tracker', parent)
@@ -281,7 +319,8 @@ function init()
 end
 
 function terminate()
-  disconnect(g_game, { onTextMessage = onTextMessage })
+  disconnect(g_game, { onTextMessage = onTextMessage, onPlayerGoods = onPlayerGoods, onCloseNpcTrade = onCloseNpcTrade })
+  disconnect(Container, { onClose = onContainerClose })
   removeEvent(refreshEvent)
   removeEvent(refreshEvent2)
   if button then button:destroy() button = nil end

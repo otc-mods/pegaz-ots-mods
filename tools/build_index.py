@@ -15,6 +15,7 @@ for e in cat["entries"]:
     files += e.get("extraFiles", [])
     entry = {k: e[k] for k in ("name", "type", "version", "title", "description") if k in e}
     if "requires" in e: entry["requires"] = e["requires"]
+    if e.get("screenshot") and os.path.exists(e["screenshot"]): entry["screenshot"] = e["screenshot"]
     entry["files"] = []
     for p in sorted(set(files)):
         data = open(p, 'rb').read()

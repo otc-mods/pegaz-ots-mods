@@ -1,3 +1,24 @@
+InstallerPreview < MainWindow
+  !text: tr('Screenshot')
+  size: 660 420
+  @onEscape: self:destroy()
+
+  UIWidget
+    id: image
+    anchors.fill: parent
+    margin-bottom: 30
+    image-smooth: true
+    image-fixed-ratio: true
+    phantom: true
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 24
+    @onClick: self:getParent():destroy()
+
 InstallerRow < Panel
   height: 62
   margin-top: 3
@@ -6,11 +27,22 @@ InstallerRow < Panel
   background-color: #00000044
   padding: 4
 
+  UIWidget
+    id: shot
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 96 54
+    image-smooth: true
+    image-fixed-ratio: true
+    background-color: #00000066
+    visible: false
+
   Label
     id: title
     anchors.top: parent.top
-    anchors.left: parent.left
+    anchors.left: shot.right
     anchors.right: buttons.left
+    margin-left: 6
     height: 16
     text-align: left
     color: #ffdd55
@@ -18,8 +50,9 @@ InstallerRow < Panel
   Label
     id: description
     anchors.top: prev.bottom
-    anchors.left: parent.left
+    anchors.left: shot.right
     anchors.right: buttons.left
+    margin-left: 6
     height: 26
     text-align: left
     text-wrap: true
@@ -29,8 +62,9 @@ InstallerRow < Panel
   Label
     id: versions
     anchors.top: prev.bottom
-    anchors.left: parent.left
+    anchors.left: shot.right
     anchors.right: buttons.left
+    margin-left: 6
     height: 12
     text-align: left
     font: verdana-9px

@@ -171,6 +171,26 @@ refreshRows = function()
     row.buttons.remove:setEnabled(state == "installed" or state == "outdated")
     row.buttons.install.onClick = function() install(entry) end
     row.buttons.remove.onClick = function() remove(entry) end
+    if type(entry.screenshot) == 'string' and entry.screenshot:len() > 0 then
+      local url = index.base .. entry.screenshot
+      row.shot:show()
+      row.shot:setTooltip("click to enlarge")
+      HTTP.downloadImage(url, function(path, err)
+        if err or not path then return end
+        if row.shot then row.shot:setImageSource(path) end
+        row.shot.onMouseRelease = function(widget, mousePos, mouseButton)
+          if mouseButton ~= MouseLeftButton then return false end
+          local w = g_ui.createWidget('InstallerPreview', g_ui.getRootWidget())
+          w:setText(entry.title or entry.name)
+          w.image:setImageSource(path)
+          w:show() w:raise() w:focus()
+          return true
+        end
+      end)
+    else
+      row.shot:hide()
+      row.title:setMarginLeft(0) row.description:setMarginLeft(0) row.versions:setMarginLeft(0)
+    end
     rows[entry.name] = row
   end
 end

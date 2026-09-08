@@ -22,6 +22,8 @@ SORT_LABELS = { list = "server order", name = "name", count = "count, highest fi
 local sortMode = "list"   -- g_settings 'lootTrackerSort'
 -- automatic recounts use every listed item once; a scripted or edible loot item would be used up, so off by default
 local autoRecount = false -- g_settings 'lootTrackerAutoRecount'
+AUTO_RECOUNT_MS = 30000   -- while on: recount everything this often during the hunt, plus after trades and depot visits
+local lastAutoRecount = 0
 
 local applySort -- defined below, used by updateCounts
 
@@ -163,7 +165,7 @@ function toggleAutoRecount()
   end
   local box
   box = displayGeneralBox(tr('Auto recount'),
-    tr('After every NPC trade and depot visit the tracker would use each listed item once to read its count.\n' ..
+    tr('Every ' .. math.floor(AUTO_RECOUNT_MS / 1000) .. ' seconds (and after trades and depot visits) the tracker would use each listed item once to read its count.\n' ..
        'Gear and gold are fine, but food, potions and scripted items (scrolls, removers) get used up.\n\nEnable anyway?'),
     { { text = tr('Enable'), callback = function() box:destroy() autoRecount = true g_settings.set('lootTrackerAutoRecount', true) end },
       { text = tr('Cancel'), callback = function() box:destroy() end },
@@ -177,8 +179,7 @@ function showMenu()
     menu:addOption((m == sortMode and "* " or "  ") .. "Sort by " .. SORT_LABELS[m], function() setSort(m) end)
   end
   menu:addSeparator()
-  menu:addOption("Recount every item", refreshAll)
-  menu:addOption((autoRecount and "[x] " or "[ ] ") .. "Auto recount after trade / depot", toggleAutoRecount)
+  menu:addOption((autoRecount and "[x] " or "[ ] ") .. "Auto recount every " .. math.floor(AUTO_RECOUNT_MS / 1000) .. "s (uses items)", toggleAutoRecount)
   local b = window:getChildById('menuButton')
   menu:display({ x = b:getX(), y = b:getY() + b:getHeight() })
 end
@@ -309,7 +310,14 @@ function refreshAll()
 end
 
 local function tick()
-  if g_game.isOnline() then rebuild() end
+  if g_game.isOnline() then
+    rebuild()
+    if autoRecount and window and window:isVisible() and #refreshQueue == 0
+       and g_clock.millis() - lastAutoRecount >= AUTO_RECOUNT_MS then
+      lastAutoRecount = g_clock.millis()
+      refreshAll()
+    end
+  end
   refreshEvent = scheduleEvent(tick, REFRESH_MS)
 end
 

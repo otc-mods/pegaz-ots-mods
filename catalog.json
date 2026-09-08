@@ -20,7 +20,7 @@
     {
       "name": "game_loot_tracker",
       "type": "module",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "title": "Autoloot tracker",
       "description": "Mini-window listing the items the server loots for you with carried counts.",
       "requires": [

@@ -24,8 +24,6 @@ ExivaMarker < UILabel
   font: verdana-11px-rounded
   text-auto-resize: true
   color: #ffffff
-  background-color: #00000099
-  padding: 2 5 2 5
 
 ExivaRow < Panel
   height: 30

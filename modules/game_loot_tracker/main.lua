@@ -15,6 +15,12 @@ local rows = {}          -- id -> row widget
 -- later would read as a loss. Counts move on server facts only (probe, use line, NPC trade list).
 local known = {}
 local pendingProbe       -- { id=, due= }
+-- items that never answer with a count (gear, weapons, arrows): read their number from equipment and open bags
+local noProbe = {}
+local lastGoods          -- { at=, count= } from the last NPC trade window (counts include closed bags)
+local flipProbe = {}     -- id -> true: the other probe method (plain use vs use on yourself) after a silent try
+local updateCounts       -- defined below, used by probe()
+local showTip            -- defined below, used by probe()
 local refreshEvent
 local lastKey = ""
 SORT_MODES = { "list", "name", "count", "value" }
@@ -88,7 +94,7 @@ end
 
 -- placed against the hovered row, not the mouse: widget coordinates are the same space as the root widget,
 -- while the mouse position can be off under a scaled window
-local function showTip(text, anchorWidget)
+showTip = function(text, anchorWidget)
   if not showTips then return end
   if not tip or tip:isDestroyed() then tip = makeTip() end
   tip:setText(text)
@@ -169,12 +175,66 @@ local function estimate(id)
   return math.max(0, k.n)
 end
 
+-- Hotkey use makes the server search every backpack and answer "Using one of N ...", closed bags included -
+-- that is how the bot's icon labels count rings and amulets. A plain use is impossible for "use with" items
+-- (a weapon would only open the crosshair), but the hotkey use-WITH packet gets the same count line, so those
+-- are probed on ourselves, which is what a "use on yourself" hotkey does: "Using one of 6 noble axes...".
+-- Not probed: runes (any target casts them) and fluid containers (they would pour out).
+local function itemFlags(id)
+  local okType, tt = pcall(function() return g_things.getThingType(id, ThingCategoryItem) end)
+  if not okType or not tt then return false, false end
+  local multi, fluid = false, false
+  pcall(function() multi = tt:isMultiUse() end)
+  pcall(function() fluid = tt:isFluidContainer() end)
+  return multi, fluid
+end
+
+local function isRune(id)
+  local n = nameOf(id)
+  return n ~= nil and n:lower():find("rune", 1, true) ~= nil
+end
+
+local function reportsCount(id)
+  local multi, fluid = itemFlags(id)
+  if fluid or isRune(id) then return false end
+  return true, multi
+end
+
 local function probe(id)
   if not g_game.isOnline() then return end
-  pendingProbe = { id = id, due = g_clock.millis() + 1500 }
+  local can, needsTarget = reportsCount(id)
+  if flipProbe[id] then needsTarget = not needsTarget end -- the client's flags disagreed with the server: swap
+  if noProbe[id] or not can then
+    noProbe[id] = true
+    -- the server only counts items it lets you "use": for gear and weapons we re-read what the client sees.
+    -- Flash the number so the click is visibly answered, and say so when nothing is visible at all.
+    local row = rows[id]
+    if row then
+      row.count:setText("...")
+      row.count:setColor('#ffdd55')
+    end
+    scheduleEvent(function()
+      updateCounts()
+      if clientCount(id) == 0 and not known[id] then
+        showTip((nameOf(id) or ("item " .. id)) ..
+          "\nrunes and fluids are not counted: using them would cast or pour" ..
+          "\nan open NPC trade window counts them, closed bags included", rows[id])
+      end
+    end, 150)
+    return
+  end
+  pendingProbe = { id = id, due = g_clock.millis() + 1500, target = needsTarget }
   local row = rows[id]
   if row then row.count:setText("..."); row.count:setColor('#ffdd55') end -- asking the server
-  g_game.useInventoryItem(id)
+  if needsTarget then
+    -- "use on yourself" is what a hotkey does for use-with items: the server prints the count first and then
+    -- refuses the action itself, so a weapon or a shield is counted without any side effect
+    local me = g_game.getLocalPlayer()
+    if not me then return end
+    g_game.useInventoryItemWith(id, me, 0)
+  else
+    g_game.useInventoryItem(id)
+  end
 end
 
 -- cut a name that does not fit its label, with "..." (labels do not do this on their own)
@@ -192,10 +252,15 @@ local function fitName(row)
   end
 end
 
-local function updateCounts()
-  -- a probe that got no answer: keep whatever we knew (an answer can be late or lost), never invent a 0
+updateCounts = function()
+  -- a probe that got no answer: keep whatever we knew (an answer can be late or lost), never invent a 0.
+  -- Silence also means the method was wrong for this item, so the next click tries the other one.
   if pendingProbe and pendingProbe.due <= g_clock.millis() then
+    local p = pendingProbe
     pendingProbe = nil
+    if not known[p.id] then
+      if flipProbe[p.id] then noProbe[p.id] = true else flipProbe[p.id] = true end
+    end
   end
   for id, row in pairs(rows) do
     if id == "order" then goto continue end
@@ -203,12 +268,18 @@ local function updateCounts()
     if row.name:getText() == row.fullName or row.name:getText():sub(-3) == "..." then fitName(row) end
     local client = clientCount(id)
     local est = estimate(id)
-    -- "?" = nothing confirmed yet; click the row to ask the server (open bags are deliberately not shown as the count)
-    local text = est and tostring(est) or "?"
+    -- server-confirmed number wins; for items that cannot be used the client's own view of equipment and open
+    -- bags is the best we get (grey, since closed bags are invisible); "?" only when we know nothing at all
+    local text, fromClient = "?", false
+    if est then
+      text = tostring(est)
+    elseif client > 0 then
+      text, fromClient = tostring(client), true
+    end
     row.count:setText(text)
     local k = known[id]
     local fresh = k and (g_clock.millis() - k.t) < 10 * 60 * 1000
-    row.count:setColor(fresh and '#ffffff' or '#c8c8c8')
+    row.count:setColor((fresh and not fromClient) and '#ffffff' or '#c8c8c8')
     -- price first: that is what the box is for
     local price = priceOf(id)
     local lines = { nameOf(id) or ("item " .. id) }
@@ -216,7 +287,14 @@ local function updateCounts()
       table.insert(lines, fmtGold(price) .. " gp each")
       local w = weightOf(id)
       if w and w > 0 then table.insert(lines, fmtGold(price / w) .. " gp/oz") end
-      if est then table.insert(lines, "total " .. fmtGold(price * est) .. " gp  (" .. est .. " x)") end
+      local n = est or (client > 0 and client or nil)
+      if n then
+        local src = ""
+        if not est and client > 0 then src = ", open bags only"
+        elseif noProbe[id] and est then src = ", from a trade window"
+        end
+        table.insert(lines, "total " .. fmtGold(price * n) .. " gp  (" .. n .. " x" .. src .. ")")
+      end
     else
       table.insert(lines, "no NPC price known yet")
     end
@@ -366,8 +444,21 @@ local function nameBelongs(reported, id)
   return r == k or r == k .. "s" or r == k .. "es" or r:gsub("s$", "") == k or r:gsub("es$", "") == k or r:gsub("ies$", "y") == k
 end
 
+local CANNOT_USE = { 'cannot use', 'nie mozesz', 'nie mo\197\188esz', 'nie da si' }
+
 local function onTextMessage(mode, text)
   if type(text) ~= 'string' then return end
+  if pendingProbe then
+    local low = text:lower()
+    for _, pat in ipairs(CANNOT_USE) do
+      if low:find(pat, 1, true) then -- this item never reports a count: stop asking, use the client's view
+        noProbe[pendingProbe.id] = true
+        pendingProbe = nil
+        updateCounts()
+        return
+      end
+    end
+  end
   local count, name = text:match("^Using one of (%d+) (.+)%.%.%.$")
   if not count then
     name = text:match("^Using the last (.+)%.%.%.$")
@@ -392,11 +483,15 @@ end
 
 -- NPC trade: the server sends exact totals of everything the NPC buys -> confirm those; and after the trade
 -- window closes, recount the list (selling changed numbers we could not see)
+-- An open NPC trade window is the only place the server tells us how many of an item we own INCLUDING closed
+-- bags (it answers for every item that NPC buys), so those numbers are the ground truth for gear and weapons.
 local function onPlayerGoods(money, items)
+  local n = 0
   for _, it in pairs(items or {}) do
     local id = it[1] and it[1]:getId()
-    if id and rows[id] then confirm(id, it[2] or 0) end
+    if id and rows[id] then confirm(id, it[2] or 0) n = n + 1 end
   end
+  if n > 0 then lastGoods = { at = g_clock.millis(), count = n } end
   updateCounts()
 end
 
@@ -429,8 +524,14 @@ local function refreshStep()
 end
 
 function refreshAll()
+  for id, row in pairs(rows) do -- visible answer to the click, also for rows that cannot be probed
+    if id ~= "order" then row.count:setText("...") row.count:setColor('#ffdd55') end
+  end
+  scheduleEvent(updateCounts, 150)
   refreshQueue = {}
-  for _, id in ipairs(rows.order or {}) do table.insert(refreshQueue, id) end
+  for _, id in ipairs(rows.order or {}) do
+    if not noProbe[id] then table.insert(refreshQueue, id) end
+  end
   if #refreshQueue > 0 and not refreshEvent2 then refreshStep() end
 end
 

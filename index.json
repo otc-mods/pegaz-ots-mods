@@ -80,7 +80,7 @@
   {
    "name": "game_loot_tracker",
    "type": "module",
-   "version": "1.1.0",
+   "version": "1.1.1",
    "title": "Autoloot tracker",
    "description": "Items the server loots, counts, NPC value per item and total.",
    "requires": [
@@ -100,8 +100,8 @@
     },
     {
      "path": "modules/game_loot_tracker/main.lua",
-     "sha1": "9fca1be3e430ed5549aef8468a45280f2b1d3ebc",
-     "size": 19250
+     "sha1": "343d36b2d1fe7fbbf5d742634999d8a31427dfc6",
+     "size": 23825
     },
     {
      "path": "modules/game_loot_tracker/refresh.png",

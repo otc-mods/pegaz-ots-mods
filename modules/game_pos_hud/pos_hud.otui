@@ -1,25 +1,10 @@
-UIWidget
+Label
   id: posHud
   anchors.top: parent.top
-  anchors.left: parent.left
-  margin-left: 3
-  margin-top: 3
-  size: 110 42
+  anchors.right: parent.right
+  margin-top: 2
+  margin-right: 3
+  font: verdana-11px-rounded
+  color: #ffffff
+  text-auto-resize: true
   phantom: true
-  layout:
-    type: verticalBox
-
-  Label
-    id: x
-    font: verdana-11px-rounded
-    color: #ffffff
-
-  Label
-    id: y
-    font: verdana-11px-rounded
-    color: #ffffff
-
-  Label
-    id: z
-    font: verdana-11px-rounded
-    color: #ffffff

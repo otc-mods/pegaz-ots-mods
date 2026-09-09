@@ -1,6 +1,6 @@
 Module
   name: game_pos_hud
-  description: Position HUD - your map position (X, Y, Z) under the FPS/ping overlay
+  description: Position HUD - your x, y, z at the top of the minimap
   author: otc-mods
   website: local
   sandboxed: true

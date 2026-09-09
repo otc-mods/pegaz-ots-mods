@@ -51,9 +51,9 @@
     {
       "name": "game_pos_hud",
       "type": "module",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Position HUD",
-      "description": "Pos X / Y / Z lines under the FPS and ping overlay (or the map's top-left corner).",
+      "description": "Your x, y, z in one line at the top-right corner of the minimap.",
       "screenshot": "screenshots/game_pos_hud.png"
     },
     {

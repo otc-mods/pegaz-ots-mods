@@ -156,6 +156,18 @@ MainWindow
     @onClick: modules.game_module_installer.reloadAll()
 
   Button
+    id: installAll
+    anchors.bottom: parent.bottom
+    anchors.left: reload.right
+    margin-left: 6
+    margin-bottom: 14
+    size: 100 24
+    !text: tr('Install all')
+    color: #66ff66
+    !tooltip: tr('Install every missing module and update the outdated ones, one after another')
+    @onClick: modules.game_module_installer.installAll()
+
+  Button
     id: github
     anchors.bottom: parent.bottom
     anchors.right: closeButton.left
@@ -192,7 +204,7 @@ MainWindow
     anchors.bottom: parent.bottom
     margin-bottom: 14
     width: 8
-    minimum: 460
+    minimum: 560
     maximum: 1600
 
   UIWidget

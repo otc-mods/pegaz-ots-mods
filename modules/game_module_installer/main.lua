@@ -4,7 +4,7 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.8"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.0.9"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua", "modules/game_module_installer/grip.png" }
@@ -80,6 +80,8 @@ end
 
 -- install / remove ------------------------------------------------------------------------------
 local refreshRows
+local installQueue, queueCurrent = {}, nil -- "Install all": entries still to do, name of the one running
+local nextInQueue
 
 local function finishInstall(entry, paths)
   installed[entry.name] = { version = entry.version, files = paths }
@@ -98,6 +100,7 @@ local function finishInstall(entry, paths)
   end
   setStatus(entry.title .. " " .. entry.version .. " installed and loaded.", '#66ff66')
   refreshRows()
+  if queueCurrent == entry.name then scheduleEvent(nextInQueue, 150) end
 end
 
 local function install(entry)
@@ -140,6 +143,35 @@ local function install(entry)
     end)
   end
   nextFile()
+end
+
+nextInQueue = function()
+  queueCurrent = nil
+  local entry = table.remove(installQueue, 1)
+  if not entry then
+    if index then setStatus("all modules installed and up to date.", '#66ff66') end
+    return
+  end
+  queueCurrent = entry.name
+  install(entry)
+end
+
+-- every missing or outdated entry, one after another; the installer itself last (its reload closes this window)
+function installAll()
+  if busy then return setStatus("busy, wait a moment", '#ffdd55') end
+  if not index then return setStatus("no list yet - press Refresh list", '#ffdd55') end
+  installQueue = {}
+  local selfEntry
+  for _, entry in ipairs(index.entries or {}) do
+    local state = moduleState(entry)
+    if state == "missing" or state == "outdated" then
+      if entry.name == SELF then selfEntry = entry else table.insert(installQueue, entry) end
+    end
+  end
+  if selfEntry then table.insert(installQueue, selfEntry) end
+  if #installQueue == 0 then return setStatus("nothing to do: everything is installed and up to date.", '#66ff66') end
+  setStatus("installing " .. #installQueue .. " module(s)...")
+  nextInQueue()
 end
 
 local function remove(entry)
@@ -280,7 +312,7 @@ function reloadAll()
       anchor = AnchorHorizontalCenter }, nil, function() box:destroy() end)
 end
 
-MIN_W, MIN_H, MAX_W, MAX_H = 460, 320, 1600, 1400
+MIN_W, MIN_H, MAX_W, MAX_H = 560, 320, 1600, 1400
 
 -- bottom-right grip: drag resizes both ways. The first drag breaks the centre anchors so the top-left corner
 -- stays put and the grip follows the mouse (a centred window would grow half as fast on each side).

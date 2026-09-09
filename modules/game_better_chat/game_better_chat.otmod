@@ -1,0 +1,12 @@
+Module
+  name: game_better_chat
+  description: Better chat - a split view next to the console with coloured [!] filter tabs (sources, include/exclude patterns, flash, sound)
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, game_console, game_textmessage, client_options ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

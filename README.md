@@ -12,6 +12,7 @@ Client modules for the PegazOTS OTClientV8 client (protocol 8.6).
 | Player info | Other players shown as `[RP 250] Name` (vocation and level from an automatic look) |
 | Exiva | Exiva replies drawn on the minimap: ring sectors, several casts intersected, masked to explored tiles |
 | Position HUD | Your x, y, z in one line at the top-right corner of the minimap |
+| Better chat | Split view beside the console with coloured `[!]` filter tabs (alerts, trade, raids, private), resizable, keeps channels open |
 | Module installer | This installer: lists, installs, updates and removes the modules above without a restart |
 
 Install with the in-game module installer (fetches `index.json` from this repo's Pages site), or by hand:

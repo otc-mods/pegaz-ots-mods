@@ -1,0 +1,237 @@
+BetterChatPanel < Panel
+  focusable: false
+  width: 300
+
+  Panel
+    id: header
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 18
+
+    UIButton
+      id: menu
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 3
+      size: 14 14
+      image-source: /images/ui/miniwindow_buttons
+      image-clip: 56 0 14 14
+      !tooltip: tr('Tab menu: settings, clear, add')
+
+      $hover:
+        image-clip: 56 14 14 14
+
+      $pressed:
+        image-clip: 56 28 14 14
+
+    Label
+      id: name
+      anchors.left: menu.right
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 5
+      margin-right: 14
+      text-align: left
+
+  ScrollablePanel
+    id: buffer
+    anchors.top: header.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-top: 2
+    margin-right: 12
+    vertical-scrollbar: scroll
+    layout:
+      type: verticalBox
+      align-bottom: true
+    border-width: 1
+    border-color: #202327
+    background: #00000066
+    inverted-scroll: true
+    padding: 1
+
+  VerticalScrollBar
+    id: scroll
+    anchors.top: buffer.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 14
+    pixels-scroll: true
+
+BetterChatSplitter < UIWidget
+  width: 6
+  background-color: #ffffff22
+  !tooltip: tr('Drag to resize the split view')
+
+  $hover:
+    background-color: #ffffff66
+
+BetterChatRail < UIWidget
+  width: 26
+  focusable: false
+  layout:
+    type: verticalBox
+    spacing: 2
+
+BetterChatBang < UIButton
+  size: 22 20
+  text: !
+  font: verdana-11px-rounded
+  text-align: center
+  color: #ffffff
+  border-width: 1
+  border-color: #000000
+
+  Label
+    id: badge
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: -6
+    margin-right: -7
+    font: verdana-9px
+    color: #ffffff
+    background-color: #000000
+    text-auto-resize: true
+    phantom: true
+    visible: false
+
+BetterChatRow < UILabel
+  font: verdana-11px-antialised
+  height: 14
+  margin-left: 2
+  text-wrap: true
+  text-auto-resize: true
+  color: yellow
+  focusable: false
+
+BetterChatSettingsRow < Panel
+  height: 22
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 100
+    text-align: left
+
+BetterChatSettings < MainWindow
+  !text: tr('Better chat - filter tab')
+  size: 430 450
+  @onEscape: self:destroy()
+
+  Panel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: deleteButton.top
+    margin-bottom: 8
+    layout:
+      type: verticalBox
+
+    BetterChatSettingsRow
+      id: nameRow
+      TextEdit
+        id: value
+        anchors.left: text.right
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+
+    BetterChatSettingsRow
+      id: colorRow
+      ComboBox
+        id: value
+        anchors.left: text.right
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+
+    BetterChatSettingsRow
+      id: sourcesRow
+      height: 62
+      Panel
+        id: value
+        anchors.left: text.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        layout:
+          type: grid
+          cell-size: 94 18
+          cell-spacing: 2
+          flow: true
+
+    BetterChatSettingsRow
+      id: channelsRow
+      TextEdit
+        id: value
+        anchors.left: text.right
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+
+    BetterChatSettingsRow
+      id: includeRow
+      height: 62
+      MultilineTextEdit
+        id: value
+        anchors.left: text.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+
+    BetterChatSettingsRow
+      id: excludeRow
+      height: 46
+      MultilineTextEdit
+        id: value
+        anchors.left: text.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+
+    BetterChatSettingsRow
+      id: flagsRow
+      height: 42
+      Panel
+        id: value
+        anchors.left: text.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        layout:
+          type: grid
+          cell-size: 142 18
+          cell-spacing: 2
+          flow: true
+
+    BetterChatSettingsRow
+      id: keepRow
+      TextEdit
+        id: value
+        anchors.left: text.right
+        anchors.verticalCenter: parent.verticalCenter
+        width: 60
+
+  Button
+    id: deleteButton
+    !text: tr('Delete tab')
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 90 22
+
+  Button
+    id: cancelButton
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 22
+
+  Button
+    id: saveButton
+    !text: tr('Save')
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 6
+    size: 80 22

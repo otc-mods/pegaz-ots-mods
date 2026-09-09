@@ -226,6 +226,36 @@
    ]
   },
   {
+   "name": "game_better_chat",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Better chat",
+   "description": "Split view beside the console with coloured [!] filter tabs: sources, channels, include/exclude patterns, flash, sound; keeps your channels open.",
+   "screenshot": "screenshots/game_better_chat.png",
+   "screenshotSize": [
+    383,
+    118
+   ],
+   "screenshotSha1": "fa9785a68fe1e14f9e8400df4789aaeb10302b11",
+   "files": [
+    {
+     "path": "modules/game_better_chat/better_chat.otui",
+     "sha1": "3e9c7f97bd2aa95c95bfdcb022d175793ab6a360",
+     "size": 5120
+    },
+    {
+     "path": "modules/game_better_chat/game_better_chat.otmod",
+     "sha1": "c15a7d2d5d4db964cb9fcca149b95f6f3f4eabae",
+     "size": 417
+    },
+    {
+     "path": "modules/game_better_chat/main.lua",
+     "sha1": "3d4a308afa633b97a322d763f2cfc055383cbd79",
+     "size": 25400
+    }
+   ]
+  },
+  {
    "name": "game_module_installer",
    "type": "module",
    "version": "1.0.10",

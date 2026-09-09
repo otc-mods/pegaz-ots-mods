@@ -4,7 +4,7 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.9"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.0.10"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua", "modules/game_module_installer/grip.png" }
@@ -68,13 +68,21 @@ local function sha1(data)
   return nil
 end
 
+-- "bundled" = the client ships the files itself (no install record). Checked on the files, not on
+-- g_modules: an unloaded module whose folder was deleted is still remembered by the client.
+local function filesPresent(entry)
+  for _, f in ipairs(entry.files or {}) do
+    if g_resources.fileExists("/" .. f.path) then return true end
+  end
+  return false
+end
+
 local function moduleState(entry)
-  local m = g_modules.getModule(entry.name)
   local rec = installed[entry.name]
   if rec then
     if rec.version == entry.version then return "installed" else return "outdated" end
   end
-  if m then return "bundled" end
+  if filesPresent(entry) then return "bundled" end
   return "missing"
 end
 

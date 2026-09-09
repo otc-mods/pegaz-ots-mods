@@ -49,6 +49,14 @@
       "screenshot": "screenshots/game_exiva.png"
     },
     {
+      "name": "game_pos_hud",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Position HUD",
+      "description": "Pos X / Y / Z lines under the FPS and ping overlay (or the map's top-left corner).",
+      "screenshot": "screenshots/game_pos_hud.png"
+    },
+    {
       "name": "game_module_installer",
       "type": "module",
       "version": "1.0.8",

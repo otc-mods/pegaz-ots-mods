@@ -196,6 +196,36 @@
    ]
   },
   {
+   "name": "game_pos_hud",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Position HUD",
+   "description": "Pos X / Y / Z lines under the FPS and ping overlay (or the map's top-left corner).",
+   "screenshot": "screenshots/game_pos_hud.png",
+   "screenshotSize": [
+    106,
+    80
+   ],
+   "screenshotSha1": "ea1de8fe3733febfc8700f00d2d21aa3399cda90",
+   "files": [
+    {
+     "path": "modules/game_pos_hud/game_pos_hud.otmod",
+     "sha1": "4d878e79de07e186352016d595085871dac78383",
+     "size": 308
+    },
+    {
+     "path": "modules/game_pos_hud/main.lua",
+     "sha1": "e8a6598ebb32849283f0ae4da5c9a15ab91a789a",
+     "size": 1579
+    },
+    {
+     "path": "modules/game_pos_hud/pos_hud.otui",
+     "sha1": "997a33c72952138a0a70d9419f54c8c435370926",
+     "size": 379
+    }
+   ]
+  },
+  {
    "name": "game_module_installer",
    "type": "module",
    "version": "1.0.8",

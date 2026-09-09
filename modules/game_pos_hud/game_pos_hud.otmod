@@ -1,0 +1,12 @@
+Module
+  name: game_pos_hud
+  description: Position HUD - your map position (X, Y, Z) under the FPS/ping overlay
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

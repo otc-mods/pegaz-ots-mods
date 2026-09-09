@@ -17,7 +17,8 @@ TICK_MS = 1000
 CACHE_FLUSH_EVERY = 10 -- renders between g_textures.clearCache() calls (each render is a new file)
 DIR = '/exiva'
 
-local window, contents, button, minimap, hint
+local window, contents, button, minimap, hint, mapPanel
+local useMarkers = true -- name floating at the edge of the game view, in the direction of the estimated spot
 local targets = {}     -- { name, color, casts = { newest first }, overlay, label, dots, row, raster, file }
 local pendingCast      -- { who (lower case), pos, t }
 local tickEvent
@@ -77,11 +78,13 @@ end
 local function hideOverlay(target)
   if target.overlay then target.overlay:hide() end
   if target.label then target.label:hide() end
+  if target.marker then target.marker:hide() end
   destroyDots(target)
 end
 
 local function destroyWidgets(target)
   hideOverlay(target)
+  if target.marker then target.marker:destroy() target.marker = nil end
   if target.row then target.row:destroy() target.row = nil end
   if target.overlay then target.overlay:destroy() target.overlay = nil end
   if target.label then target.label:destroy() target.label = nil end
@@ -169,6 +172,39 @@ local function render(target)
   target.casts = casts
   target.raster = r
   applyRaster(target, z)
+  updateMarker(target)
+end
+
+-- on-screen marker: the name slides along the edge of the game view, in the direction of the estimated spot
+-- (centroid of the highlighted area, or the label point for a lone very-far reply), from your current position
+local function updateMarker(target)
+  local r = target.raster
+  local me = g_game.getLocalPlayer()
+  local pos = me and me:getPosition()
+  if not useMarkers or not mapPanel or not r or not r.cx or not pos or #target.casts == 0 then
+    if target.marker then target.marker:hide() end
+    return
+  end
+  if not target.marker then
+    target.marker = g_ui.createWidget('ExivaMarker', mapPanel)
+    target.marker:setColor(target.color)
+  end
+  local m = target.marker
+  local dx, dy = r.cx - pos.x, r.cy - pos.y
+  local dist = math.floor(math.sqrt(dx * dx + dy * dy) + 0.5)
+  m:setText(labelText(target) .. '  ~' .. dist .. ' sqm')
+  local w, h = mapPanel:getWidth(), mapPanel:getHeight()
+  local mw, mh = m:getWidth(), m:getHeight()
+  if dx == 0 and dy == 0 then dy = -1 end
+  local halfW, halfH = w / 2 - mw / 2 - 4, h / 2 - mh / 2 - 4
+  local t = math.min(dx ~= 0 and halfW / math.abs(dx) or math.huge, dy ~= 0 and halfH / math.abs(dy) or math.huge)
+  m:setMarginLeft(math.floor(w / 2 + dx * t - mw / 2))
+  m:setMarginTop(math.floor(h / 2 + dy * t - mh / 2))
+  m:show()
+end
+
+local function updateMarkers()
+  for _, t in ipairs(targets) do updateMarker(t) end
 end
 
 local function fade(target)
@@ -177,6 +213,7 @@ local function fade(target)
   local op = math.max(0.35, 1 - 0.65 * (now() - c.t) / CAST_TTL)
   target.overlay:setOpacity(op)
   target.label:setOpacity(op)
+  if target.marker then target.marker:setOpacity(math.max(0.5, op)) end
 end
 
 -- ---------------------------------------------------------------- panel
@@ -332,6 +369,11 @@ function showMenu()
   local menu = g_ui.createWidget('PopupMenu')
   menu:setGameMenu(true)
   menu:addOption((useMask and '[x] ' or '[ ] ') .. tr('Only explored tiles'), function() setMask(not useMask) end)
+  menu:addOption((useMarkers and '[x] ' or '[ ] ') .. tr('Name at the edge of the game view'), function()
+    useMarkers = not useMarkers
+    g_settings.set('exivaMarker', useMarkers)
+    updateMarkers()
+  end)
   menu:addOption(tr('Full map (Ctrl+Shift+M)'), function() modules.game_minimap.toggleFullMap() end)
   menu:addSeparator()
   menu:addOption(tr('Forget everyone'), clearAll)
@@ -355,6 +397,8 @@ function init()
     return
   end
   if g_settings.exists('exivaMask') then useMask = g_settings.getBoolean('exivaMask') end
+  if g_settings.exists('exivaMarker') then useMarkers = g_settings.getBoolean('exivaMarker') end
+  mapPanel = modules.game_interface.getMapPanel()
   if not g_map.getMinimapColor then
     print('exiva: g_map.getMinimapColor missing in this client, explored-tiles mask disabled')
     useMask = false
@@ -374,6 +418,8 @@ function init()
 
   connect(g_game, { onTextMessage = onTextMessage, onTalk = onTalk, onGameEnd = clearAll })
   connect(minimap, { onZoomChange = onZoom, onCameraPositionChange = onCamera })
+  connect(LocalPlayer, { onPositionChange = updateMarkers })
+  if mapPanel then connect(mapPanel, { onGeometryChange = updateMarkers }) end
   local cam = minimap:getCameraPosition() -- nil before the first login
   lastFloor = cam and cam.z
   tickEvent = cycleEvent(tick, TICK_MS)
@@ -383,6 +429,8 @@ function terminate()
   if not minimap then return end
   disconnect(g_game, { onTextMessage = onTextMessage, onTalk = onTalk, onGameEnd = clearAll })
   disconnect(minimap, { onZoomChange = onZoom, onCameraPositionChange = onCamera })
+  disconnect(LocalPlayer, { onPositionChange = updateMarkers })
+  if mapPanel then disconnect(mapPanel, { onGeometryChange = updateMarkers }) end
   removeEvent(tickEvent)
   clearAll()
   if button then button:destroy() button = nil end

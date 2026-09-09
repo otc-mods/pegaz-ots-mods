@@ -65,6 +65,18 @@
       "screenshot": "screenshots/game_better_chat.png"
     },
     {
+      "name": "game_save_now",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Save now",
+      "description": "Writes settings, hotkeys, window layout, bot storage and the minimap to disk without closing the client (button or Ctrl+Alt+S).",
+      "extraFiles": [
+        "layouts/retro/images/topbuttons/savenow.png",
+        "data/images/topbuttons/savenow.png"
+      ],
+      "screenshot": "screenshots/game_save_now.png"
+    },
+    {
       "name": "game_module_installer",
       "type": "module",
       "version": "1.0.10",

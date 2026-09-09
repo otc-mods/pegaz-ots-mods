@@ -256,6 +256,41 @@
    ]
   },
   {
+   "name": "game_save_now",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Save now",
+   "description": "Writes settings, hotkeys, window layout, bot storage and the minimap to disk without closing the client (button or Ctrl+Alt+S).",
+   "screenshot": "screenshots/game_save_now.png",
+   "screenshotSize": [
+    160,
+    160
+   ],
+   "screenshotSha1": "ef032bb4d60e39dabe9e1bd464fdec316b5338a1",
+   "files": [
+    {
+     "path": "data/images/topbuttons/savenow.png",
+     "sha1": "7d1118f3907cacd8219038ce1e818c194ff437d0",
+     "size": 134
+    },
+    {
+     "path": "layouts/retro/images/topbuttons/savenow.png",
+     "sha1": "74a4bea3e470e1dc4611b68a1718199ffc9323ad",
+     "size": 197
+    },
+    {
+     "path": "modules/game_save_now/game_save_now.otmod",
+     "sha1": "0babeaab5d2f5251b87bf400b3d3fc0a52a1d2c3",
+     "size": 392
+    },
+    {
+     "path": "modules/game_save_now/main.lua",
+     "sha1": "96478f446f77b0e6a0c8547ecc34ae379264db3f",
+     "size": 2278
+    }
+   ]
+  },
+  {
    "name": "game_module_installer",
    "type": "module",
    "version": "1.0.10",

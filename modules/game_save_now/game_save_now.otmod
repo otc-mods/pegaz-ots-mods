@@ -1,0 +1,12 @@
+Module
+  name: game_save_now
+  description: Save now - writes settings, bot storage, hotkeys, window layout and the minimap to disk without closing the client (button + Ctrl+Alt+S)
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

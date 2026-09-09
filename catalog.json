@@ -6,7 +6,7 @@
       "type": "module",
       "version": "1.0.0",
       "title": "Stats",
-      "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage received, kills, graphs in a mini-window.",
+      "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage, kills and graphs.",
       "screenshot": "screenshots/game_hud_stats.png"
     },
     {
@@ -14,7 +14,7 @@
       "type": "module",
       "version": "1.0.0",
       "title": "Autoloot",
-      "description": "Named loot backpacks with item search; Apply sends !autoloot clear/add.",
+      "description": "Named loot backpacks with item search; Apply sends !autoloot.",
       "screenshot": "screenshots/game_autoloot.png"
     },
     {
@@ -22,7 +22,7 @@
       "type": "module",
       "version": "1.0.5",
       "title": "Autoloot tracker",
-      "description": "Mini-window listing the items the server loots for you with carried counts.",
+      "description": "The items the server loots and how many you carry.",
       "requires": [
         "game_autoloot"
       ],
@@ -33,7 +33,7 @@
       "type": "module",
       "version": "1.0.0",
       "title": "Player info",
-      "description": "Other players shown as [RP 250] Name (vocation and level from an automatic look).",
+      "description": "Other players shown as [RP 250] Name (vocation + level).",
       "extraFiles": [
         "layouts/retro/images/topbuttons/playerinfo.png",
         "data/images/topbuttons/playerinfo.png"
@@ -45,7 +45,7 @@
       "type": "module",
       "version": "1.1.3",
       "title": "Exiva",
-      "description": "Exiva replies drawn on the minimap (ring sectors, intersections, explored-tile mask) plus the name floating at the edge of the game view in the target's direction.",
+      "description": "Exiva replies drawn on the minimap and at the screen edge.",
       "screenshot": "screenshots/game_exiva.png"
     },
     {
@@ -53,7 +53,7 @@
       "type": "module",
       "version": "1.1.0",
       "title": "Position HUD",
-      "description": "Your x, y, z in one line at the top-right corner of the minimap.",
+      "description": "Your x, y, z at the top-right corner of the minimap.",
       "screenshot": "screenshots/game_pos_hud.png"
     },
     {
@@ -61,7 +61,7 @@
       "type": "module",
       "version": "1.0.0",
       "title": "Better chat",
-      "description": "Split view beside the console with coloured [!] filter tabs: sources, channels, include/exclude patterns, flash, sound; keeps your channels open.",
+      "description": "Split view beside the chat with coloured [!] filter tabs.",
       "screenshot": "screenshots/game_better_chat.png"
     },
     {
@@ -69,7 +69,7 @@
       "type": "module",
       "version": "1.0.0",
       "title": "Save now",
-      "description": "Writes settings, hotkeys, window layout, bot storage and the minimap to disk without closing the client (button or Ctrl+Alt+S).",
+      "description": "Save settings, hotkeys, layout and bot storage without exiting.",
       "extraFiles": [
         "layouts/retro/images/topbuttons/savenow.png",
         "data/images/topbuttons/savenow.png"
@@ -81,7 +81,7 @@
       "type": "module",
       "version": "1.0.10",
       "title": "Module installer",
-      "description": "This installer: lists the published modules, installs, updates and removes them without a client restart.",
+      "description": "Lists the published modules, installs and updates them.",
       "screenshot": "screenshots/game_module_installer.png"
     }
   ]

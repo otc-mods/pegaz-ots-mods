@@ -168,6 +168,39 @@ end
 
 -- rendering ----------------------------------------------------------------------------------------
 
+-- text the user dragged over, across all rows of the tab (rows are selectable text edits like the console's)
+local function selectionText()
+  if not panel then return nil end
+  local parts = {}
+  for _, row in ipairs(panel.buffer:getChildren()) do
+    local sel = row.getSelection and row:getSelection()
+    if sel and #sel > 0 then table.insert(parts, sel) end
+  end
+  if #parts == 0 then return nil end
+  return table.concat(parts, '\n')
+end
+
+local function allText()
+  local tab = activeTab()
+  local parts = {}
+  for _, m in ipairs((tab and history[tab.id]) or {}) do table.insert(parts, m.text) end
+  return table.concat(parts, '\n')
+end
+
+local function clearSelection()
+  if not panel then return end
+  for _, row in ipairs(panel.buffer:getChildren()) do
+    if row.setSelection then row:setSelection(0, 0) end
+  end
+end
+
+local function selectAllRows()
+  if not panel then return end
+  for _, row in ipairs(panel.buffer:getChildren()) do
+    if row.setSelection then row:setSelection(0, #row:getText()) end
+  end
+end
+
 local function addRow(msg)
   local row = g_ui.createWidget('BetterChatRow', panel.buffer)
   row:setText(msg.text)
@@ -176,14 +209,31 @@ local function addRow(msg)
   row.onMouseRelease = function(_, pos, button)
     local me = g_game.getCharacterName()
     if button == MouseRightButton then
+      local console = modules.game_console
       local menu = g_ui.createWidget('PopupMenu')
       menu:setGameMenu(true)
       if msg.name and #msg.name > 0 and msg.name ~= me then
-        menu:addOption('Open chat with ' .. msg.name, function() modules.game_console.addPrivateChannel(msg.name) end)
+        menu:addOption('Open chat with ' .. msg.name, function() console.addPrivateChannel(msg.name) end)
         menu:addOption('Exiva ' .. msg.name, function() g_game.talk('exiva "' .. msg.name .. '"') end)
+        local me2 = g_game.getLocalPlayer()
+        if me2 and not me2:hasVip(msg.name) then
+          menu:addOption('Add to VIP list', function() g_game.addVip(msg.name) end)
+        end
+        if console.isIgnored and console.isIgnored(msg.name) then
+          menu:addOption('Unignore ' .. msg.name, function() console.removeIgnoredPlayer(msg.name) end)
+        elseif console.addIgnoredPlayer then
+          menu:addOption('Ignore ' .. msg.name, function() console.addIgnoredPlayer(msg.name) end)
+        end
         menu:addSeparator()
+        menu:addOption('Copy name', function() g_window.setClipboardText(msg.name) end)
       end
+      local sel = selectionText()
+      if sel then menu:addOption('Copy selection', function() g_window.setClipboardText(sel) end) end
       menu:addOption('Copy message', function() g_window.setClipboardText(msg.text) end)
+    menu:addOption('Copy whole tab', function() g_window.setClipboardText(allText()) end)
+      menu:addSeparator()
+      menu:addOption('Select all', selectAllRows)
+      if sel then menu:addOption('Clear selection', clearSelection) end
       menu:display(pos)
       return true
     elseif button == MouseLeftButton and msg.source == 'private' and msg.name and msg.name ~= me then
@@ -567,6 +617,7 @@ function init()
     if tab then
       menu:addOption('Settings of "' .. tab.name .. '"...', function() openSettings(tab, false) end)
       menu:addOption('Clear "' .. tab.name .. '"', function() history[tab.id] = {} renderActive() end)
+    menu:addOption('Copy whole tab', function() g_window.setClipboardText(allText()) end)
       menu:addSeparator()
     end
     menu:addOption('Add a filter tab...', function() openSettings(newTab{ name = 'New tab', color = 'green' }, true) end)

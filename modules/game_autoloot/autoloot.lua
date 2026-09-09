@@ -2,7 +2,7 @@
 -- item types, Apply = "!autoloot clear" + "!autoloot add <name>" per item. Unlocked slot count comes from
 -- the server's "Autoloot: X/Y slotow." reply. Names: items_860.lua (AutolootNames) + user-set names.
 
-MAX_RESULTS = 300
+MAX_RESULTS = 1000          -- one widget per item: more than this and opening the window drags
 SLOTS_PER_BAG = 15           -- server maximum
 DEFAULT_UNLOCKED = 3         -- until the server tells us
 CAROUSEL_SIZE = 5
@@ -19,10 +19,62 @@ local carouselStart = 1
 local serverItems = {}       -- what the server reported on the last bare !autoloot: { {id=, name=}, ... }
 local collectUntil = 0       -- reply lines arriving before this time are part of the list reply
 local nameIndex              -- lower-case name -> id (bundled + custom), built lazily
+local resultsSummary = ""    -- the counts line, restored when the mouse leaves an item
 local sendQueue, sendEvent = {}, nil
+-- price book: what NPCs pay, learned from every trade window you open. prices[id] = {sell=, weight=, npc=, name=}
+local prices = {}
+-- the picked sort lives in data (saved with the lists), sortMode mirrors it for the sort comparators
+SORT_MODES = { { id = 'name', text = 'name' }, { id = 'value', text = 'sell price' }, { id = 'density', text = 'gold per oz' } }
 
 -- persistence -----------------------------------------------------------------------
 local function save() g_settings.setNode('autoloot', data) end
+local priceMeta = { npc = nil, at = nil, count = 0 } -- who taught us last and when (os.time)
+
+local function savePrices()
+  g_settings.setNode('autolootPrices', prices)
+  g_settings.setNode('autolootPricesMeta', priceMeta)
+end
+
+local function loadPrices()
+  prices = {}
+  local node = g_settings.getNode('autolootPrices')
+  if type(node) == 'table' then
+    for id, p in pairs(node) do
+      local n = tonumber(id)
+      if n and type(p) == 'table' and tonumber(p.sell) then
+        prices[n] = { sell = tonumber(p.sell), weight = tonumber(p.weight) or 0, npc = p.npc, name = p.name }
+      end
+    end
+  end
+  local meta = g_settings.getNode('autolootPricesMeta')
+  if type(meta) == 'table' then
+    priceMeta = { npc = meta.npc, at = tonumber(meta.at), count = tonumber(meta.count) or 0 }
+  end
+end
+
+local function ago(t)
+  if not t then return nil end
+  local d = os.time() - t
+  if d < 60 then return 'just now' end
+  if d < 3600 then return math.floor(d / 60) .. ' min ago' end
+  if d < 86400 then return math.floor(d / 3600) .. ' h ago' end
+  return math.floor(d / 86400) .. ' days ago'
+end
+
+-- shop names are the server's own: they beat the bundled 8.60 table and fill in items it does not know
+local function priceOf(id) return prices[id] end
+local function sellOf(id) local p = prices[id] return p and p.sell or 0 end
+local function densityOf(id)
+  local p = prices[id]
+  if not p or not p.sell or (p.weight or 0) <= 0 then return 0 end
+  return p.sell / p.weight
+end
+
+local function fmtGold(n)
+  if n >= 1000000 then return string.format('%.1fkk', n / 1000000) end
+  if n >= 1000 then return string.format('%.1fk', n / 1000) end
+  return tostring(n)
+end
 
 -- g_settings stores arrays as "1:", "2:" child nodes and may hand them back with string keys: rebuild real arrays
 local function toArray(t)
@@ -40,8 +92,12 @@ end
 
 local function load()
   local raw = g_settings.getNode('autoloot')
-  data = { lists = {}, active = 1, customNames = {} }
+  data = { lists = {}, active = 1, customNames = {}, ownTips = true, pricedOnly = false, sort = 'name' }
+  local function flag(v) return v == true or v == 'true' or v == 1 end
   if type(raw) == 'table' then
+    if raw.ownTips ~= nil then data.ownTips = flag(raw.ownTips) end
+    data.pricedOnly = flag(raw.pricedOnly)
+    for _, m in ipairs(SORT_MODES) do if raw.sort == m.id then data.sort = m.id end end
     for _, l in ipairs(toArray(raw.lists)) do
       if type(l) == 'table' and l.name then
         local items = {}
@@ -63,7 +119,10 @@ end
 
 local function activeList() return data.lists[data.active] end
 local function unlocked() return slotsMax or DEFAULT_UNLOCKED end
-local function nameOf(id) return data.customNames[tostring(id)] or AutolootNames[id] end
+local function nameOf(id)
+  local p = prices[id]
+  return data.customNames[tostring(id)] or (p and p.name) or AutolootNames[id]
+end
 
 local function idOf(name)
   if not nameIndex then
@@ -107,8 +166,63 @@ local function buildIndex()
   end)
 end
 
+-- our own tooltip for the item list: everything the price book knows
 local function itemTooltip(id)
-  return (nameOf(id) or "(no name - right click to set)") .. "  [" .. id .. "]"
+  local t = (nameOf(id) or "(no name - right click to set)") .. "  [" .. id .. "]"
+  local p = prices[id]
+  if p then
+    t = t .. "\n" .. fmtGold(p.sell) .. " gp"
+    if (p.weight or 0) > 0 then t = t .. "   " .. p.weight .. " oz   " .. fmtGold(math.floor(densityOf(id))) .. " gp/oz" end
+    if p.npc and #p.npc > 0 then t = t .. "\nbest price seen at: " .. p.npc end
+  else
+    t = t .. "\nno price known yet"
+  end
+  return t
+end
+
+-- The client draws its own item tooltip (a root widget holding a label with id 'klasa') and it also swallows the
+-- normal setTooltip path for items, so we hide theirs and draw our own box next to the cursor.
+local tip
+
+local function hideClientTooltip()
+  if not data.ownTips then return end
+  for _, c in ipairs(g_ui.getRootWidget():getChildren()) do
+    if not c:isDestroyed() and c:isVisible() and c:getChildById('klasa') then c:hide() end
+  end
+end
+
+local function hideTip()
+  if tip then tip:hide() end
+end
+
+local function showTip(text)
+  if not data.ownTips then return end
+  if not tip then
+    tip = g_ui.createWidget('AutolootTip', g_ui.getRootWidget())
+    tip:setId('autolootTip')
+  end
+  tip:setText(text)
+  tip:show()
+  tip:raise()
+  local pos, screen, size = g_window.getMousePosition(), g_window.getSize(), tip:getSize()
+  local x = pos.x + 14
+  local y = pos.y + 14
+  if x + size.width > screen.width - 6 then x = pos.x - size.width - 8 end
+  if y + size.height > screen.height - 6 then y = pos.y - size.height - 8 end
+  tip:setPosition({ x = math.max(0, x), y = math.max(0, y) })
+end
+
+-- every item cell in this window uses our box, the client's tooltip is pushed out of the way
+local function bindTip(widget, textFn)
+  widget.onHoverChange = function(_, hovered)
+    if hovered then
+      showTip(textFn())
+      addEvent(hideClientTooltip)
+      scheduleEvent(hideClientTooltip, 60)
+    else
+      hideTip()
+    end
+  end
 end
 
 -- ui ------------------------------------------------------------------------------------
@@ -169,31 +283,61 @@ refreshResults = function()
   if not allItems then buildIndex() end
   window.results:destroyChildren()
   local q = window.search:getText():trim():lower()
-  local shown, total = 0, 0
+  local hits = {}
   for _, id in ipairs(allItems) do
     local hit = true
     if q:len() > 0 then
       local n = nameOf(id)
       hit = (tostring(id):find(q, 1, true) == 1) or (n and n:lower():find(q, 1, true)) or false
     end
-    if hit then
-      total = total + 1
-      if shown < MAX_RESULTS then
-        shown = shown + 1
-        local w = g_ui.createWidget('AutolootItem', window.results)
-        w:setItemId(id)
-        w:setTooltip(itemTooltip(id))
-        bindClicks(w, id, function() addToActive(id) end)
-      end
+    if hit and data.pricedOnly and not prices[id] then hit = false end
+    if hit then table.insert(hits, id) end
+  end
+  local sortMode = data.sort or 'name'
+  if sortMode == 'value' or sortMode == 'density' then
+    -- items with a known price first, best on top; everything unpriced keeps the name order behind them
+    local key = (sortMode == 'value') and sellOf or densityOf
+    table.sort(hits, function(a, b)
+      local ka, kb = key(a), key(b)
+      if ka ~= kb then return ka > kb end
+      local na, nb = nameOf(a), nameOf(b)
+      if na and nb and na ~= nb then return na < nb end
+      if na and not nb then return true end
+      if nb and not na then return false end
+      return a < b
+    end)
+  end
+  local total, shown = #hits, 0
+  for _, id in ipairs(hits) do
+    if shown >= MAX_RESULTS then break end
+    shown = shown + 1
+    local w = g_ui.createWidget('AutolootItem', window.results)
+    w:setItemId(id)
+    bindTip(w, function() return itemTooltip(id) end)
+    bindClicks(w, id, function() addToActive(id) end)
+  end
+  local known = 0
+  for _ in pairs(prices) do known = known + 1 end
+  local priceNote
+  if known == 0 then
+    priceNote = " - no prices yet: open an NPC trade window once"
+  else
+    priceNote = " - prices for " .. known .. " items"
+    if priceMeta.npc then
+      priceNote = priceNote .. ", last from " .. priceMeta.npc ..
+        (priceMeta.count > 0 and (" (" .. priceMeta.count .. " items") or " (") ..
+        (ago(priceMeta.at) and ((priceMeta.count > 0 and ", " or "") .. ago(priceMeta.at)) or "") .. ")"
     end
   end
   if total == 0 then
-    window.resultsInfo:setText("no match")
+    resultsSummary = "no match"
   elseif shown < total then
-    window.resultsInfo:setText(shown .. " of " .. total .. " shown - type to narrow down")
+    resultsSummary = shown .. " of " .. total .. " shown, type to narrow down" .. priceNote
   else
-    window.resultsInfo:setText(total .. " items")
+    resultsSummary = total .. " items" .. priceNote
   end
+  window.resultsInfo:setText(resultsSummary)
+  window.resultsInfo:setColor('#aaaaaa')
 end
 
 -- one small backpack in the carousel
@@ -211,7 +355,9 @@ local function drawBackpack(index)
       cell:setImageColor(id and RED or GREY)
       cell:setOpacity(0.5)
     end
-    cell:setTooltip(id and itemTooltip(id) or ("slot " .. i .. (i > unlocked() and " (locked)" or "")))
+    bindTip(cell, function()
+      return id and itemTooltip(id) or ("slot " .. i .. (i > unlocked() and " (locked on the server)" or " (empty)"))
+    end)
     cell.onMouseRelease = function(widget, mousePos, mouseButton)
       if mouseButton == MouseRightButton and id then askName(id) return true end
       if mouseButton ~= MouseLeftButton then return false end
@@ -268,7 +414,12 @@ local function drawServerCard()
     local cell = g_ui.createWidget('AutolootMiniSlot', w.slots)
     local e = serverItems[i]
     cell:setItemId(e and e.id or 0)
-    if e then cell:setTooltip(e.name .. (e.id and ("  [" .. e.id .. "]") or "  (unknown item name)")) end
+    if e then
+      bindTip(cell, function()
+        if e.id then return itemTooltip(e.id) end
+        return e.name .. "  (item id unknown - right click it in the list to set the name)"
+      end)
+    end
     if i > unlocked() then cell:setImageColor(GREY); cell:setOpacity(0.5) end
     cell.onMouseRelease = function() saveServerAsBag(); return true end
   end
@@ -404,7 +555,95 @@ local function onTextMessage(mode, text)
   if window and window:isVisible() then refreshBags() end
 end
 
+-- add by value: fill the selected list with the best-paying items the price book knows ---
+local function openByValue()
+  local list = activeList()
+  local w = g_ui.createWidget('AutolootValueWindow', g_ui.getRootWidget())
+  local content = w.content
+  local rows = {}
+  local function row(label, value, tip)
+    local r = g_ui.createWidget('AutolootValueRow', content)
+    r.text:setText(label)
+    r.value:setText(tostring(value))
+    if tip then r.text:setTooltip(tip) end
+    return r
+  end
+  rows.minSell = row('Min sell price', 1000, 'Only items an NPC pays at least this much for')
+  rows.minDensity = row('Min gold per oz', 0, 'Value density: sell price divided by weight. 0 = ignore')
+  rows.slots = row('Slots to fill', math.max(0, unlocked() - #list.items),
+    'How many items to add. Your unlocked slot count is ' .. unlocked() .. ', the list holds ' .. #list.items .. ' now')
+  local sortRow = g_ui.createWidget('AutolootValueRow', content)
+  sortRow.text:setText('Order by')
+  sortRow.value:destroy()
+  local order = g_ui.createWidget('ComboBox', sortRow)
+  order:addAnchor(AnchorLeft, 'text', AnchorRight)
+  order:addAnchor(AnchorVerticalCenter, 'parent', AnchorVerticalCenter)
+  order:setWidth(150)
+  order:addOption('gold per oz', 'density')
+  order:addOption('sell price', 'value')
+
+  local known = 0
+  for _ in pairs(prices) do known = known + 1 end
+  w.info:setText(known == 0 and 'No prices yet: open an NPC trade window once and they are learned automatically.'
+                             or (known .. ' items with known prices. Items already in the list are skipped.'))
+  w.cancelButton.onClick = function() w:destroy() end
+  w.okButton.onClick = function()
+    local minSell = tonumber(rows.minSell.value:getText()) or 0
+    local minDens = tonumber(rows.minDensity.value:getText()) or 0
+    local slots = math.min(tonumber(rows.slots.value:getText()) or 0, SLOTS_PER_BAG - #list.items)
+    local opt = order:getCurrentOption()
+    local by = (opt and opt.data) or 'density'
+    local cands = {}
+    for id, p in pairs(prices) do
+      if p.sell >= minSell and densityOf(id) >= minDens and not inList(list, id) then table.insert(cands, id) end
+    end
+    table.sort(cands, function(a, b)
+      local ka, kb = (by == 'value') and sellOf(a) or densityOf(a), (by == 'value') and sellOf(b) or densityOf(b)
+      if ka ~= kb then return ka > kb end
+      return a < b
+    end)
+    local added = 0
+    for _, id in ipairs(cands) do
+      if added >= slots then break end
+      table.insert(list.items, id)
+      added = added + 1
+    end
+    save()
+    refreshAll()
+    w:destroy()
+    setStatus(added .. ' item(s) added to ' .. list.name .. ' (' .. #cands .. ' matched)',
+      added > 0 and '#66ff66' or RED)
+  end
+end
+
+-- price book: every trade window teaches us what that NPC pays -------------------------
+local function onOpenNpcTrade(items)
+  local npc = (modules.game_npctrade and modules.game_npctrade.npcWindow and modules.game_npctrade.npcWindow:getText()) or 'an NPC'
+  local learned, renamed = 0, 0
+  for _, item in pairs(items) do
+    local ptr, name, weight, sell = item[1], item[2], (item[3] or 0) / 100, item[5] or 0
+    local id = ptr and ptr:getId()
+    if id and sell > 0 then
+      local p = prices[id]
+      if not p or sell >= p.sell then
+        prices[id] = { sell = sell, weight = weight, npc = npc, name = name }
+        learned = learned + 1
+      elseif p.name ~= name then
+        p.name = name
+        renamed = renamed + 1
+      end
+    end
+  end
+  if learned > 0 or renamed > 0 then
+    priceMeta = { npc = npc, at = os.time(), count = learned }
+    savePrices()
+    nameIndex = nil -- shop names feed the search index
+    if window and window:isVisible() then refreshAll() end
+  end
+end
+
 -- for other modules (autoloot tracker) -------------------------------------------------
+function priceInfo(id) return prices[id] end              -- { sell=, weight=, npc=, name= } or nil
 function getServerItems() return serverItems end          -- { {id=, name=}, ... } from the last !autoloot reply
 function getActiveItems() local l = activeList() return l.items, l.name end
 function itemName(id) return nameOf(id) end
@@ -422,6 +661,7 @@ function show()
 end
 
 function hide()
+  hideTip()
   window:hide()
   if button then button:setOn(false) end
 end
@@ -432,13 +672,37 @@ end
 
 function init()
   load()
-  connect(g_game, { onTextMessage = onTextMessage, onGameEnd = function() slotsUsed, slotsMax, serverItems = nil, nil, {} end })
+  loadPrices()
+  connect(g_game, { onTextMessage = onTextMessage, onOpenNpcTrade = onOpenNpcTrade,
+                    onGameEnd = function() slotsUsed, slotsMax, serverItems = nil, nil, {} end })
   window = g_ui.displayUI('autoloot')
   window:hide()
   button = modules.client_topmenu.addRightGameToggleButton('autolootButton', tr('Autoloot'), '/images/topbuttons/shop', toggle, false, 1002)
   button:setOn(false)
 
   window.search.onTextChange = function() refreshResults() end
+  for i, m in ipairs(SORT_MODES) do
+    window.sort:addOption(m.text, m.id)
+    if m.id == (data.sort or 'name') then window.sort:setCurrentIndex(i) end
+  end
+  window.sort.onOptionChange = function(_, _, dataId)
+    data.sort = dataId or 'name'
+    save()
+    refreshResults()
+  end
+  window.byValue.onClick = openByValue
+  window.ownTips:setChecked(data.ownTips and true or false)
+  window.ownTips.onCheckChange = function(_, checked)
+    data.ownTips = checked
+    if not checked then hideTip() end
+    save()
+  end
+  window.pricedOnly:setChecked(data.pricedOnly and true or false)
+  window.pricedOnly.onCheckChange = function(_, checked)
+    data.pricedOnly = checked
+    save()
+    refreshResults()
+  end
   window.prevBag.onClick = function() carouselStart = math.max(1, carouselStart - 1); refreshBags() end
   window.nextBag.onClick = function() carouselStart = carouselStart + 1; refreshBags() end
   window.newBag.onClick = newBag
@@ -451,8 +715,9 @@ function init()
 end
 
 function terminate()
-  disconnect(g_game, { onTextMessage = onTextMessage })
+  disconnect(g_game, { onTextMessage = onTextMessage, onOpenNpcTrade = onOpenNpcTrade })
   removeEvent(sendEvent)
   if button then button:destroy() button = nil end
+  if tip then tip:destroy() tip = nil end
   if window then window:destroy() window = nil end
 end

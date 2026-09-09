@@ -19,6 +19,7 @@ DIR = '/exiva'
 
 local window, contents, button, minimap, hint, mapPanel
 local useMarkers = true -- name floating at the edge of the game view, in the direction of the estimated spot
+local updateMarker      -- defined below render(), which calls it
 local targets = {}     -- { name, color, casts = { newest first }, overlay, label, dots, row, raster, file }
 local pendingCast      -- { who (lower case), pos, t }
 local tickEvent
@@ -177,7 +178,7 @@ end
 
 -- on-screen marker: the name slides along the edge of the game view, in the direction of the estimated spot
 -- (centroid of the highlighted area, or the label point for a lone very-far reply), from your current position
-local function updateMarker(target)
+updateMarker = function(target)
   local r = target.raster
   local me = g_game.getLocalPlayer()
   local pos = me and me:getPosition()

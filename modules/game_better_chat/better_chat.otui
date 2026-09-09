@@ -97,13 +97,20 @@ BetterChatBang < UIButton
     phantom: true
     visible: false
 
-BetterChatRow < UILabel
+BetterChatRow < UITextEdit
   font: verdana-11px-antialised
   height: 14
   margin-left: 2
   text-wrap: true
   text-auto-resize: true
   color: yellow
+  selection-color: #111416
+  selection-background-color: #999999
+  change-cursor-image: false
+  cursor-visible: false
+  editable: false
+  selectable: true
+  draggable: false
   focusable: false
 
 BetterChatSettingsRow < Panel

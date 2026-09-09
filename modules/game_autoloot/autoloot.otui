@@ -1,3 +1,15 @@
+AutolootTip < UILabel
+  font: verdana-11px-antialised
+  color: #ffffff
+  background-color: #111111ee
+  border-width: 1
+  border-color: #666666
+  text-align: left
+  text-auto-resize: true
+  padding: 3 5 3 5
+  phantom: true
+  visible: false
+
 AutolootItem < Item
   virtual: true
   &selectable: true
@@ -59,6 +71,64 @@ AutolootBackpack < Panel
     font: verdana-9px
     color: #aaaaaa
 
+AutolootValueRow < Panel
+  height: 24
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 120
+    text-align: left
+
+  TextEdit
+    id: value
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    width: 90
+
+AutolootValueWindow < MainWindow
+  !text: tr('Add by value')
+  size: 380 250
+  @onEscape: self:destroy()
+
+  Panel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: info.top
+    margin-bottom: 4
+    layout:
+      type: verticalBox
+
+  Label
+    id: info
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: okButton.top
+    margin-bottom: 6
+    height: 30
+    text-wrap: true
+    text-align: left
+    color: #aaaaaa
+
+  Button
+    id: cancelButton
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 22
+
+  Button
+    id: okButton
+    !text: tr('Add')
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 6
+    size: 80 22
+
 AutolootServerBag < AutolootBackpack
   border-color: #6688cc
   background-color: #223355aa
@@ -79,20 +149,68 @@ MainWindow
     anchors.left: parent.left
     anchors.right: parent.right
     text-align: left
-    !text: tr('Items (type to filter by name or id). Left click: put into the selected backpack. Right click: set name.')
+    !text: tr('Items (type to filter by name or id). Left click: put into the selected backpack. Right click: set name. Prices come from NPC trade windows you open.')
     text-wrap: true
     height: 28
 
-  TextEdit
-    id: search
-    anchors.top: prev.bottom
-    anchors.left: parent.left
+  Button
+    id: byValue
+    anchors.top: hint.bottom
     anchors.right: parent.right
     margin-top: 3
+    size: 110 20
+    !text: tr('Add by value...')
+    !tooltip: tr('Fill the selected backpack with the most valuable items an NPC buys (prices are learned from trade windows)')
+
+  ComboBox
+    id: sort
+    anchors.top: hint.bottom
+    anchors.right: byValue.left
+    margin-top: 3
+    margin-right: 6
+    width: 130
+
+  CheckBox
+    id: pricedOnly
+    anchors.top: hint.bottom
+    anchors.right: sortLabel.left
+    margin-top: 4
+    margin-right: 10
+    width: 150
+    !text: tr('Only with known price')
+    !tooltip: tr('Hide items no NPC price has been learned for yet')
+
+  CheckBox
+    id: ownTips
+    anchors.top: hint.bottom
+    anchors.right: pricedOnly.left
+    margin-top: 4
+    margin-right: 10
+    width: 110
+    !text: tr('Price tooltips')
+    !tooltip: tr("Hide the client's item tooltip over this list and show name, id, price, weight and gold per oz instead")
+
+  Label
+    id: sortLabel
+    anchors.top: hint.bottom
+    anchors.right: sort.left
+    margin-top: 5
+    margin-right: 4
+    width: 30
+    text-align: right
+    !text: tr('Sort')
+
+  TextEdit
+    id: search
+    anchors.top: hint.bottom
+    anchors.left: parent.left
+    anchors.right: ownTips.left
+    margin-top: 3
+    margin-right: 6
 
   AutolootGrid
     id: results
-    anchors.top: prev.bottom
+    anchors.top: search.bottom
     anchors.left: parent.left
     anchors.right: resultsScroll.left
     margin-top: 5

@@ -45,9 +45,9 @@
   {
    "name": "game_autoloot",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "title": "Autoloot",
-   "description": "Named loot backpacks with item search; Apply sends !autoloot.",
+   "description": "Loot lists with item search, NPC prices and gold per oz, Add by value.",
    "screenshot": "screenshots/game_autoloot.png",
    "screenshotSize": [
     850,
@@ -57,8 +57,8 @@
    "files": [
     {
      "path": "modules/game_autoloot/autoloot.lua",
-     "sha1": "deee2060573231a70e8c0ab1639da4269e9fdb3c",
-     "size": 17032
+     "sha1": "ea9686395a6b0608fc639a5c1695e31c98d013b0",
+     "size": 27647
     },
     {
      "path": "modules/game_autoloot/autoloot.otmod",
@@ -67,8 +67,8 @@
     },
     {
      "path": "modules/game_autoloot/autoloot.otui",
-     "sha1": "7d42c5b791a802540c76106d06993c87d89c381b",
-     "size": 4341
+     "sha1": "f9846f4d95d6c0889489eb4540b23b7e9b7e2c3b",
+     "size": 6924
     },
     {
      "path": "modules/game_autoloot/items_860.lua",
@@ -158,7 +158,7 @@
   {
    "name": "game_exiva",
    "type": "module",
-   "version": "1.1.3",
+   "version": "1.1.4",
    "title": "Exiva",
    "description": "Exiva replies drawn on the minimap and at the screen edge.",
    "screenshot": "screenshots/game_exiva.png",
@@ -185,8 +185,8 @@
     },
     {
      "path": "modules/game_exiva/main.lua",
-     "sha1": "ebffaeba6eaac6b1a27fd878f0405028fd5e6605",
-     "size": 17079
+     "sha1": "460e95c923950f4418596287331f68a35e88645a",
+     "size": 17141
     },
     {
      "path": "modules/game_exiva/png.lua",
@@ -228,7 +228,7 @@
   {
    "name": "game_better_chat",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "title": "Better chat",
    "description": "Split view beside the chat with coloured [!] filter tabs.",
    "screenshot": "screenshots/game_better_chat.png",
@@ -240,8 +240,8 @@
    "files": [
     {
      "path": "modules/game_better_chat/better_chat.otui",
-     "sha1": "3e9c7f97bd2aa95c95bfdcb022d175793ab6a360",
-     "size": 5120
+     "sha1": "43aef3c2f937eb9f5f7edfd31804e3ea7fe0ec27",
+     "size": 5297
     },
     {
      "path": "modules/game_better_chat/game_better_chat.otmod",
@@ -250,8 +250,8 @@
     },
     {
      "path": "modules/game_better_chat/main.lua",
-     "sha1": "3d4a308afa633b97a322d763f2cfc055383cbd79",
-     "size": 25400
+     "sha1": "4078d2ffcd19acf7ec1bf8c6ee9126ee676624d1",
+     "size": 27522
     }
    ]
   },

@@ -12,9 +12,9 @@
     {
       "name": "game_autoloot",
       "type": "module",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Autoloot",
-      "description": "Named loot backpacks with item search; Apply sends !autoloot.",
+      "description": "Loot lists with item search, NPC prices and gold per oz, Add by value.",
       "screenshot": "screenshots/game_autoloot.png"
     },
     {
@@ -43,7 +43,7 @@
     {
       "name": "game_exiva",
       "type": "module",
-      "version": "1.1.3",
+      "version": "1.1.4",
       "title": "Exiva",
       "description": "Exiva replies drawn on the minimap and at the screen edge.",
       "screenshot": "screenshots/game_exiva.png"
@@ -59,7 +59,7 @@
     {
       "name": "game_better_chat",
       "type": "module",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "title": "Better chat",
       "description": "Split view beside the chat with coloured [!] filter tabs.",
       "screenshot": "screenshots/game_better_chat.png"

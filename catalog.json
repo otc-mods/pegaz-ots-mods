@@ -77,6 +77,14 @@
       "screenshot": "screenshots/game_save_now.png"
     },
     {
+      "name": "game_buttons_fit",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Buttons panel fit",
+      "description": "Grows the Buttons panel so every button row stays visible.",
+      "screenshot": "screenshots/game_buttons_fit.png"
+    },
+    {
       "name": "game_module_installer",
       "type": "module",
       "version": "1.0.10",

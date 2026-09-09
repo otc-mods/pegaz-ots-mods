@@ -14,6 +14,7 @@ Client modules for the PegazOTS OTClientV8 client (protocol 8.6).
 | Position HUD | Your x, y, z in one line at the top-right corner of the minimap |
 | Better chat | Split view beside the console with coloured `[!]` filter tabs (alerts, trade, raids, private), resizable, keeps channels open |
 | Save now | Save settings, hotkeys, layout, bot storage and minimap without exiting (button or `Ctrl+Alt+S`) |
+| Buttons panel fit | Grows the right-side Buttons panel so the extra buttons these modules add stay visible |
 | Module installer | This installer: lists, installs, updates and removes the modules above without a restart |
 
 Install with the in-game module installer (fetches `index.json` from this repo's Pages site), or by hand:

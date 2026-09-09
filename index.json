@@ -291,6 +291,31 @@
    ]
   },
   {
+   "name": "game_buttons_fit",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Buttons panel fit",
+   "description": "Grows the Buttons panel so every button row stays visible.",
+   "screenshot": "screenshots/game_buttons_fit.png",
+   "screenshotSize": [
+    194,
+    77
+   ],
+   "screenshotSha1": "66be95bbc8b8fecd188a2f7e245bc8b6da8826ae",
+   "files": [
+    {
+     "path": "modules/game_buttons_fit/game_buttons_fit.otmod",
+     "sha1": "dca6f66b1c0f68100089c24aafcce05e18340ba2",
+     "size": 342
+    },
+    {
+     "path": "modules/game_buttons_fit/main.lua",
+     "sha1": "4e107c83804e396892811e0e6347a618a42af82d",
+     "size": 1338
+    }
+   ]
+  },
+  {
    "name": "game_module_installer",
    "type": "module",
    "version": "1.0.10",

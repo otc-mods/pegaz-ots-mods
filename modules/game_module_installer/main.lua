@@ -4,7 +4,7 @@
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
 ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.0.10"  -- keep equal to the catalog entry; the installer records itself with it on first load
+VERSION = "1.2.0"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua", "modules/game_module_installer/grip.png" }
@@ -89,6 +89,11 @@ end
 -- install / remove ------------------------------------------------------------------------------
 local refreshRows
 local installQueue, queueCurrent = {}, nil -- "Install all": entries still to do, name of the one running
+CHECK_EVERY_MS = 30 * 60 * 1000   -- silent update check while you play
+local checkEvent
+local pendingUpdates = 0          -- how many entries are missing or outdated after the last check
+local autoInPz = false            -- install them by itself, but only while standing in a protection zone
+local countUpdates, markButton    -- defined further down, used by the install queue above them
 local nextInQueue
 
 local function finishInstall(entry, paths)
@@ -158,6 +163,8 @@ nextInQueue = function()
   local entry = table.remove(installQueue, 1)
   if not entry then
     if index then setStatus("all modules installed and up to date.", '#66ff66') end
+    pendingUpdates = countUpdates()
+    markButton()
     return
   end
   queueCurrent = entry.name
@@ -178,7 +185,7 @@ function installAll()
   end
   if selfEntry then table.insert(installQueue, selfEntry) end
   if #installQueue == 0 then return setStatus("nothing to do: everything is installed and up to date.", '#66ff66') end
-  setStatus("installing " .. #installQueue .. " module(s)...")
+  setStatus("installing / updating " .. #installQueue .. " module(s)...")
   nextInQueue()
 end
 
@@ -205,7 +212,13 @@ refreshRows = function()
   window.list:destroyChildren()
   rows = {}
   if not index then return end
+  local q = window.search and window.search:getText():trim():lower() or ""
+  local shown = {}
   for _, entry in ipairs(index.entries or {}) do
+    local hay = ((entry.title or "") .. " " .. entry.name .. " " .. (entry.description or "")):lower()
+    if q:len() == 0 or hay:find(q, 1, true) then table.insert(shown, entry) end
+  end
+  for _, entry in ipairs(shown) do
     local row = g_ui.createWidget('InstallerCard', window.list)
     local state = moduleState(entry)
     row.title:setText((entry.title or entry.name) .. "  (" .. entry.name .. ")")
@@ -278,9 +291,73 @@ function fetchIndex()
     end
     index = data
     if type(index.base) ~= 'string' then index.base = INDEX_URL:gsub("index%.json.*$", "") end
+    pendingUpdates = countUpdates()
+    markButton()
     refreshRows()
-    setStatus(#index.entries .. " module(s) listed.")
+    setStatus(#index.entries .. " module(s) listed." ..
+      (pendingUpdates > 0 and ("  " .. pendingUpdates .. " update(s) available.") or ""))
   end)
+end
+
+-- a silent check: fetch the list, count what is new, mark the top-menu button. Nothing is downloaded.
+local function inProtectionZone()
+  local me = g_game.getLocalPlayer()
+  if not me then return false end
+  local ok, states = pcall(function() return me:getStates() end)
+  if not ok or type(states) ~= 'number' then return false end
+  return bit.band(states, PlayerStates.Pz) > 0
+end
+
+countUpdates = function()
+  local n = 0
+  if not index then return 0 end
+  for _, entry in ipairs(index.entries or {}) do
+    local state = moduleState(entry)
+    if state == "outdated" or (state == "installed" and false) then n = n + 1 end
+  end
+  return n
+end
+
+markButton = function()
+  if not button then return end
+  local tip = tr('Modules')
+  if pendingUpdates > 0 then
+    tip = pendingUpdates .. ' ' .. (pendingUpdates == 1 and tr('update available') or tr('updates available')) ..
+      '\n' .. tr('open the window and press Install all')
+    button:setIcon('/images/topbuttons/modulemanager')
+    button:setIconColor('#66ff66')
+  else
+    button:setIconColor('#ffffff')
+  end
+  button:setTooltip(tip)
+end
+
+function checkForUpdates(silent)
+  HTTP.getJSON(INDEX_URL .. "?t=" .. os.time(), function(data, err)
+    if err or type(data) ~= 'table' or type(data.entries) ~= 'table' then return end
+    index = data
+    if type(index.base) ~= 'string' then index.base = INDEX_URL:gsub("index%.json.*$", "") end
+    pendingUpdates = countUpdates()
+    markButton()
+    if window and window:isVisible() then refreshRows() end
+    if pendingUpdates > 0 and autoInPz and not busy and g_game.isOnline() and inProtectionZone()
+       and not g_game.getAttackingCreature() then
+      installAll()
+    elseif not silent and window and window:isVisible() then
+      setStatus(pendingUpdates > 0 and (pendingUpdates .. " update(s) available") or "everything is up to date.")
+    end
+  end)
+end
+
+local function periodicCheck()
+  if g_game.isOnline() then checkForUpdates(true) end
+  checkEvent = scheduleEvent(periodicCheck, CHECK_EVERY_MS)
+end
+
+function toggleAutoInPz()
+  autoInPz = not autoInPz
+  g_settings.set('moduleInstallerAutoPz', autoInPz)
+  if autoInPz then checkForUpdates(true) end
 end
 
 function openRepo()
@@ -320,7 +397,7 @@ function reloadAll()
       anchor = AnchorHorizontalCenter }, nil, function() box:destroy() end)
 end
 
-MIN_W, MIN_H, MAX_W, MAX_H = 560, 320, 1600, 1400
+MIN_W, MIN_H, MAX_W, MAX_H = 600, 340, 1600, 1400
 
 -- bottom-right grip: drag resizes both ways. The first drag breaks the centre anchors so the top-left corner
 -- stays put and the grip follows the mouse (a centred window would grow half as fast on each side).
@@ -355,8 +432,17 @@ function init()
   button = modules.client_topmenu.addRightGameToggleButton('moduleInstallerButton', tr('Modules'), '/images/topbuttons/modulemanager', toggle, false, 1005)
   button:setOn(false)
   window.refresh.onClick = fetchIndex
+  window.search.onTextChange = function() refreshRows() end
   window.onClose = hide
   setupCornerGrip()
+  autoInPz = g_settings.getBoolean('moduleInstallerAutoPz')
+  window.autoPz:setChecked(autoInPz)
+  window.autoPz.onCheckChange = function(_, checked)
+    if checked ~= autoInPz then toggleAutoInPz() end
+  end
+  connect(g_game, { onGameStart = function() scheduleEvent(function() checkForUpdates(true) end, 8000) end })
+  checkEvent = scheduleEvent(periodicCheck, CHECK_EVERY_MS)
+  if g_game.isOnline() then scheduleEvent(function() checkForUpdates(true) end, 3000) end
 end
 
 function terminate()

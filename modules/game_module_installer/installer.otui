@@ -92,18 +92,27 @@ InstallerCard < Panel
 MainWindow
   id: moduleInstallerWindow
   !text: tr('Modules')
-  size: 560 640
+  size: 620 640
   // mouse hit-testing stops at the padding rect, so the frame cannot hold resize grips: shrink the right and
   // bottom padding to 2 px, push the content back with margins and place the grips in the freed strip
   padding-right: 2
   padding-bottom: 2
   @onEscape: modules.game_module_installer.hide()
 
-  ScrollablePanel
-    id: list
+  TextEdit
+    id: search
     anchors.top: parent.top
     anchors.left: parent.left
+    anchors.right: parent.right
+    margin-right: 14
+    !tooltip: tr('Filter the list by name or description')
+
+  ScrollablePanel
+    id: list
+    anchors.top: search.bottom
+    anchors.left: parent.left
     anchors.right: listScroll.left
+    margin-top: 6
     anchors.bottom: status.top
     margin-bottom: 6
     margin-right: 4
@@ -116,9 +125,11 @@ MainWindow
 
   VerticalScrollBar
     id: listScroll
-    anchors.top: parent.top
+    // must not point back at 'list' (which anchors its right edge here): that counts as a cycle
+    anchors.top: search.bottom
     anchors.right: parent.right
     anchors.bottom: status.top
+    margin-top: 6
     margin-bottom: 6
     margin-right: 14
     step: 60
@@ -126,21 +137,31 @@ MainWindow
 
   Label
     id: status
-    anchors.bottom: refresh.top
+    anchors.bottom: autoPz.top
     anchors.left: parent.left
     anchors.right: parent.right
-    margin-bottom: 6
+    margin-bottom: 4
     margin-right: 14
-    height: 28
+    height: 26
     text-align: left
     text-wrap: true
+
+  CheckBox
+    id: autoPz
+    anchors.bottom: refresh.top
+    anchors.left: parent.left
+    margin-bottom: 8
+    width: 300
+    height: 18
+    !text: tr('Update by itself in protection zones')
+    !tooltip: tr('When updates are published, install them without asking - but only while you stand in a protection zone and are not attacking anything')
 
   Button
     id: refresh
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     margin-bottom: 14
-    size: 110 24
+    size: 100 24
     !text: tr('Refresh list')
 
   Button
@@ -160,11 +181,11 @@ MainWindow
     anchors.bottom: parent.bottom
     anchors.left: reload.right
     margin-left: 6
+    size: 150 24
     margin-bottom: 14
-    size: 100 24
-    !text: tr('Install all')
+    !text: tr('Install / update all')
     color: #66ff66
-    !tooltip: tr('Install every missing module and update the outdated ones, one after another')
+    !tooltip: tr('Install every missing module and update every outdated one, one after another')
     @onClick: modules.game_module_installer.installAll()
 
   Button
@@ -173,7 +194,7 @@ MainWindow
     anchors.right: closeButton.left
     margin-right: 6
     margin-bottom: 14
-    size: 110 24
+    size: 100 24
     !text: tr('Open GitHub')
     @onClick: modules.game_module_installer.openRepo()
 
@@ -204,7 +225,7 @@ MainWindow
     anchors.bottom: parent.bottom
     margin-bottom: 14
     width: 8
-    minimum: 560
+    minimum: 600
     maximum: 1600
 
   UIWidget

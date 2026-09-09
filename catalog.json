@@ -87,9 +87,9 @@
     {
       "name": "game_module_installer",
       "type": "module",
-      "version": "1.0.10",
+      "version": "1.2.0",
       "title": "Module installer",
-      "description": "Lists the published modules, installs and updates them.",
+      "description": "Lists the published modules, installs and updates them, search included.",
       "screenshot": "screenshots/game_module_installer.png"
     }
   ]

@@ -318,9 +318,9 @@
   {
    "name": "game_module_installer",
    "type": "module",
-   "version": "1.0.10",
+   "version": "1.2.0",
    "title": "Module installer",
-   "description": "Lists the published modules, installs and updates them.",
+   "description": "Lists the published modules, installs and updates them, search included.",
    "screenshot": "screenshots/game_module_installer.png",
    "screenshotSize": [
     799,
@@ -340,13 +340,13 @@
     },
     {
      "path": "modules/game_module_installer/installer.otui",
-     "sha1": "acf833065179b08873176dcfeaea12b46ec6b025",
-     "size": 4924
+     "sha1": "9acd54c345269da8c46ce6da2bf2d018640db4d6",
+     "size": 5618
     },
     {
      "path": "modules/game_module_installer/main.lua",
-     "sha1": "dfe6227b302a28b4c8d1bc86531ca783eea1479e",
-     "size": 14812
+     "sha1": "97ef399533198535f60638324b1e76c28785a91a",
+     "size": 18436
     }
    ]
   }

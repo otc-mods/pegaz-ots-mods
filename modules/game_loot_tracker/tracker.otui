@@ -1,6 +1,21 @@
+LootTrackerTip < UILabel
+  font: verdana-11px-antialised
+  color: #ffffff
+  background-color: #111111ee
+  border-width: 1
+  border-color: #666666
+  text-align: left
+  text-auto-resize: true
+  padding: 3 5 3 5
+  phantom: true
+  visible: false
+
 LootTrackerRow < Panel
   height: 34
   margin-top: 2
+  // the stock Panel style is phantom: without this the row gets no hover and no clicks
+  phantom: false
+  focusable: false
 
   Item
     id: item

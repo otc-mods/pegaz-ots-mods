@@ -17,9 +17,12 @@ local known = {}
 local pendingProbe       -- { id=, due= }
 local refreshEvent
 local lastKey = ""
-SORT_MODES = { "list", "name", "count" }
-SORT_LABELS = { list = "server order", name = "name", count = "count, highest first" }
+SORT_MODES = { "list", "name", "count", "value" }
+SORT_LABELS = { list = "server order", name = "name", count = "count, highest first", value = "total value" }
 local sortMode = "list"   -- g_settings 'lootTrackerSort'
+-- our own item box on hover. Stored inverted ('lootTrackerTipsOff'): a missing or false key means enabled,
+-- so a stale/half-written setting cannot silently switch it off.
+local showTips = true
 -- auto recount (optional, off by default): every AUTO_RECOUNT_MS while the window is open, plus after trades and
 -- depot visits. Off = only the row clicks and the title-bar button. It uses every listed item once per round.
 AUTO_RECOUNT_MS = 30000
@@ -29,6 +32,91 @@ local lastAutoRecount = 0
 local applySort -- defined below, used by updateCounts
 
 local function autoloot() return modules.game_autoloot end
+
+-- prices come from the autoloot module's price book (learned from NPC trade windows)
+local function priceOf(id)
+  local al = autoloot()
+  local p = al and al.priceInfo and al.priceInfo(id)
+  return p and p.sell or nil
+end
+
+local function weightOf(id)
+  local al = autoloot()
+  local p = al and al.priceInfo and al.priceInfo(id)
+  return p and p.weight or nil
+end
+
+local function fmtGold(n)
+  if n >= 1000000 then return string.format('%.1fkk', n / 1000000) end
+  if n >= 1000 then return string.format('%.1fk', n / 1000) end
+  return tostring(math.floor(n))
+end
+
+-- the client draws its own item tooltip (a root widget holding a label with id 'klasa'): hide it over our rows
+-- and draw our own box, same as the autoloot window does
+local tip
+
+local function hideClientTooltip()
+  if not showTips then return end
+  for _, c in ipairs(g_ui.getRootWidget():getChildren()) do
+    if not c:isDestroyed() and c:isVisible() and c:getChildById('klasa') then c:hide() end
+  end
+end
+
+local tipOwner  -- the row the box currently belongs to: a neighbour's leave event must not hide it
+
+local function hideTip(widget)
+  if widget and tipOwner and widget ~= tipOwner then return end
+  tipOwner = nil
+  if tip then tip:hide() end
+end
+
+local function makeTip()
+  local ok, w = pcall(function() return g_ui.createWidget('LootTrackerTip', g_ui.getRootWidget()) end)
+  if not ok or not w then -- style not registered (older install): build the same box in code
+    w = g_ui.createWidget('UILabel', g_ui.getRootWidget())
+    w:setBackgroundColor('#111111ee')
+    w:setColor('#ffffff')
+    w:setBorderWidth(1)
+    w:setBorderColor('#666666')
+    w:setTextAlign(AlignLeft)
+    w:setPhantom(true)
+  end
+  w:setId('lootTrackerTip')
+  return w
+end
+
+-- placed against the hovered row, not the mouse: widget coordinates are the same space as the root widget,
+-- while the mouse position can be off under a scaled window
+local function showTip(text, anchorWidget)
+  if not showTips then return end
+  if not tip or tip:isDestroyed() then tip = makeTip() end
+  tip:setText(text)
+  tip:resizeToText()
+  tip:resize(tip:getWidth() + 10, tip:getHeight() + 6)
+  tipOwner = anchorWidget
+  tip:setOpacity(1)
+  tip:show()
+  tip:raise()
+  local root = g_ui.getRootWidget()
+  local rw, rh = root:getWidth(), root:getHeight()
+  local size = tip:getSize()
+  local m = g_window.getMousePosition()
+  local x, y
+  if m and m.x > 0 and m.y > 0 and m.x < rw and m.y < rh then
+    x, y = m.x + 16, m.y + 16                                   -- next to the cursor
+    if x + size.width > rw - 4 then x = m.x - size.width - 10 end
+    if y + size.height > rh - 4 then y = m.y - size.height - 10 end
+  elseif anchorWidget and not anchorWidget:isDestroyed() then    -- scaled window: mouse coords unusable
+    x = anchorWidget:getX() - size.width - 6
+    if x < 4 then x = anchorWidget:getX() + anchorWidget:getWidth() + 6 end
+    y = anchorWidget:getY()
+  else
+    x, y = 20, 20
+  end
+  tip:setPosition({ x = math.max(4, math.min(x, rw - size.width - 4)),
+                    y = math.max(4, math.min(y, rh - size.height - 4)) })
+end
 
 local function currentItems()
   local al = autoloot()
@@ -121,16 +209,31 @@ local function updateCounts()
     local k = known[id]
     local fresh = k and (g_clock.millis() - k.t) < 10 * 60 * 1000
     row.count:setColor(fresh and '#ffffff' or '#c8c8c8')
-    row:setTooltip((nameOf(id) or ("item " .. id)) .. "\nin equipment and open bags: " .. client ..
-      (k and ("\nserver confirmed: " .. k.n .. " (" .. math.floor((g_clock.millis() - k.t) / 60000) .. " min ago)") or "\nnot confirmed yet") ..
-      "\nclick: recount (uses the item once)")
+    -- price first: that is what the box is for
+    local price = priceOf(id)
+    local lines = { nameOf(id) or ("item " .. id) }
+    if price then
+      table.insert(lines, fmtGold(price) .. " gp each")
+      local w = weightOf(id)
+      if w and w > 0 then table.insert(lines, fmtGold(price / w) .. " gp/oz") end
+      if est then table.insert(lines, "total " .. fmtGold(price * est) .. " gp  (" .. est .. " x)") end
+    else
+      table.insert(lines, "no NPC price known yet")
+    end
+    row.tipText = table.concat(lines, "\n")
     ::continue::
   end
-  if sortMode == "count" then applySort() end
+  if sortMode == "count" or sortMode == "value" then applySort() end
 end
 
 local function shownCount(id)
   return estimate(id) or -1 -- unknown sorts last
+end
+
+local function shownValue(id)
+  local price, est = priceOf(id), estimate(id)
+  if not price or not est then return -1 end
+  return price * est
 end
 
 applySort = function()
@@ -138,6 +241,12 @@ applySort = function()
   for id, row in pairs(rows) do if id ~= "order" then table.insert(ordered, id) end end
   if sortMode == "name" then
     table.sort(ordered, function(a, b) return (nameOf(a) or tostring(a)):lower() < (nameOf(b) or tostring(b)):lower() end)
+  elseif sortMode == "value" then
+    table.sort(ordered, function(a, b)
+      local va, vb = shownValue(a), shownValue(b)
+      if va ~= vb then return va > vb end
+      return (nameOf(a) or tostring(a)):lower() < (nameOf(b) or tostring(b)):lower()
+    end)
   elseif sortMode == "count" then
     table.sort(ordered, function(a, b)
       local ca, cb = shownCount(a), shownCount(b)
@@ -181,6 +290,11 @@ function showMenu()
   end
   menu:addSeparator()
   menu:addOption((autoRecount and "[x] " or "[ ] ") .. "Auto recount every " .. math.floor(AUTO_RECOUNT_MS / 1000) .. "s", toggleAutoRecount)
+  menu:addOption((showTips and "[x] " or "[ ] ") .. "Item info on hover", function()
+    showTips = not showTips
+    g_settings.set('lootTrackerTipsOff', not showTips)
+    if not showTips then hideTip() end
+  end)
   local b = window:getChildById('menuButton')
   menu:display({ x = b:getX(), y = b:getY() + b:getHeight() })
 end
@@ -210,6 +324,15 @@ local function rebuild()
       row.onMouseRelease = function(widget, mousePos, mouseButton)
         if mouseButton == MouseLeftButton or mouseButton == MouseRightButton then probe(id) return true end
         return false
+      end
+      row.onHoverChange = function(widget, hovered)
+        if hovered then
+          showTip(widget.tipText or (nameOf(id) or ("item " .. id)), widget)
+          addEvent(hideClientTooltip)
+          scheduleEvent(hideClientTooltip, 60)
+        else
+          hideTip(widget)
+        end
       end
       rows[id] = row
     end
@@ -322,6 +445,19 @@ local function tick()
   refreshEvent = scheduleEvent(tick, REFRESH_MS)
 end
 
+-- console helper: modules.game_loot_tracker.tipTest()
+function tipTest()
+  showTips = true
+  showTip('tip test\nline two', window)
+  local kids = g_ui.getRootWidget():getChildren()
+  local idx = 0
+  for i, c in ipairs(kids) do if c == tip then idx = i end end
+  print('tip:', tip:getX() .. ',' .. tip:getY(), tip:getWidth() .. 'x' .. tip:getHeight(),
+        'visible', tostring(tip:isVisible()), 'opacity', tip:getOpacity(),
+        'root child', idx .. '/' .. #kids, 'text len', #tip:getText())
+  print('last root children:', (kids[#kids] and kids[#kids]:getId() or '-'), (kids[#kids-1] and kids[#kids-1]:getId() or '-'))
+end
+
 function toggle()
   if window:isVisible() then window:close() else window:open() end
 end
@@ -333,6 +469,7 @@ end
 function init()
   if g_settings.exists('lootTrackerSort') then sortMode = g_settings.getString('lootTrackerSort') end
   if g_settings.exists('lootTrackerAutoRecount') then autoRecount = g_settings.getBoolean('lootTrackerAutoRecount') end
+  showTips = not g_settings.getBoolean('lootTrackerTipsOff')
   connect(g_game, { onTextMessage = onTextMessage, onPlayerGoods = onPlayerGoods, onCloseNpcTrade = onCloseNpcTrade,
                     onGameEnd = function() known = {} end })
   connect(Container, { onClose = onContainerClose })
@@ -353,6 +490,7 @@ function terminate()
   disconnect(Container, { onClose = onContainerClose })
   removeEvent(refreshEvent)
   removeEvent(refreshEvent2)
+  if tip then tip:destroy() tip = nil end
   if button then button:destroy() button = nil end
   if window then window:destroy() window = nil end
 end

@@ -191,8 +191,26 @@ local function updateMarker(target)
   end
   local m = target.marker
   local dx, dy = r.cx - pos.x, r.cy - pos.y
-  local dist = math.floor(math.sqrt(dx * dx + dy * dy) + 0.5)
-  m:setText(labelText(target) .. '  ~' .. dist .. ' sqm')
+  -- honest distance: nearest and farthest point of the highlighted area from where you stand. The extremes of a
+  -- region lie on its outline, so only the edge cells are checked (cached per raster).
+  if not r.edgePoints then
+    r.edgePoints = {}
+    local half = (r.cell - 1) / 2
+    for j, row in pairs(r.edge) do
+      for i in pairs(row) do table.insert(r.edgePoints, { r.x0 + i * r.cell + half, r.y0 + j * r.cell + half }) end
+    end
+  end
+  local dmin, dmax = math.huge, 0
+  for _, pt in ipairs(r.edgePoints) do
+    local ex, ey = pt[1] - pos.x, pt[2] - pos.y
+    local d = math.sqrt(ex * ex + ey * ey)
+    if d < dmin then dmin = d end
+    if d > dmax then dmax = d end
+  end
+  local j, i = math.floor((pos.y - r.y0) / r.cell), math.floor((pos.x - r.x0) / r.cell)
+  if r.grid[j] and r.grid[j][i] and r.grid[j][i] > 0 then dmin = 0 end -- standing inside the area
+  local range = dmin == math.huge and '?' or (math.floor(dmin) .. '-' .. math.ceil(dmax) .. ' sqm')
+  m:setText(labelText(target) .. '  ' .. range)
   local w, h = mapPanel:getWidth(), mapPanel:getHeight()
   local mw, mh = m:getWidth(), m:getHeight()
   if dx == 0 and dy == 0 then dy = -1 end

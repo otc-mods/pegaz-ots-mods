@@ -158,7 +158,7 @@
   {
    "name": "game_exiva",
    "type": "module",
-   "version": "1.1.0",
+   "version": "1.1.1",
    "title": "Exiva",
    "description": "Exiva replies drawn on the minimap (ring sectors, intersections, explored-tile mask) plus the name floating at the edge of the game view in the target's direction.",
    "screenshot": "screenshots/game_exiva.png",
@@ -185,8 +185,8 @@
     },
     {
      "path": "modules/game_exiva/main.lua",
-     "sha1": "aa501718970f295fc43d0c31539a5b957622bd72",
-     "size": 15899
+     "sha1": "f31f3a9f2546bdfa398828a92a2751b7bda08474",
+     "size": 16801
     },
     {
      "path": "modules/game_exiva/png.lua",

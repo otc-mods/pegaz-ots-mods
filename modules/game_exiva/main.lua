@@ -209,7 +209,13 @@ local function updateMarker(target)
   end
   local j, i = math.floor((pos.y - r.y0) / r.cell), math.floor((pos.x - r.x0) / r.cell)
   if r.grid[j] and r.grid[j][i] and r.grid[j][i] > 0 then dmin = 0 end -- standing inside the area
-  local range = dmin == math.huge and '?' or (math.floor(dmin) .. '-' .. math.ceil(dmax) .. ' sqm')
+  -- "very far" is open-ended (the wedge is only drawn to a cap): no honest upper bound then
+  local openEnded = false
+  for _, c in ipairs(target.casts) do if c.band == 'veryfar' then openEnded = true end end
+  local range = '?'
+  if dmin ~= math.huge then
+    range = openEnded and (math.floor(dmin) .. '+ sqm') or (math.floor(dmin) .. '-' .. math.ceil(dmax) .. ' sqm')
+  end
   m:setText(labelText(target) .. '  ' .. range)
   local w, h = mapPanel:getWidth(), mapPanel:getHeight()
   local mw, mh = m:getWidth(), m:getHeight()

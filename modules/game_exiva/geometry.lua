@@ -7,7 +7,11 @@ ExivaGeo.BESIDE = 4          -- |dx| and |dy| below this = "standing next to you
 ExivaGeo.CLOSE = 100         -- "is to the": under this many sqm
 ExivaGeo.FAR = 274           -- "far": under this, "very far": beyond
 ExivaGeo.VERYFAR_CAP = 3000  -- "very far" is open-ended; draw this much (past the map edge in tests)
-ExivaGeo.MAX_PX = 768        -- image side limit; bigger areas use cells of several sqm
+ExivaGeo.MAX_PX = 192        -- image side limit; bigger areas use cells of several sqm.
+-- Cost is per PIXEL: the overlay PNG is encoded in pure Lua, so crc32/adler32 walk every byte. At 768 a
+-- "very far" reply meant a 751x751 grid and a 2.2 MB image = ~512 ms of frozen client per cast (measured).
+-- 192 gives 34 ms and is still finer than the minimap widget (~180 px), so nothing visible is lost there;
+-- only the full map shows a coarser blob for very-far areas, which are vague anyway.
 ExivaGeo.MASK_MAX_CELL = 8   -- cells above this are too coarse to sample the minimap: drawn as plain fill
 -- minimap colours nobody can stand on: trees, water, walls, lava. 0 and 255 = nothing known there.
 ExivaGeo.BLOCKED = { [0] = true, [24] = true, [40] = true, [186] = true, [192] = true, [255] = true }

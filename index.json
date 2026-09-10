@@ -168,9 +168,9 @@
   {
    "name": "game_exiva",
    "type": "module",
-   "version": "1.1.4",
+   "version": "1.1.5",
    "title": "Exiva",
-   "description": "Exiva replies drawn on the minimap and at the screen edge.",
+   "description": "Exiva replies drawn on the minimap and at the screen edge. Overlay rendering is 15x faster: no more freeze when casting.",
    "screenshot": "screenshots/game_exiva.png",
    "screenshotSize": [
     527,
@@ -190,8 +190,8 @@
     },
     {
      "path": "modules/game_exiva/geometry.lua",
-     "sha1": "cb3e3b7c67981d49e3412ecca4648502a941183b",
-     "size": 7526
+     "sha1": "2750c6bf770763f564f05594b200a5264dff9067",
+     "size": 7933
     },
     {
      "path": "modules/game_exiva/main.lua",

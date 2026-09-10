@@ -55,20 +55,27 @@ local function realName(creature)
   return creature.playerInfoName or creature:getName()
 end
 
-local function decorate(name)
+-- The tag shown above the player. It is deliberately NOT part of the name: the name is what the rest of the
+-- client keys on - add to VIP, open a private message, the battle list, right-click menus - so renaming a
+-- creature made all of those unusable. creature:setText() draws an extra line above the creature and leaves the
+-- real name completely untouched.
+local function tagFor(name)
   local info = cache[name]
-  if not info or not (showVocation or showLevel) then return nil end
+  if not info or not (showVocation or showLevel) then return "" end
   local parts = {}
   if showVocation then table.insert(parts, info.voc or "?") end
   if showLevel then table.insert(parts, tostring(info.level or "?")) end
-  return "[" .. table.concat(parts, " ") .. "] " .. name
+  return "[" .. table.concat(parts, " ") .. "]"
 end
 
 local function apply(creature)
   local name = realName(creature)
+  -- undo any renaming an earlier version of this module did, so names are correct again
+  if creature.playerInfoName and creature:getName() ~= creature.playerInfoName then
+    pcall(function() creature:setName(creature.playerInfoName) end)
+  end
   creature.playerInfoName = name
-  local text = enabled and decorate(name) or name
-  if text and creature:getName() ~= text then creature:setName(text) end
+  pcall(function() creature:setText(enabled and tagFor(name) or "") end)
 end
 
 local function visiblePlayers()

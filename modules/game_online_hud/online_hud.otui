@@ -1,0 +1,5 @@
+Label
+  id: onlineHud
+  font: verdana-11px-rounded
+  color: #00ff00
+  height: 14

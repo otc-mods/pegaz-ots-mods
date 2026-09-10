@@ -1,0 +1,12 @@
+Module
+  name: game_online_hud
+  description: Players online HUD - shows the !online count under fps/ping
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

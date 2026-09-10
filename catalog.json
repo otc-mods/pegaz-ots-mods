@@ -12,17 +12,21 @@
     {
       "name": "game_autoloot",
       "type": "module",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "title": "Autoloot",
-      "description": "Loot lists with item search, NPC prices and gold per oz, Add by value.",
-      "screenshot": "screenshots/game_autoloot.png"
+      "description": "Loot lists with item search, NPC prices and gold per oz, Add by value, and right-click any item to add or remove it from autoloot.",
+      "screenshot": "screenshots/game_autoloot.png",
+      "extraFiles": [
+        "layouts/retro/images/topbuttons/coin.png",
+        "data/images/topbuttons/coin.png"
+      ]
     },
     {
       "name": "game_loot_tracker",
       "type": "module",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "title": "Autoloot tracker",
-      "description": "Items the server loots, counts, NPC value per item and total.",
+      "description": "Items the server loots, counts, NPC value per item and total. Right-click a row to remove it from autoloot or copy its name or id.",
       "requires": [
         "game_autoloot"
       ],
@@ -31,9 +35,9 @@
     {
       "name": "game_player_info",
       "type": "module",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Player info",
-      "description": "Other players shown as [RP 250] Name (vocation + level).",
+      "description": "Other players tagged [RP 250] above their head. The tag is drawn separately, so names stay intact for VIP, private messages and the battle list.",
       "extraFiles": [
         "layouts/retro/images/topbuttons/playerinfo.png",
         "data/images/topbuttons/playerinfo.png"
@@ -91,6 +95,22 @@
       "title": "Module installer",
       "description": "Lists the published modules, installs and updates them, search included.",
       "screenshot": "screenshots/game_module_installer.png"
+    },
+    {
+      "name": "game_top_buttons",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Better top buttons",
+      "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
+      "screenshot": "screenshots/game_top_buttons.png"
+    },
+    {
+      "name": "game_online_hud",
+      "type": "module",
+      "version": "1.0.0",
+      "title": "Players online",
+      "description": "Shows the !online player count under FPS/Ping. Click to refresh, right-click to pause the 2 minute auto refresh.",
+      "screenshot": "screenshots/game_online_hud.png"
     }
   ]
 }

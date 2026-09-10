@@ -400,7 +400,19 @@ local function rebuild()
       row.name:setText(row.fullName)
       row.itemId:setText("id " .. id)
       row.onMouseRelease = function(widget, mousePos, mouseButton)
-        if mouseButton == MouseLeftButton or mouseButton == MouseRightButton then probe(id) return true end
+        if mouseButton == MouseLeftButton then probe(id) return true end
+        if mouseButton == MouseRightButton then
+          local al = autoloot()
+          local menu = g_ui.createWidget('PopupMenu')
+          if al and al.serverRemove then
+            menu:addOption("Remove from autoloot", function() al.serverRemove(id) end)
+          end
+          menu:addSeparator()
+          menu:addOption("Copy name", function() g_window.setClipboardText(nameOf(id) or "") end)
+          menu:addOption("Copy id [" .. id .. "]", function() g_window.setClipboardText(tostring(id)) end)
+          menu:display(mousePos)
+          return true
+        end
         return false
       end
       row.onHoverChange = function(widget, hovered)

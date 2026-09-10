@@ -524,6 +524,36 @@ local function apply()
   pump()
 end
 
+-- single-command autoloot toggles for the item context menu and the tracker row menu
+local function enqueueAutoloot(cmd, progress)
+  table.insert(sendQueue, { cmd = cmd, progress = progress })
+  if not sendEvent then pump() end
+end
+
+function isServerListed(id)
+  local nm = nameOf(id)
+  if not nm then return false end
+  local low = nm:lower()
+  for _, e in ipairs(serverItems) do
+    if e.id == id or (e.name and e.name:lower() == low) then return true end
+  end
+  return false
+end
+
+function serverAdd(id)
+  local nm = nameOf(id)
+  if not nm or not g_game.isOnline() then return end
+  enqueueAutoloot("!autoloot add " .. nm, "autoloot + " .. nm)
+  enqueueAutoloot("!autoloot")
+end
+
+function serverRemove(id)
+  local nm = nameOf(id)
+  if not nm or not g_game.isOnline() then return end
+  enqueueAutoloot("!autoloot remove " .. nm, "autoloot - " .. nm)
+  enqueueAutoloot("!autoloot")
+end
+
 -- server replies ----------------------------------------------------------------------
 -- "Autoloot: X/Y slotow." opens a short window in which the following line(s) list the items
 -- (comma separated names, or "Lista jest pusta."). Names are mapped back to ids where known.
@@ -677,7 +707,7 @@ function init()
                     onGameEnd = function() slotsUsed, slotsMax, serverItems = nil, nil, {} end })
   window = g_ui.displayUI('autoloot')
   window:hide()
-  button = modules.client_topmenu.addRightGameToggleButton('autolootButton', tr('Autoloot'), '/images/topbuttons/shop', toggle, false, 1002)
+  button = modules.client_topmenu.addRightGameToggleButton('autolootButton', tr('Autoloot'), '/images/topbuttons/coin', toggle, false, 1002)
   button:setOn(false)
 
   window.search.onTextChange = function() refreshResults() end
@@ -711,11 +741,29 @@ function init()
   window.clearBag.onClick = clearBag
   window.apply.onClick = apply
   window.onClose = hide
+
+  local gi = modules.game_interface
+  if gi and gi.addMenuHook then
+    local function menuItemId(look, use)
+      local t = use or look
+      if t and t:isItem() and t:isPickupable() then return t:getId() end
+    end
+    gi.addMenuHook('autoloot', tr('Add to autoloot'),
+      function(_, look, use) local id = menuItemId(look, use) if id then serverAdd(id) end end,
+      function(_, look, use) local id = menuItemId(look, use) return id ~= nil and nameOf(id) ~= nil and not isServerListed(id) end)
+    gi.addMenuHook('autoloot', tr('Remove from autoloot'),
+      function(_, look, use) local id = menuItemId(look, use) if id then serverRemove(id) end end,
+      function(_, look, use) local id = menuItemId(look, use) return id ~= nil and nameOf(id) ~= nil and isServerListed(id) end)
+  end
+
   setStatus("")
 end
 
 function terminate()
   disconnect(g_game, { onTextMessage = onTextMessage, onOpenNpcTrade = onOpenNpcTrade })
+  if modules.game_interface and modules.game_interface.removeMenuHook then
+    modules.game_interface.removeMenuHook('autoloot')
+  end
   removeEvent(sendEvent)
   if button then button:destroy() button = nil end
   if tip then tip:destroy() tip = nil end

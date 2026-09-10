@@ -1,0 +1,133 @@
+TopButtonsRow < UIWidget
+  height: 22
+  focusable: false
+
+  UILabel
+    id: label
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 27
+    margin-right: 4
+    text-align: left
+    phantom: true
+
+TopButtonsSetRow < UIWidget
+  height: 22
+
+  Button
+    id: offBtn
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 4
+    size: 38 18
+    !text: tr('Off')
+
+  Button
+    id: listBtn
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 3
+    size: 38 18
+    !text: tr('List')
+
+  Button
+    id: favBtn
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 3
+    size: 38 18
+    !text: tr('Fav')
+
+  UILabel
+    id: name
+    anchors.left: parent.left
+    anchors.right: favBtn.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 5
+    margin-right: 6
+    text-align: left
+
+TopButtonsSettings < MainWindow
+  id: topButtonsSettings
+  !text: tr('Buttons - settings')
+  size: 390 470
+  @onEscape: self:destroy()
+
+  UILabel
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 34
+    text-wrap: true
+    text-align: left
+    color: #b0b0b0
+    !text: tr('Fav = icon in the old Buttons grid. List = row in the Buttons panel. Off = not shown anywhere.')
+
+  Button
+    id: closeBtn
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 24
+    !text: tr('Close')
+
+  Button
+    id: resetBtn
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 6
+    size: 110 24
+    !text: tr('All to List')
+
+  VerticalScrollBar
+    id: listScroll
+    anchors.top: hint.bottom
+    anchors.bottom: closeBtn.top
+    anchors.right: parent.right
+    margin-top: 4
+    margin-bottom: 8
+    step: 16
+    pixels-scroll: true
+
+  ScrollablePanel
+    id: list
+    anchors.top: hint.bottom
+    anchors.left: parent.left
+    anchors.right: listScroll.left
+    anchors.bottom: closeBtn.top
+    margin-top: 4
+    margin-bottom: 8
+    vertical-scrollbar: listScroll
+    border-width: 1
+    border-color: #202327
+    layout:
+      type: verticalBox
+
+MiniWindow
+  id: topButtonsWindow
+  !text: tr('Buttons')
+  icon: /images/topbuttons/buttons
+  height: 200
+  &save: true
+
+  UIWidget
+    id: settingsButton
+    anchors.top: parent.top
+    anchors.right: minimizeButton.left
+    margin-top: 5
+    margin-right: 3
+    size: 14 14
+    image-source: gear.png
+    image-smooth: true
+    phantom: false
+
+  MiniWindowContents
+    Panel
+      id: rows
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+      layout:
+        type: verticalBox
+        fit-children: true

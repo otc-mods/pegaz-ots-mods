@@ -45,9 +45,9 @@
   {
    "name": "game_autoloot",
    "type": "module",
-   "version": "1.1.0",
+   "version": "1.2.0",
    "title": "Autoloot",
-   "description": "Loot lists with item search, NPC prices and gold per oz, Add by value.",
+   "description": "Loot lists with item search, NPC prices and gold per oz, Add by value, and right-click any item to add or remove it from autoloot.",
    "screenshot": "screenshots/game_autoloot.png",
    "screenshotSize": [
     850,
@@ -56,9 +56,19 @@
    "screenshotSha1": "cea86ddcac5faf77adef123288a3f0b98aaae406",
    "files": [
     {
+     "path": "data/images/topbuttons/coin.png",
+     "sha1": "88c167313df08e84a4924ed97c13cb876cc602e4",
+     "size": 393
+    },
+    {
+     "path": "layouts/retro/images/topbuttons/coin.png",
+     "sha1": "fb53bb10449590b8cae3060e7bd337eae69a3ec8",
+     "size": 583
+    },
+    {
      "path": "modules/game_autoloot/autoloot.lua",
-     "sha1": "ea9686395a6b0608fc639a5c1695e31c98d013b0",
-     "size": 27647
+     "sha1": "7b7663dc510500b31e29d51ccc89f4c6087480c7",
+     "size": 29467
     },
     {
      "path": "modules/game_autoloot/autoloot.otmod",
@@ -80,9 +90,9 @@
   {
    "name": "game_loot_tracker",
    "type": "module",
-   "version": "1.1.1",
+   "version": "1.2.0",
    "title": "Autoloot tracker",
-   "description": "Items the server loots, counts, NPC value per item and total.",
+   "description": "Items the server loots, counts, NPC value per item and total. Right-click a row to remove it from autoloot or copy its name or id.",
    "requires": [
     "game_autoloot"
    ],
@@ -100,8 +110,8 @@
     },
     {
      "path": "modules/game_loot_tracker/main.lua",
-     "sha1": "343d36b2d1fe7fbbf5d742634999d8a31427dfc6",
-     "size": 23825
+     "sha1": "edac483d2ab4ff46b358a2dfa7fc2d0d6e52d018",
+     "size": 24368
     },
     {
      "path": "modules/game_loot_tracker/refresh.png",
@@ -118,9 +128,9 @@
   {
    "name": "game_player_info",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "title": "Player info",
-   "description": "Other players shown as [RP 250] Name (vocation + level).",
+   "description": "Other players tagged [RP 250] above their head. The tag is drawn separately, so names stay intact for VIP, private messages and the battle list.",
    "screenshot": "screenshots/game_player_info.png",
    "screenshotSize": [
     188,
@@ -145,8 +155,8 @@
     },
     {
      "path": "modules/game_player_info/main.lua",
-     "sha1": "401327bdb18407671f246c50b7d36f11638c01a2",
-     "size": 8954
+     "sha1": "bb42e7cc9b167c4609a2df334888daaadaae71bb",
+     "size": 9503
     },
     {
      "path": "modules/game_player_info/options.otui",
@@ -347,6 +357,71 @@
      "path": "modules/game_module_installer/main.lua",
      "sha1": "97ef399533198535f60638324b1e76c28785a91a",
      "size": 18436
+    }
+   ]
+  },
+  {
+   "name": "game_top_buttons",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Better top buttons",
+   "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
+   "screenshot": "screenshots/game_top_buttons.png",
+   "screenshotSize": [
+    193,
+    231
+   ],
+   "screenshotSha1": "ab52b9a2b7a01627b7f3fe1f6ead81325a41b6e0",
+   "files": [
+    {
+     "path": "modules/game_top_buttons/game_top_buttons.otmod",
+     "sha1": "c9aceb193a29d31e681c0bf85a53f39d6e0a64f3",
+     "size": 336
+    },
+    {
+     "path": "modules/game_top_buttons/gear.png",
+     "sha1": "69ae188e6d6009e6a80461a5d172b9b944ab1e96",
+     "size": 207
+    },
+    {
+     "path": "modules/game_top_buttons/main.lua",
+     "sha1": "9c189d308461bd3ab4f5ae43390407a1216e20f4",
+     "size": 11576
+    },
+    {
+     "path": "modules/game_top_buttons/top_buttons.otui",
+     "sha1": "11ba33ec8f46d3c55e9fe1a41cc00fcbb0f67d62",
+     "size": 2804
+    }
+   ]
+  },
+  {
+   "name": "game_online_hud",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Players online",
+   "description": "Shows the !online player count under FPS/Ping. Click to refresh, right-click to pause the 2 minute auto refresh.",
+   "screenshot": "screenshots/game_online_hud.png",
+   "screenshotSize": [
+    112,
+    65
+   ],
+   "screenshotSha1": "f4d8b85a8332a8f272119d03d323294658e436a6",
+   "files": [
+    {
+     "path": "modules/game_online_hud/game_online_hud.otmod",
+     "sha1": "c838099eb4fafc31e29421c230631ba8c9fe140c",
+     "size": 317
+    },
+    {
+     "path": "modules/game_online_hud/main.lua",
+     "sha1": "c261ca18df7af65b04b15416727a2c16de17cb18",
+     "size": 4302
+    },
+    {
+     "path": "modules/game_online_hud/online_hud.otui",
+     "sha1": "0383e2615197d76421af57e661d9857f26dd1965",
+     "size": 81
     }
    ]
   }

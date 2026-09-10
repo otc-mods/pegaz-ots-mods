@@ -1,0 +1,12 @@
+Module
+  name: game_top_buttons
+  description: Better top buttons - one collapsible panel listing every button as icon + name
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 900
+  dependencies: [ game_interface, client_topmenu ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

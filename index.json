@@ -128,9 +128,9 @@
   {
    "name": "game_player_info",
    "type": "module",
-   "version": "1.1.0",
+   "version": "1.2.0",
    "title": "Player info",
-   "description": "Other players tagged [RP 250] above their head. The tag is drawn separately, so names stay intact for VIP, private messages and the battle list.",
+   "description": "Other players shown inline as [RP 250] Name, in the name's own health colour. Copy Name, VIP, private messages and the battle list all still see the real name.",
    "screenshot": "screenshots/game_player_info.png",
    "screenshotSize": [
     188,
@@ -155,8 +155,8 @@
     },
     {
      "path": "modules/game_player_info/main.lua",
-     "sha1": "bb42e7cc9b167c4609a2df334888daaadaae71bb",
-     "size": 9503
+     "sha1": "43aa3f5d51ec65d1c9f9282ca6d6c3be55e2bb02",
+     "size": 13003
     },
     {
      "path": "modules/game_player_info/options.otui",
@@ -363,7 +363,7 @@
   {
    "name": "game_top_buttons",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.0.1",
    "title": "Better top buttons",
    "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
    "screenshot": "screenshots/game_top_buttons.png",
@@ -374,14 +374,14 @@
    "screenshotSha1": "ab52b9a2b7a01627b7f3fe1f6ead81325a41b6e0",
    "files": [
     {
+     "path": "modules/game_top_buttons/cog.png",
+     "sha1": "41e94b967948f5e407cfd39b1ecf62bddbd65c52",
+     "size": 183
+    },
+    {
      "path": "modules/game_top_buttons/game_top_buttons.otmod",
      "sha1": "c9aceb193a29d31e681c0bf85a53f39d6e0a64f3",
      "size": 336
-    },
-    {
-     "path": "modules/game_top_buttons/gear.png",
-     "sha1": "69ae188e6d6009e6a80461a5d172b9b944ab1e96",
-     "size": 207
     },
     {
      "path": "modules/game_top_buttons/main.lua",
@@ -390,8 +390,8 @@
     },
     {
      "path": "modules/game_top_buttons/top_buttons.otui",
-     "sha1": "11ba33ec8f46d3c55e9fe1a41cc00fcbb0f67d62",
-     "size": 2804
+     "sha1": "d6fd95844b10f4bb4bbc32a3bd47f74c6671c5b9",
+     "size": 2803
     }
    ]
   },

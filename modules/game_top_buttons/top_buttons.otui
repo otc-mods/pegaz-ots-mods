@@ -118,7 +118,7 @@ MiniWindow
     margin-top: 5
     margin-right: 3
     size: 14 14
-    image-source: gear.png
+    image-source: cog.png
     image-smooth: true
     phantom: false
 

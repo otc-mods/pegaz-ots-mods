@@ -35,9 +35,9 @@
     {
       "name": "game_player_info",
       "type": "module",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "title": "Player info",
-      "description": "Other players tagged [RP 250] above their head. The tag is drawn separately, so names stay intact for VIP, private messages and the battle list.",
+      "description": "Other players shown inline as [RP 250] Name, in the name's own health colour. Copy Name, VIP, private messages and the battle list all still see the real name.",
       "extraFiles": [
         "layouts/retro/images/topbuttons/playerinfo.png",
         "data/images/topbuttons/playerinfo.png"
@@ -99,7 +99,7 @@
     {
       "name": "game_top_buttons",
       "type": "module",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "title": "Better top buttons",
       "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
       "screenshot": "screenshots/game_top_buttons.png"

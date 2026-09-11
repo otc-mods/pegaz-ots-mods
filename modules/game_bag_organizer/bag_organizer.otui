@@ -1,0 +1,584 @@
+BagOrgBucketRow < Panel
+  height: 30
+  margin-top: 2
+  margin-right: 2
+  background-color: #ffffff10
+
+  Label
+    id: name
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.right: editBtn.left
+    margin-left: 4
+    height: 13
+    text-align: left
+    font: verdana-11px-rounded
+
+  Label
+    id: sub
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    anchors.right: editBtn.left
+    margin-left: 4
+    height: 11
+    text-align: left
+    font: verdana-9px
+    color: #999999
+
+  Button
+    id: editBtn
+    anchors.right: removeBtn.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 4
+    size: 44 18
+    !text: tr('Edit')
+
+  Button
+    id: removeBtn
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 4
+    size: 22 18
+    !text: tr('X')
+    !tooltip: tr('Remove this bucket')
+
+BagOrgCatCheck < CheckBox
+  height: 16
+  !text: tr('cat')
+
+BagOrgVizRow < Panel
+  height: 36
+  margin-top: 2
+
+BagOrgVizBag < Item
+  anchors.top: parent.top
+  anchors.left: parent.left
+  virtual: true
+  border-width: 2
+
+BagOrgVizCell < Item
+  anchors.top: parent.top
+  anchors.left: parent.left
+  virtual: true
+
+  Label
+    id: count
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-right: 2
+    font: verdana-9px
+    color: #ffe680
+    text-align: right
+
+BagOrgVizEmpty < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  size: 34 34
+  background-color: #ffffff08
+  border-width: 1
+  border-color: #ffffff12
+
+  Label
+    id: count
+    anchors.centerIn: parent
+    font: verdana-9px
+    color: #79818a
+
+BagOrgVizName < Label
+  anchors.top: parent.top
+  anchors.left: parent.left
+  margin-left: 38
+  margin-top: 3
+  width: 56
+  height: 12
+  text-align: left
+  font: verdana-9px
+
+BagOrgVizSub < Label
+  anchors.top: parent.top
+  anchors.left: parent.left
+  margin-left: 38
+  margin-top: 16
+  width: 56
+  height: 12
+  text-align: left
+  font: verdana-9px
+  color: #8a9298
+
+BagOrgPane < Panel
+  border-width: 1
+  border-color: #202327
+
+BagOrgHSplit < Splitter
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  height: 6
+  margin-right: 14
+  background: #ffffff33
+
+BagOrgVSplit < Splitter
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  anchors.right: parent.right
+  width: 6
+  background: #ffffff33
+
+MainWindow
+  id: bagOrganizerWindow
+  !text: tr('Bag organizer')
+  size: 960 700
+  // hit-testing stops at the padding rect, so the frame cannot hold resize grips: shrink the right and bottom
+  // padding and push the content back with margins, leaving a strip for the borders and the corner grip
+  padding-right: 2
+  padding-bottom: 2
+  @onEscape: modules.game_bag_organizer.hide()
+
+  Label
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 14
+    text-align: left
+    !text: tr('Buckets decide what goes where. Scan reads your bags and shows the target; Apply sorts them.')
+
+  Label
+    id: bucketsTitle
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 4
+    height: 14
+    text-align: left
+    !text: tr('Buckets')
+
+  Button
+    id: addBucket
+    anchors.verticalCenter: bucketsTitle.verticalCenter
+    anchors.right: parent.right
+    margin-right: 320
+    size: 90 18
+    !text: tr('Add bucket')
+
+  Panel
+    id: emptyBox
+    anchors.top: bucketsTitle.bottom
+    anchors.right: parent.right
+    anchors.bottom: bucketsSplit.top
+    margin-top: 2
+    margin-right: 16
+    width: 300
+    border-width: 1
+    border-color: #202327
+
+    Label
+      id: emptyTitle
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 6
+      margin-top: 4
+      height: 14
+      text-align: left
+      !text: tr('Empty backpacks')
+
+    Label
+      id: keepLabel1
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-left: 6
+      margin-top: 8
+      width: 34
+      height: 18
+      text-align: left
+      font: verdana-9px
+      color: #b0b6bb
+      !text: tr('keep')
+
+    TextEdit
+      id: keepEmpty
+      anchors.verticalCenter: keepLabel1.verticalCenter
+      anchors.left: keepLabel1.right
+      size: 40 18
+      !tooltip: tr('How many empty backpacks to keep for future loot')
+
+    Label
+      id: keepLabel2
+      anchors.verticalCenter: keepLabel1.verticalCenter
+      anchors.left: prev.right
+      margin-left: 4
+      anchors.right: parent.right
+      margin-right: 6
+      height: 18
+      text-align: left
+      font: verdana-9px
+      color: #8a9298
+      !text: tr('for future loot')
+
+    Label
+      id: dropTargetLabel
+      anchors.top: keepLabel1.bottom
+      anchors.left: parent.left
+      margin-left: 6
+      margin-top: 6
+      width: 34
+      height: 18
+      text-align: left
+      font: verdana-9px
+      color: #b0b6bb
+      !text: tr('put in')
+
+    ComboBox
+      id: dropTarget
+      anchors.verticalCenter: dropTargetLabel.verticalCenter
+      anchors.left: dropTargetLabel.right
+      anchors.right: parent.right
+      margin-right: 6
+      height: 18
+      !tooltip: tr('Where the surplus goes. The depot is opened for you if you are standing next to it.')
+
+    Label
+      id: emptyInfo
+      anchors.top: dropTarget.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: 6
+      margin-right: 6
+      margin-top: 6
+      height: 26
+      text-wrap: true
+      text-align: left
+      font: verdana-9px
+      color: #8a9298
+      !text: tr('Scan to count them.')
+
+    Button
+      id: dropEmpties
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: 6
+      margin-right: 6
+      margin-bottom: 6
+      height: 20
+      !text: tr('drop empty bps')
+      enabled: false
+
+  BagOrgHSplit
+    id: bucketsSplit
+    margin-bottom: 500
+    !tooltip: tr('Drag to resize the bucket list')
+
+  BagOrgHSplit
+    id: logSplit
+    margin-bottom: 126
+    !tooltip: tr('Drag to resize the log')
+
+  ScrollablePanel
+    id: buckets
+    anchors.top: bucketsTitle.bottom
+    anchors.left: parent.left
+    anchors.right: emptyBox.left
+    anchors.bottom: bucketsSplit.top
+    margin-top: 2
+    margin-right: 22
+    vertical-scrollbar: bucketsScroll
+    border-width: 1
+    border-color: #202327
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: bucketsScroll
+    anchors.top: buckets.top
+    anchors.bottom: buckets.bottom
+    anchors.right: emptyBox.left
+    margin-right: 6
+    step: 26
+    pixels-scroll: true
+
+  Button
+    id: closeButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-right: 14
+    margin-bottom: 14
+    size: 70 24
+    !text: tr('Close')
+    @onClick: modules.game_bag_organizer.hide()
+
+  MultilineTextEdit
+    id: output
+    anchors.top: logSplit.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: closeButton.top
+    margin-top: 2
+    margin-bottom: 6
+    margin-right: 30
+    editable: false
+    selectable: true
+    font: verdana-11px
+    vertical-scrollbar: outputScroll
+
+  VerticalScrollBar
+    id: outputScroll
+    anchors.top: output.top
+    anchors.bottom: output.bottom
+    anchors.right: parent.right
+    margin-right: 14
+    step: 14
+    pixels-scroll: true
+
+  BagOrgVSplit
+    id: paneSplit
+    anchors.top: bucketsSplit.bottom
+    anchors.bottom: logSplit.top
+    margin-top: 8
+    margin-bottom: 6
+    margin-right: 480
+    !tooltip: tr('Drag to resize the two halves')
+
+  BagOrgPane
+    id: leftPane
+    anchors.top: bucketsSplit.bottom
+    anchors.left: parent.left
+    anchors.right: paneSplit.left
+    anchors.bottom: logSplit.top
+    margin-top: 8
+    margin-bottom: 6
+
+    Label
+      id: leftTitle
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 4
+      margin-top: 3
+      height: 14
+      text-align: left
+      color: #cfd4d8
+      !text: tr('BEFORE - what you carry now')
+
+    Button
+      id: rescan
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-right: 4
+      margin-top: 2
+      size: 68 20
+      !text: tr('Rescan')
+      !tooltip: tr('Read every backpack again, ignoring the saved scan')
+
+    Button
+      id: preview
+      anchors.top: parent.top
+      anchors.right: rescan.left
+      margin-right: 4
+      margin-top: 2
+      size: 62 20
+      !text: tr('Scan')
+      !tooltip: tr('Use the saved scan when nothing has changed')
+
+    Label
+      id: leftSummary
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: 4
+      height: 14
+      text-align: left
+      font: verdana-9px
+      color: #8a9298
+
+    ScrollablePanel
+      id: leftView
+      anchors.top: leftTitle.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: leftSummary.top
+      margin-top: 4
+      margin-left: 2
+      margin-right: 14
+      margin-bottom: 2
+      vertical-scrollbar: leftScroll
+      layout:
+        type: verticalBox
+
+    VerticalScrollBar
+      id: leftScroll
+      anchors.top: leftView.top
+      anchors.bottom: leftView.bottom
+      anchors.right: parent.right
+      step: 36
+      pixels-scroll: true
+
+  BagOrgPane
+    id: rightPane
+    anchors.top: bucketsSplit.bottom
+    anchors.left: paneSplit.right
+    anchors.right: parent.right
+    anchors.bottom: logSplit.top
+    margin-top: 8
+    margin-bottom: 6
+    margin-right: 14
+
+    Label
+      id: rightTitle
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 4
+      margin-top: 3
+      height: 14
+      text-align: left
+      color: #cfd4d8
+      !text: tr('AFTER - the target layout')
+
+    Button
+      id: stop
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-right: 4
+      margin-top: 2
+      size: 54 20
+      !text: tr('Stop')
+      color: #ff6666
+      enabled: false
+
+    Button
+      id: apply
+      anchors.top: parent.top
+      anchors.right: stop.left
+      margin-right: 6
+      margin-top: 2
+      size: 74 20
+      !text: tr('Apply')
+      color: #66ff66
+      enabled: false
+
+    Label
+      id: rightSummary
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: 4
+      height: 14
+      text-align: left
+      font: verdana-9px
+      color: #8a9298
+
+    ScrollablePanel
+      id: rightView
+      anchors.top: rightTitle.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: rightSummary.top
+      margin-top: 4
+      margin-left: 2
+      margin-right: 14
+      margin-bottom: 2
+      vertical-scrollbar: rightScroll
+      layout:
+        type: verticalBox
+
+    VerticalScrollBar
+      id: rightScroll
+      anchors.top: rightView.top
+      anchors.bottom: rightView.bottom
+      anchors.right: parent.right
+      step: 36
+      pixels-scroll: true
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-right: 14
+    height: 8
+    minimum: 460
+    maximum: 1400
+
+  ResizeBorder
+    id: rightResizeBorder
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-bottom: 14
+    width: 8
+    minimum: 700
+    maximum: 1900
+
+  UIWidget
+    id: cornerGrip
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 14 14
+    image-source: grip.png
+    opacity: 0.7
+    !tooltip: tr('Drag to resize')
+
+    $hover:
+      opacity: 1
+
+BagOrgEditor < MainWindow
+  !text: tr('Edit bucket')
+  size: 340 440
+  @onEscape: self:destroy()
+
+  Label
+    id: nameLabel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    height: 16
+    !text: tr('Name')
+
+  TextEdit
+    id: nameEdit
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+
+  Label
+    id: catLabel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 8
+    height: 16
+    !text: tr('Item categories in this bucket')
+
+  ScrollablePanel
+    id: cats
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: saveBtn.top
+    margin-top: 2
+    margin-bottom: 8
+    vertical-scrollbar: catsScroll
+    border-width: 1
+    border-color: #202327
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: catsScroll
+    anchors.top: cats.top
+    anchors.bottom: cats.bottom
+    anchors.right: parent.right
+    step: 16
+    pixels-scroll: true
+
+  Button
+    id: saveBtn
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 24
+    !text: tr('Save')
+
+  Button
+    id: cancelBtn
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 6
+    size: 80 24
+    !text: tr('Cancel')

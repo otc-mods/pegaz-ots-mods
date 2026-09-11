@@ -1,116 +1,116 @@
 {
-  "base": "https://otc-mods.github.io/pegaz-ots-mods/",
-  "entries": [
-    {
-      "name": "game_hud_stats",
-      "type": "module",
-      "version": "1.0.0",
-      "title": "Stats",
-      "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage, kills and graphs.",
-      "screenshot": "screenshots/game_hud_stats.png"
-    },
-    {
-      "name": "game_autoloot",
-      "type": "module",
-      "version": "1.2.0",
-      "title": "Autoloot",
-      "description": "Loot lists with item search, NPC prices and gold per oz, Add by value, and right-click any item to add or remove it from autoloot.",
-      "screenshot": "screenshots/game_autoloot.png",
-      "extraFiles": [
-        "layouts/retro/images/topbuttons/coin.png",
-        "data/images/topbuttons/coin.png"
-      ]
-    },
-    {
-      "name": "game_loot_tracker",
-      "type": "module",
-      "version": "1.2.0",
-      "title": "Autoloot tracker",
-      "description": "Items the server loots, counts, NPC value per item and total. Right-click a row to remove it from autoloot or copy its name or id.",
-      "requires": [
-        "game_autoloot"
-      ],
-      "screenshot": "screenshots/game_loot_tracker.png"
-    },
-    {
-      "name": "game_player_info",
-      "type": "module",
-      "version": "1.2.0",
-      "title": "Player info",
-      "description": "Other players shown inline as [RP 250] Name, in the name's own health colour. Copy Name, VIP, private messages and the battle list all still see the real name.",
-      "extraFiles": [
-        "layouts/retro/images/topbuttons/playerinfo.png",
-        "data/images/topbuttons/playerinfo.png"
-      ],
-      "screenshot": "screenshots/game_player_info.png"
-    },
-    {
-      "name": "game_exiva",
-      "type": "module",
-      "version": "1.1.5",
-      "title": "Exiva",
-      "description": "Exiva replies drawn on the minimap and at the screen edge. Overlay rendering is 15x faster: no more freeze when casting.",
-      "screenshot": "screenshots/game_exiva.png"
-    },
-    {
-      "name": "game_pos_hud",
-      "type": "module",
-      "version": "1.1.0",
-      "title": "Position HUD",
-      "description": "Your x, y, z at the top-right corner of the minimap.",
-      "screenshot": "screenshots/game_pos_hud.png"
-    },
-    {
-      "name": "game_better_chat",
-      "type": "module",
-      "version": "1.0.1",
-      "title": "Better chat",
-      "description": "Split view beside the chat with coloured [!] filter tabs.",
-      "screenshot": "screenshots/game_better_chat.png"
-    },
-    {
-      "name": "game_save_now",
-      "type": "module",
-      "version": "1.0.0",
-      "title": "Save now",
-      "description": "Save settings, hotkeys, layout and bot storage without exiting.",
-      "extraFiles": [
-        "layouts/retro/images/topbuttons/savenow.png",
-        "data/images/topbuttons/savenow.png"
-      ],
-      "screenshot": "screenshots/game_save_now.png"
-    },
-    {
-      "name": "game_buttons_fit",
-      "type": "module",
-      "version": "1.0.0",
-      "title": "Buttons panel fit",
-      "description": "Grows the Buttons panel so every button row stays visible.",
-      "screenshot": "screenshots/game_buttons_fit.png"
-    },
-    {
-      "name": "game_module_installer",
-      "type": "module",
-      "version": "1.2.0",
-      "title": "Module installer",
-      "description": "Lists the published modules, installs and updates them, search included.",
-      "screenshot": "screenshots/game_module_installer.png"
-    },
-    {
-      "name": "game_top_buttons",
-      "type": "module",
-      "version": "1.0.1",
-      "title": "Better top buttons",
-      "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
-      "screenshot": "screenshots/game_top_buttons.png"
-    },
-    {
-      "name": "game_online_hud",
-      "type": "module",
-      "version": "1.0.0",
-      "title": "Players online",
-      "description": "Shows the !online player count under FPS/Ping. Click to refresh, right-click to pause the 2 minute auto refresh.",
-      "screenshot": "screenshots/game_online_hud.png"
-    }
-  ]
+ "base": "https://otc-mods.github.io/pegaz-ots-mods/",
+ "entries": [
+  {
+   "name": "game_hud_stats",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Stats",
+   "description": "Exp/h, raw exp/h, DPS, HPS, MPS, damage, kills and graphs.",
+   "screenshot": "screenshots/game_hud_stats.png"
+  },
+  {
+   "name": "game_autoloot",
+   "type": "module",
+   "version": "1.2.0",
+   "title": "Autoloot",
+   "description": "Loot lists with item search, NPC prices and gold per oz, Add by value, and right-click any item to add or remove it from autoloot.",
+   "screenshot": "screenshots/game_autoloot.png",
+   "extraFiles": [
+    "layouts/retro/images/topbuttons/coin.png",
+    "data/images/topbuttons/coin.png"
+   ]
+  },
+  {
+   "name": "game_loot_tracker",
+   "type": "module",
+   "version": "1.2.0",
+   "title": "Autoloot tracker",
+   "description": "Items the server loots, counts, NPC value per item and total. Right-click a row to remove it from autoloot or copy its name or id.",
+   "requires": [
+    "game_autoloot"
+   ],
+   "screenshot": "screenshots/game_loot_tracker.png"
+  },
+  {
+   "name": "game_player_info",
+   "type": "module",
+   "version": "1.2.0",
+   "title": "Player info",
+   "description": "Other players shown inline as [RP 250] Name, in the name's own health colour. Copy Name, VIP, private messages and the battle list all still see the real name.",
+   "extraFiles": [
+    "layouts/retro/images/topbuttons/playerinfo.png",
+    "data/images/topbuttons/playerinfo.png"
+   ],
+   "screenshot": "screenshots/game_player_info.png"
+  },
+  {
+   "name": "game_exiva",
+   "type": "module",
+   "version": "1.1.5",
+   "title": "Exiva",
+   "description": "Exiva replies drawn on the minimap and at the screen edge. Overlay rendering is 15x faster: no more freeze when casting.",
+   "screenshot": "screenshots/game_exiva.png"
+  },
+  {
+   "name": "game_pos_hud",
+   "type": "module",
+   "version": "1.1.0",
+   "title": "Position HUD",
+   "description": "Your x, y, z at the top-right corner of the minimap.",
+   "screenshot": "screenshots/game_pos_hud.png"
+  },
+  {
+   "name": "game_better_chat",
+   "type": "module",
+   "version": "1.0.1",
+   "title": "Better chat",
+   "description": "Split view beside the chat with coloured [!] filter tabs.",
+   "screenshot": "screenshots/game_better_chat.png"
+  },
+  {
+   "name": "game_save_now",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Save now",
+   "description": "Save settings, hotkeys, layout and bot storage without exiting.",
+   "extraFiles": [
+    "layouts/retro/images/topbuttons/savenow.png",
+    "data/images/topbuttons/savenow.png"
+   ],
+   "screenshot": "screenshots/game_save_now.png"
+  },
+  {
+   "name": "game_module_installer",
+   "type": "module",
+   "version": "1.2.0",
+   "title": "Module installer",
+   "description": "Lists the published modules, installs and updates them, search included.",
+   "screenshot": "screenshots/game_module_installer.png"
+  },
+  {
+   "name": "game_top_buttons",
+   "type": "module",
+   "version": "1.0.1",
+   "title": "Better top buttons",
+   "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
+   "screenshot": "screenshots/game_top_buttons.png"
+  },
+  {
+   "name": "game_online_hud",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Players online",
+   "description": "Shows the !online player count under FPS/Ping. Click to refresh, right-click to pause the 2 minute auto refresh.",
+   "screenshot": "screenshots/game_online_hud.png"
+  },
+  {
+   "name": "game_bag_organizer",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Bag organizer",
+   "description": "Sorts your backpacks into buckets you define: one backpack per category, overflow nested inside it, and identical items kept together. Shows the current and target layout side by side with real sprites before it moves anything, and puts the spare empty backpacks in your depot.",
+   "screenshot": "screenshots/game_bag_organizer.png"
+  }
+ ]
 }

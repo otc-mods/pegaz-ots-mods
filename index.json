@@ -399,6 +399,66 @@
      "size": 81
     }
    ]
+  },
+  {
+   "name": "game_bag_organizer",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Bag organizer",
+   "description": "Sorts your backpacks into buckets you define: one backpack per category, overflow nested inside it, and identical items kept together. Shows the current and target layout side by side with real sprites before it moves anything, and puts the spare empty backpacks in your depot.",
+   "screenshot": "screenshots/game_bag_organizer.png",
+   "screenshotSize": [
+    1217,
+    1022
+   ],
+   "screenshotSha1": "0c0f2c203f5d302c048168b8df9555a566f4a14b",
+   "files": [
+    {
+     "path": "modules/game_bag_organizer/apply.lua",
+     "sha1": "86d89b9e5474927956662d8b33fe549235c9e3a7",
+     "size": 24499
+    },
+    {
+     "path": "modules/game_bag_organizer/bag_organizer.otui",
+     "sha1": "da8fec6809fadb260767935ccc58766c4b615310",
+     "size": 12831
+    },
+    {
+     "path": "modules/game_bag_organizer/cache.lua",
+     "sha1": "c56fb0e5743bdcfe072226e198db237edc62f369",
+     "size": 8124
+    },
+    {
+     "path": "modules/game_bag_organizer/game_bag_organizer.otmod",
+     "sha1": "155424a30eeeac6d7cae510a90e2b4554d47aeeb",
+     "size": 408
+    },
+    {
+     "path": "modules/game_bag_organizer/grip.png",
+     "sha1": "730259aadf4a0bb752650d6faae1b7c545f5f16b",
+     "size": 102
+    },
+    {
+     "path": "modules/game_bag_organizer/main.lua",
+     "sha1": "87eca2759a3f37a568105828913b2cc168e6fec6",
+     "size": 79751
+    },
+    {
+     "path": "modules/game_bag_organizer/plan.lua",
+     "sha1": "fd549ac10994e2de67c2a67547e17d5e4a02b48d",
+     "size": 35038
+    },
+    {
+     "path": "modules/game_bag_organizer/scan.lua",
+     "sha1": "de6df2603220920b1176a652bca78857e09502ef",
+     "size": 11533
+    },
+    {
+     "path": "modules/game_bag_organizer/viz.lua",
+     "sha1": "9386c9989671690b14ad3e7a3d618591e39f75dc",
+     "size": 5435
+    }
+   ]
   }
  ]
 }

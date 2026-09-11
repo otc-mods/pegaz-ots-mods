@@ -1,0 +1,12 @@
+Module
+  name: game_bag_organizer
+  description: Bag organizer - sorts your backpacks into buckets you define, shows before/after with real sprites, and drops the spare empty bags
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu, game_containers ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

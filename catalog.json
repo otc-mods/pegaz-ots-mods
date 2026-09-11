@@ -103,14 +103,6 @@
    "title": "Players online",
    "description": "Shows the !online player count under FPS/Ping. Click to refresh, right-click to pause the 2 minute auto refresh.",
    "screenshot": "screenshots/game_online_hud.png"
-  },
-  {
-   "name": "game_bag_organizer",
-   "type": "module",
-   "version": "1.0.0",
-   "title": "Bag organizer",
-   "description": "Sorts your backpacks into buckets you define: one backpack per category, overflow nested inside it, and identical items kept together. Shows the current and target layout side by side with real sprites before it moves anything, and puts the spare empty backpacks in your depot.",
-   "screenshot": "screenshots/game_bag_organizer.png"
   }
  ]
 }

@@ -35,7 +35,7 @@
   {
    "name": "game_player_info",
    "type": "module",
-   "version": "1.2.0",
+   "version": "1.2.1",
    "title": "Player info",
    "description": "Other players shown inline as [RP 250] Name, in the name's own health colour. Copy Name, VIP, private messages and the battle list all still see the real name.",
    "extraFiles": [
@@ -63,7 +63,7 @@
   {
    "name": "game_better_chat",
    "type": "module",
-   "version": "1.0.1",
+   "version": "1.0.2",
    "title": "Better chat",
    "description": "Split view beside the chat with coloured [!] filter tabs.",
    "screenshot": "screenshots/game_better_chat.png"
@@ -83,7 +83,7 @@
   {
    "name": "game_module_installer",
    "type": "module",
-   "version": "1.2.0",
+   "version": "1.3.1",
    "title": "Module installer",
    "description": "Lists the published modules, installs and updates them, search included.",
    "screenshot": "screenshots/game_module_installer.png"
@@ -91,7 +91,7 @@
   {
    "name": "game_top_buttons",
    "type": "module",
-   "version": "1.0.1",
+   "version": "1.1.0",
    "title": "Better top buttons",
    "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
    "screenshot": "screenshots/game_top_buttons.png"
@@ -103,6 +103,38 @@
    "title": "Players online",
    "description": "Shows the !online player count under FPS/Ping. Click to refresh, right-click to pause the 2 minute auto refresh.",
    "screenshot": "screenshots/game_online_hud.png"
+  },
+  {
+   "name": "game_cursor",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Cursors",
+   "description": "Draws the cursors this client never shows under Wine: the use-with crosshair (the stock 8.6 sheet) and the resize arrows on window edges, with the system pointer hidden underneath. Also repeats the last use-with so one key can spam magic walls, ropes or potions on a friend.",
+   "screenshot": "screenshots/game_cursor.png"
+  },
+  {
+   "name": "game_bot_presets",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Bot presets",
+   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys, buffs that learn their own duration, mwall target and keep-mwall, pre-emptive mana shield, equip rules and per-vocation supply icons. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
+   "screenshot": "screenshots/game_bot_presets.png",
+   "roots": [
+    "modules/game_bot_presets",
+    "bot/ek",
+    "bot/rp",
+    "bot/ms",
+    "bot/ed"
+   ],
+   "package": true
+  },
+  {
+   "name": "game_hide_topbar",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Hide top bar",
+   "description": "Hides the client's top bar while you are logged in and brings it back on the login screen, so the game view keeps the space.",
+   "screenshot": "screenshots/game_hide_topbar.png"
   }
  ]
 }

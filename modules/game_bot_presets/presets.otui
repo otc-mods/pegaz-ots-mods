@@ -1,0 +1,227 @@
+BotPresetRow < UIWidget
+  height: 24
+
+  Button
+    id: delBtn
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 2
+    size: 58 20
+    !text: tr('Delete')
+
+  Button
+    id: useBtn
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 3
+    size: 44 20
+    !text: tr('Use')
+
+  Button
+    id: setBtn
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 3
+    size: 62 20
+    !text: tr('Settings')
+
+  Button
+    id: copyBtn
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 3
+    size: 58 20
+    !text: tr('Copy')
+
+  UILabel
+    id: name
+    anchors.left: parent.left
+    anchors.right: copyBtn.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    margin-right: 6
+    text-align: left
+    phantom: true
+
+BotPresetsWindow < MainWindow
+  id: botPresetsWindow
+  !text: tr('Bot presets')
+  size: 520 420
+
+  UILabel
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 44
+    text-wrap: true
+    text-align: left
+    color: #b0b0b0
+    !text: tr('Copy duplicates a preset. Settings picks the characters and vocations that start on it. A preset named exactly like a character always wins.')
+
+  VerticalScrollBar
+    id: listScroll
+    anchors.top: hint.bottom
+    anchors.bottom: closeBtn.top
+    anchors.right: parent.right
+    margin-bottom: 8
+    step: 24
+    pixels-scroll: true
+
+  ScrollablePanel
+    id: list
+    anchors.top: hint.bottom
+    anchors.bottom: closeBtn.top
+    anchors.left: parent.left
+    anchors.right: listScroll.left
+    margin-bottom: 8
+    vertical-scrollbar: listScroll
+    border-width: 1
+    border-color: #202327
+    padding: 2
+    layout:
+      type: verticalBox
+
+  Button
+    id: closeBtn
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 80 24
+    !text: tr('Close')
+
+  Button
+    id: editBtn
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 6
+    size: 110 24
+    !text: tr('Edit config')
+
+  Button
+    id: enableBtn
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 130 24
+    !text: tr('Enable bot')
+
+BotPresetCharRow < UIWidget
+  height: 20
+
+  Button
+    id: removeBtn
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 2
+    size: 20 18
+    !text: tr('x')
+
+  UILabel
+    id: name
+    anchors.left: parent.left
+    anchors.right: removeBtn.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    text-align: left
+    phantom: true
+
+BotPresetVocRow < UIWidget
+  height: 20
+
+  CheckBox
+    id: box
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    width: 150
+    height: 16
+
+BotPresetSettings < MainWindow
+  id: botPresetSettings
+  !text: tr('Preset settings')
+  size: 470 452
+
+  UILabel
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 40
+    text-wrap: true
+    text-align: left
+    color: #b0b0b0
+
+  UILabel
+    id: mineLabel
+    anchors.top: hint.bottom
+    anchors.left: parent.left
+    anchors.right: mineCombo.left
+    margin-right: 8
+    height: 22
+    text-align: left
+
+  ComboBox
+    id: mineCombo
+    anchors.top: hint.bottom
+    anchors.right: parent.right
+    width: 200
+    height: 22
+
+  UILabel
+    id: charHead
+    anchors.top: mineCombo.bottom
+    margin-top: 6
+    anchors.left: parent.left
+    width: 220
+    height: 18
+    text-align: center
+    !text: tr('Characters')
+
+  UILabel
+    id: vocHead
+    anchors.top: charHead.top
+    anchors.left: charHead.right
+    margin-left: 8
+    width: 210
+    height: 18
+    text-align: center
+    !text: tr('Vocations')
+
+  ScrollablePanel
+    id: chars
+    anchors.top: charHead.bottom
+    anchors.left: charHead.left
+    width: 220
+    anchors.bottom: addBtn.top
+    margin-bottom: 6
+    border-width: 1
+    border-color: #202327
+    padding: 2
+    layout:
+      type: verticalBox
+
+  ScrollablePanel
+    id: vocs
+    anchors.top: vocHead.bottom
+    anchors.left: vocHead.left
+    width: 210
+    anchors.bottom: closeBtn2.top
+    margin-bottom: 6
+    border-width: 1
+    border-color: #202327
+    padding: 2
+    layout:
+      type: verticalBox
+
+  Button
+    id: addBtn
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 220 24
+    !text: tr('Add this character')
+
+  Button
+    id: closeBtn2
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 100 24
+    !text: tr('Close')

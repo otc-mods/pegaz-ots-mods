@@ -12,58 +12,147 @@ TopButtonsRow < UIWidget
     text-align: left
     phantom: true
 
-TopButtonsSetRow < UIWidget
-  height: 22
+TopButtonsDragRow < UIWidget
+  height: 28
+  draggable: true
+  focusable: false
 
   Button
-    id: offBtn
+    id: rightArrow
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
-    margin-right: 4
-    size: 38 18
-    !text: tr('Off')
+    margin-right: 2
+    size: 18 18
+    !text: tr('>')
+    !tooltip: tr('Move one column to the right')
 
   Button
-    id: listBtn
-    anchors.right: prev.left
+    id: leftArrow
+    anchors.right: rightArrow.left
     anchors.verticalCenter: parent.verticalCenter
-    margin-right: 3
-    size: 38 18
-    !text: tr('List')
-
-  Button
-    id: favBtn
-    anchors.right: prev.left
-    anchors.verticalCenter: parent.verticalCenter
-    margin-right: 3
-    size: 38 18
-    !text: tr('Fav')
+    margin-right: 2
+    size: 18 18
+    !text: tr('<')
+    !tooltip: tr('Move one column to the left')
 
   UILabel
     id: name
     anchors.left: parent.left
-    anchors.right: favBtn.left
+    anchors.right: leftArrow.left
     anchors.verticalCenter: parent.verticalCenter
-    margin-left: 5
-    margin-right: 6
+    margin-left: 30
+    margin-right: 4
     text-align: left
+    phantom: true
+
+TopButtonsColumn < ScrollablePanel
+  border-width: 1
+  border-color: #202327
+  padding: 2
+  layout:
+    type: verticalBox
 
 TopButtonsSettings < MainWindow
   id: topButtonsSettings
-  !text: tr('Buttons - settings')
-  size: 390 470
-  @onEscape: self:destroy()
+  !text: tr('Buttons')
+  size: 580 520
 
   UILabel
     id: hint
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 34
+    height: 26
     text-wrap: true
     text-align: left
     color: #b0b0b0
-    !text: tr('Fav = icon in the old Buttons grid. List = row in the Buttons panel. Off = not shown anywhere.')
+    !text: tr('Use < and > to move a button between columns. Dragging works too.')
+
+  UILabel
+    id: favHead
+    anchors.top: hint.bottom
+    anchors.left: parent.left
+    width: 178
+    height: 18
+    text-align: center
+    !text: tr('Favourites (icons)')
+
+  UILabel
+    id: listHead
+    anchors.top: hint.bottom
+    anchors.left: favHead.right
+    margin-left: 8
+    width: 178
+    height: 18
+    text-align: center
+    !text: tr('List (rows)')
+
+  UILabel
+    id: offHead
+    anchors.top: hint.bottom
+    anchors.left: listHead.right
+    margin-left: 8
+    width: 178
+    height: 18
+    text-align: center
+    !text: tr('Hidden')
+
+  VerticalScrollBar
+    id: favScroll
+    anchors.top: favHead.bottom
+    anchors.bottom: closeBtn.top
+    anchors.left: favHead.right
+    margin-bottom: 8
+    margin-left: -12
+    step: 20
+    pixels-scroll: true
+
+  TopButtonsColumn
+    id: favCol
+    anchors.top: favHead.bottom
+    anchors.bottom: closeBtn.top
+    anchors.left: favHead.left
+    anchors.right: favScroll.left
+    margin-bottom: 8
+    vertical-scrollbar: favScroll
+
+  VerticalScrollBar
+    id: listScroll
+    anchors.top: listHead.bottom
+    anchors.bottom: closeBtn.top
+    anchors.left: listHead.right
+    margin-bottom: 8
+    margin-left: -12
+    step: 20
+    pixels-scroll: true
+
+  TopButtonsColumn
+    id: listCol
+    anchors.top: listHead.bottom
+    anchors.bottom: closeBtn.top
+    anchors.left: listHead.left
+    anchors.right: listScroll.left
+    margin-bottom: 8
+    vertical-scrollbar: listScroll
+
+  VerticalScrollBar
+    id: offScroll
+    anchors.top: offHead.bottom
+    anchors.bottom: closeBtn.top
+    anchors.left: offHead.right
+    margin-bottom: 8
+    margin-left: -12
+    step: 20
+    pixels-scroll: true
+
+  TopButtonsColumn
+    id: offCol
+    anchors.top: offHead.bottom
+    anchors.bottom: closeBtn.top
+    anchors.left: offHead.left
+    anchors.right: offScroll.left
+    margin-bottom: 8
+    vertical-scrollbar: offScroll
 
   Button
     id: closeBtn
@@ -80,30 +169,6 @@ TopButtonsSettings < MainWindow
     size: 110 24
     !text: tr('All to List')
 
-  VerticalScrollBar
-    id: listScroll
-    anchors.top: hint.bottom
-    anchors.bottom: closeBtn.top
-    anchors.right: parent.right
-    margin-top: 4
-    margin-bottom: 8
-    step: 16
-    pixels-scroll: true
-
-  ScrollablePanel
-    id: list
-    anchors.top: hint.bottom
-    anchors.left: parent.left
-    anchors.right: listScroll.left
-    anchors.bottom: closeBtn.top
-    margin-top: 4
-    margin-bottom: 8
-    vertical-scrollbar: listScroll
-    border-width: 1
-    border-color: #202327
-    layout:
-      type: verticalBox
-
 MiniWindow
   id: topButtonsWindow
   !text: tr('Buttons')
@@ -113,14 +178,25 @@ MiniWindow
 
   UIWidget
     id: settingsButton
-    anchors.top: parent.top
+    anchors.verticalCenter: minimizeButton.verticalCenter
     anchors.right: minimizeButton.left
-    margin-top: 5
-    margin-right: 3
-    size: 14 14
+    margin-right: 5
+    size: 12 12
     image-source: cog.png
     image-smooth: true
     phantom: false
+
+  TextEdit
+    id: search
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: 22
+    margin-left: 3
+    margin-right: 3
+    height: 20
+    placeholder: Search buttons
+    placeholder-color: #7a7a7a
 
   MiniWindowContents
     Panel
@@ -130,4 +206,24 @@ MiniWindow
       anchors.top: parent.top
       layout:
         type: verticalBox
+        fit-children: true
+
+TopFavsWindow < MiniWindow
+  id: topFavsWindow
+  !text: tr('Favourites')
+  icon: /images/topbuttons/buttons
+  height: 60
+  &save: true
+
+  MiniWindowContents
+    Panel
+      id: favs
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+      layout:
+        type: grid
+        cell-size: 28 28
+        cell-spacing: 2
+        flow: true
         fit-children: true

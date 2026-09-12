@@ -303,7 +303,6 @@ function terminate()
   removeEvent(tagEvent)
   undecorateAll()      -- put every displayed name back before letting go of the hook
   removeNameHook()
-  clearAllText()
   save()
   if optionsWindow then optionsWindow:destroy() optionsWindow = nil end
   if button then button:destroy() button = nil end

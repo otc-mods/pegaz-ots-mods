@@ -1,0 +1,12 @@
+Module
+  name: game_bot_presets
+  description: Copy, rename and delete bot presets from the bot window - no need to enable the bot or touch the client folder
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1010
+  dependencies: [ game_bot ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

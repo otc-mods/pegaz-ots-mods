@@ -1,0 +1,12 @@
+Module
+  name: game_hide_topbar
+  description: Hides the top bar while in game (login screen keeps it); Ctrl+Shift+T still toggles it
+  author: kk
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface, client_topmenu ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

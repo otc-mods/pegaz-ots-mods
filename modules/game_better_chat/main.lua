@@ -36,8 +36,11 @@ local consolePanel, contentPanel, panel, splitter, rail
 local bangs = {}             -- tab id -> [!] button
 local unread = {}            -- tab id -> count since last viewed
 local history = {}           -- tab id -> { {text, color, name, source}, ... }
+-- switching tabs re-renders every kept line, so a huge history is paid for on every click: 2000 lines lag
+local MAX_KEEP = 500
+local function clampKeep(v) return math.max(20, math.min(MAX_KEEP, tonumber(v) or 200)) end
 local lastSound = {}
-local flashEvent, flashOn = nil, false
+local flashEvent, splitEvent, flashOn = nil, false
 local settingsWindow
 local tagUntil = 0           -- while set, rows are prefixed with their source, to see where a message comes from
 local pendingJoin            -- { names = {lower -> name}, t } while we wait for the channel list to join channels
@@ -65,7 +68,7 @@ local function newTab(o)
   o.channels = o.channels or ''
   o.include = o.include or ''
   o.exclude = o.exclude or ''
-  o.keep = o.keep or 200
+  o.keep = clampKeep(o.keep)
   if o.flash == nil then o.flash = true end
   if o.skipOpen == nil then o.skipOpen = true end -- private source: skip people whose chat tab is already open
   o.sound = o.sound or false
@@ -100,7 +103,7 @@ local function load()
         local src = {}
         if type(t.sources) == 'table' then for k, v in pairs(t.sources) do if truthy(v) then src[k] = true end end end
         t.sources = src
-        t.keep = tonumber(t.keep) or 200
+        t.keep = clampKeep(t.keep)
         t.flash, t.sound, t.regex = truthy(t.flash), truthy(t.sound), truthy(t.regex)
         if t.skipOpen ~= nil then t.skipOpen = truthy(t.skipOpen) end
         table.insert(cfg.tabs, newTab(t))
@@ -527,7 +530,8 @@ openSettings = function(tab, isNew)
   skip:setText('skip open priv chats')
   skip:setTooltip('Private source: do not show messages from people whose chat tab is already open in the console')
   skip:setChecked(truthy(tab.skipOpen))
-  c.keepRow.text:setText('Keep last')
+  c.keepRow.text:setText('Keep last')            -- the row is narrow; the limit lives in the tooltip
+  c.keepRow:setTooltip('Lines kept per tab: 20 to ' .. MAX_KEEP .. ' (more than that makes tab switching lag)')
   c.keepRow.value:setText(tostring(tab.keep or 200))
 
   w.deleteButton:setVisible(not isNew)
@@ -553,7 +557,7 @@ openSettings = function(tab, isNew)
     tab.include = c.includeRow.value:getText()
     tab.exclude = c.excludeRow.value:getText()
     tab.regex, tab.flash, tab.sound, tab.skipOpen = regex:isChecked(), flash:isChecked(), sound:isChecked(), skip:isChecked()
-    tab.keep = math.max(20, tonumber(c.keepRow.value:getText()) or 200)
+    tab.keep = clampKeep(c.keepRow.value:getText())
     if isNew then
       table.insert(cfg.tabs, tab)
       cfg.active = tab.id
@@ -663,6 +667,12 @@ function init()
   connect(g_game, { onTalk = onTalk }, true) -- before the console: its private tab for this very message must not count as open
   connect(g_game, { onTextMessage = onTextMessage, onGameStart = onGameStart, onChannelList = onChannelList })
   connect(consolePanel, { onGeometryChange = applyLayout })
+  -- the client only writes the chat/map divider on exit, so a module reload loses whatever height you set.
+  -- game_interface.save()/load() are exported: calling them ourselves keeps it without touching the client.
+  scheduleEvent(function() pcall(function() modules.game_interface.load() end) end, 400)
+  splitEvent = cycleEvent(function()
+    if g_game.isOnline() then pcall(function() modules.game_interface.save() end) end
+  end, 5000)
   flashEvent = cycleEvent(tick, 500)
   channelsEvent = cycleEvent(ensureChannels, 60000)
   if g_game.isOnline() then scheduleEvent(ensureChannels, 1500) end
@@ -673,6 +683,8 @@ function init()
 end
 
 function terminate()
+  if splitEvent then removeEvent(splitEvent) splitEvent = nil end
+  pcall(function() modules.game_interface.save() end)
   disconnect(g_game, { onTalk = onTalk, onTextMessage = onTextMessage, onGameStart = onGameStart, onChannelList = onChannelList })
   if consolePanel then disconnect(consolePanel, { onGeometryChange = applyLayout }) end
   removeEvent(flashEvent)

@@ -1,0 +1,12 @@
+Module
+  name: game_cursor
+  description: Draws the cursors this client cannot show under Wine - the use-with crosshair and the resize arrows
+  author: otc-mods
+  website: local
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1000
+  dependencies: [ game_interface ]
+  scripts: [ main ]
+  @onLoad: init()
+  @onUnload: terminate()

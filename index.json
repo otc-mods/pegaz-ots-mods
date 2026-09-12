@@ -18,27 +18,32 @@
     {
      "path": "modules/game_hud_stats/README.md",
      "sha1": "c6a4529b74be3eee5a355904d1c57b77d1c7e25b",
-     "size": 1249
+     "size": 1249,
+     "packed": false
     },
     {
      "path": "modules/game_hud_stats/hud_color_dot.png",
      "sha1": "ba1df0d16fd34c06586b578980c15bbf56cf5271",
-     "size": 150
+     "size": 150,
+     "packed": false
     },
     {
      "path": "modules/game_hud_stats/hudstats.lua",
      "sha1": "01edd3916e8a415bfa9823532e3853e51641bae4",
-     "size": 29799
+     "size": 29799,
+     "packed": false
     },
     {
      "path": "modules/game_hud_stats/hudstats.otmod",
      "sha1": "39c65e7412b15dd7d89f1a58ef4632236b8a94d5",
-     "size": 327
+     "size": 327,
+     "packed": false
     },
     {
      "path": "modules/game_hud_stats/hudstats.otui",
      "sha1": "41b2d950fb526ef19df6e9d2971928fcf74b41eb",
-     "size": 2739
+     "size": 2739,
+     "packed": false
     }
    ]
   },
@@ -58,32 +63,38 @@
     {
      "path": "data/images/topbuttons/coin.png",
      "sha1": "88c167313df08e84a4924ed97c13cb876cc602e4",
-     "size": 393
+     "size": 393,
+     "packed": false
     },
     {
      "path": "layouts/retro/images/topbuttons/coin.png",
      "sha1": "fb53bb10449590b8cae3060e7bd337eae69a3ec8",
-     "size": 583
+     "size": 583,
+     "packed": false
     },
     {
      "path": "modules/game_autoloot/autoloot.lua",
      "sha1": "7b7663dc510500b31e29d51ccc89f4c6087480c7",
-     "size": 29467
+     "size": 29467,
+     "packed": false
     },
     {
      "path": "modules/game_autoloot/autoloot.otmod",
      "sha1": "a8263d048423d99a6f0e4d2014feefc44e2a4d7d",
-     "size": 369
+     "size": 369,
+     "packed": false
     },
     {
      "path": "modules/game_autoloot/autoloot.otui",
      "sha1": "f9846f4d95d6c0889489eb4540b23b7e9b7e2c3b",
-     "size": 6924
+     "size": 6924,
+     "packed": false
     },
     {
      "path": "modules/game_autoloot/items_860.lua",
      "sha1": "d53b1f6015099417edbaaaec9c882d54ac4434cf",
-     "size": 223450
+     "size": 223450,
+     "packed": false
     }
    ]
   },
@@ -106,29 +117,33 @@
     {
      "path": "modules/game_loot_tracker/game_loot_tracker.otmod",
      "sha1": "abd757a4e904804458b8ed90e8ed2d9b5d0a2429",
-     "size": 422
+     "size": 422,
+     "packed": false
     },
     {
      "path": "modules/game_loot_tracker/main.lua",
      "sha1": "edac483d2ab4ff46b358a2dfa7fc2d0d6e52d018",
-     "size": 24368
+     "size": 24368,
+     "packed": false
     },
     {
      "path": "modules/game_loot_tracker/refresh.png",
      "sha1": "a8f52837757b5c11bf13cfb5a994be21b01c540b",
-     "size": 197
+     "size": 197,
+     "packed": false
     },
     {
      "path": "modules/game_loot_tracker/tracker.otui",
      "sha1": "d8ba63b118fc86e368ae4d3892b3ea46f0e442f6",
-     "size": 2250
+     "size": 2250,
+     "packed": false
     }
    ]
   },
   {
    "name": "game_player_info",
    "type": "module",
-   "version": "1.2.0",
+   "version": "1.2.1",
    "title": "Player info",
    "description": "Other players shown inline as [RP 250] Name, in the name's own health colour. Copy Name, VIP, private messages and the battle list all still see the real name.",
    "screenshot": "screenshots/game_player_info.png",
@@ -141,27 +156,32 @@
     {
      "path": "data/images/topbuttons/playerinfo.png",
      "sha1": "61667fc4befad3921051b98dea96f7e2e52659a7",
-     "size": 583
+     "size": 583,
+     "packed": false
     },
     {
      "path": "layouts/retro/images/topbuttons/playerinfo.png",
      "sha1": "1c5aad45534f70599f07b20448b6c52f482130f6",
-     "size": 907
+     "size": 907,
+     "packed": false
     },
     {
      "path": "modules/game_player_info/game_player_info.otmod",
      "sha1": "027cee91e5efc9d62fd3fc46c512dddc40d2c275",
-     "size": 432
+     "size": 432,
+     "packed": false
     },
     {
      "path": "modules/game_player_info/main.lua",
-     "sha1": "43aa3f5d51ec65d1c9f9282ca6d6c3be55e2bb02",
-     "size": 13003
+     "sha1": "3c0218aa701f0efcacc7d2ecc88550b876e44b2d",
+     "size": 12986,
+     "packed": false
     },
     {
      "path": "modules/game_player_info/options.otui",
      "sha1": "335a15c89ab55e9e5d56689fc9fa3918eced723f",
-     "size": 874
+     "size": 874,
+     "packed": false
     }
    ]
   },
@@ -181,27 +201,32 @@
     {
      "path": "modules/game_exiva/exiva.otui",
      "sha1": "2a840b56af7547b782928d794fc126f8a1db646d",
-     "size": 2373
+     "size": 2373,
+     "packed": false
     },
     {
      "path": "modules/game_exiva/game_exiva.otmod",
      "sha1": "20d8a6d0eccb5fd00203255117befaa519c70a11",
-     "size": 419
+     "size": 419,
+     "packed": false
     },
     {
      "path": "modules/game_exiva/geometry.lua",
      "sha1": "2750c6bf770763f564f05594b200a5264dff9067",
-     "size": 7933
+     "size": 7933,
+     "packed": false
     },
     {
      "path": "modules/game_exiva/main.lua",
      "sha1": "460e95c923950f4418596287331f68a35e88645a",
-     "size": 17141
+     "size": 17141,
+     "packed": false
     },
     {
      "path": "modules/game_exiva/png.lua",
      "sha1": "3bc1bb6e72d1073441ecf87dd68d1990b3d89c37",
-     "size": 2346
+     "size": 2346,
+     "packed": false
     }
    ]
   },
@@ -221,24 +246,27 @@
     {
      "path": "modules/game_pos_hud/game_pos_hud.otmod",
      "sha1": "4f2bb3c724f70aed45113e7a6ae6d60483ea73f2",
-     "size": 292
+     "size": 292,
+     "packed": false
     },
     {
      "path": "modules/game_pos_hud/main.lua",
      "sha1": "5a813be0f578d682c1257711fece152e5f62c4f3",
-     "size": 910
+     "size": 910,
+     "packed": false
     },
     {
      "path": "modules/game_pos_hud/pos_hud.otui",
      "sha1": "8a7f9ca06ee3859c60f017996277e240a7b818dd",
-     "size": 196
+     "size": 196,
+     "packed": false
     }
    ]
   },
   {
    "name": "game_better_chat",
    "type": "module",
-   "version": "1.0.1",
+   "version": "1.0.2",
    "title": "Better chat",
    "description": "Split view beside the chat with coloured [!] filter tabs.",
    "screenshot": "screenshots/game_better_chat.png",
@@ -251,17 +279,20 @@
     {
      "path": "modules/game_better_chat/better_chat.otui",
      "sha1": "43aef3c2f937eb9f5f7edfd31804e3ea7fe0ec27",
-     "size": 5297
+     "size": 5297,
+     "packed": false
     },
     {
      "path": "modules/game_better_chat/game_better_chat.otmod",
      "sha1": "c15a7d2d5d4db964cb9fcca149b95f6f3f4eabae",
-     "size": 417
+     "size": 417,
+     "packed": false
     },
     {
      "path": "modules/game_better_chat/main.lua",
-     "sha1": "4078d2ffcd19acf7ec1bf8c6ee9126ee676624d1",
-     "size": 27522
+     "sha1": "0cabb95d736497c6ca81281aad7f617f7d1131e5",
+     "size": 28470,
+     "packed": false
     }
    ]
   },
@@ -281,29 +312,33 @@
     {
      "path": "data/images/topbuttons/savenow.png",
      "sha1": "7d1118f3907cacd8219038ce1e818c194ff437d0",
-     "size": 134
+     "size": 134,
+     "packed": false
     },
     {
      "path": "layouts/retro/images/topbuttons/savenow.png",
      "sha1": "74a4bea3e470e1dc4611b68a1718199ffc9323ad",
-     "size": 197
+     "size": 197,
+     "packed": false
     },
     {
      "path": "modules/game_save_now/game_save_now.otmod",
      "sha1": "0babeaab5d2f5251b87bf400b3d3fc0a52a1d2c3",
-     "size": 392
+     "size": 392,
+     "packed": false
     },
     {
      "path": "modules/game_save_now/main.lua",
      "sha1": "96478f446f77b0e6a0c8547ecc34ae379264db3f",
-     "size": 2278
+     "size": 2278,
+     "packed": false
     }
    ]
   },
   {
    "name": "game_module_installer",
    "type": "module",
-   "version": "1.2.0",
+   "version": "1.3.1",
    "title": "Module installer",
    "description": "Lists the published modules, installs and updates them, search included.",
    "screenshot": "screenshots/game_module_installer.png",
@@ -316,29 +351,33 @@
     {
      "path": "modules/game_module_installer/game_module_installer.otmod",
      "sha1": "00c7680d8bb7b0de99afdb1c993e46b9898f6e63",
-     "size": 346
+     "size": 346,
+     "packed": false
     },
     {
      "path": "modules/game_module_installer/grip.png",
      "sha1": "730259aadf4a0bb752650d6faae1b7c545f5f16b",
-     "size": 102
+     "size": 102,
+     "packed": false
     },
     {
      "path": "modules/game_module_installer/installer.otui",
      "sha1": "9acd54c345269da8c46ce6da2bf2d018640db4d6",
-     "size": 5618
+     "size": 5618,
+     "packed": false
     },
     {
      "path": "modules/game_module_installer/main.lua",
-     "sha1": "97ef399533198535f60638324b1e76c28785a91a",
-     "size": 18436
+     "sha1": "0ce44b95f9c29d6a73461e3a2c4c8f0b7b262718",
+     "size": 24797,
+     "packed": false
     }
    ]
   },
   {
    "name": "game_top_buttons",
    "type": "module",
-   "version": "1.0.1",
+   "version": "1.1.0",
    "title": "Better top buttons",
    "description": "One collapsible panel listing every top button as icon + name. Three tiers per button: Fav keeps it in the old grid, List shows it in the panel, Off hides it.",
    "screenshot": "screenshots/game_top_buttons.png",
@@ -351,22 +390,26 @@
     {
      "path": "modules/game_top_buttons/cog.png",
      "sha1": "41e94b967948f5e407cfd39b1ecf62bddbd65c52",
-     "size": 183
+     "size": 183,
+     "packed": false
     },
     {
      "path": "modules/game_top_buttons/game_top_buttons.otmod",
      "sha1": "c9aceb193a29d31e681c0bf85a53f39d6e0a64f3",
-     "size": 336
+     "size": 336,
+     "packed": false
     },
     {
      "path": "modules/game_top_buttons/main.lua",
-     "sha1": "9c189d308461bd3ab4f5ae43390407a1216e20f4",
-     "size": 11576
+     "sha1": "3b0e1674454bbfd2b0a05e5a18f088365a8a7f0a",
+     "size": 27924,
+     "packed": false
     },
     {
      "path": "modules/game_top_buttons/top_buttons.otui",
-     "sha1": "d6fd95844b10f4bb4bbc32a3bd47f74c6671c5b9",
-     "size": 2803
+     "sha1": "e7046700cd5aa9e9014e61ea9b4efb6c146d3ca6",
+     "size": 4871,
+     "packed": false
     }
    ]
   },
@@ -386,17 +429,1061 @@
     {
      "path": "modules/game_online_hud/game_online_hud.otmod",
      "sha1": "c838099eb4fafc31e29421c230631ba8c9fe140c",
-     "size": 317
+     "size": 317,
+     "packed": false
     },
     {
      "path": "modules/game_online_hud/main.lua",
      "sha1": "c261ca18df7af65b04b15416727a2c16de17cb18",
-     "size": 4302
+     "size": 4302,
+     "packed": false
     },
     {
      "path": "modules/game_online_hud/online_hud.otui",
      "sha1": "0383e2615197d76421af57e661d9857f26dd1965",
-     "size": 81
+     "size": 81,
+     "packed": false
+    }
+   ]
+  },
+  {
+   "name": "game_cursor",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Cursors",
+   "description": "Draws the cursors this client never shows under Wine: the use-with crosshair (the stock 8.6 sheet) and the resize arrows on window edges, with the system pointer hidden underneath. Also repeats the last use-with so one key can spam magic walls, ropes or potions on a friend.",
+   "screenshot": "screenshots/game_cursor.png",
+   "screenshotSize": [
+    420,
+    200
+   ],
+   "screenshotSha1": "04e3ad2559310da46a964c371be8895740dde406",
+   "files": [
+    {
+     "path": "modules/game_cursor/blank.png",
+     "sha1": "e2b8d2a0488ab8e3954f9504c2e6ee20c480f933",
+     "size": 83,
+     "packed": false
+    },
+    {
+     "path": "modules/game_cursor/game_cursor.otmod",
+     "sha1": "6d51e57336686049556dd276192cd8a5ec77f5b0",
+     "size": 337,
+     "packed": false
+    },
+    {
+     "path": "modules/game_cursor/main.lua",
+     "sha1": "d59ef3e470835ed3c8871103772a75d6146118ad",
+     "size": 9513,
+     "packed": false
+    }
+   ]
+  },
+  {
+   "name": "game_bot_presets",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Bot presets",
+   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys, buffs that learn their own duration, mwall target and keep-mwall, pre-emptive mana shield, equip rules and per-vocation supply icons. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
+   "screenshot": "screenshots/game_bot_presets.png",
+   "screenshotSize": [
+    196,
+    579
+   ],
+   "screenshotSha1": "a223ac437c6e096be14b4be2be88e899548550dd",
+   "files": [
+    {
+     "path": "bot/ed/_loader.lua",
+     "sha1": "cfb0588cc4a3ad189cc04021dff6e11fb81fc030",
+     "size": 877,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/actions.lua",
+     "sha1": "c9b0a667f42d2b3a5f6104b3fec50dd730a2dbdb",
+     "size": 8092,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/cavebot.lua",
+     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
+     "size": 6011,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/cavebot.otui",
+     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
+     "size": 974,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/config.lua",
+     "sha1": "e413ee7fbb637331667c234d75a85cfd0b933733",
+     "size": 2725,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/config.otui",
+     "sha1": "86d45d3b70bcc1107dea84a7bac92cce8637cbc7",
+     "size": 994,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/depositer.lua",
+     "sha1": "144e311f371370066c5649628894da6de4735584",
+     "size": 883,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/editor.lua",
+     "sha1": "009fc3ef3f7e0fdf9291a62efc5f08abb987d508",
+     "size": 5314,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/editor.otui",
+     "sha1": "bd2b354b84a501d98e555001324a851bbd57c2df",
+     "size": 783,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/example_functions.lua",
+     "sha1": "d6728bc7fda9385c7606cc480ffa9d1379f78398",
+     "size": 2194,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/extension_template.lua",
+     "sha1": "ee98fafdf7923a66245eaee8917f0fe63e0c9f5e",
+     "size": 1929,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/recorder.lua",
+     "sha1": "b98d6ddd9b741d3a8de33da202b26486b6c983c6",
+     "size": 1796,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/supply.lua",
+     "sha1": "7893edbd55d71190e62d454e4406c1055f55e448",
+     "size": 1153,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/supply.otui",
+     "sha1": "c10e2ae9de58fa2c29368b5c805243ccaf1d1277",
+     "size": 1469,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/cavebot/walking.lua",
+     "sha1": "f3a0ffe77024c06e9fb4485991e07e9579a23e95",
+     "size": 2642,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/core/engines.lua",
+     "sha1": "c88acd4cca14d6f78a6aa7fb62a0f9bd5ece5416",
+     "size": 2301,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/core/hunt.lua",
+     "sha1": "13141b3462862c17ca8cbecfa4871d21cc601c75",
+     "size": 3474,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/core/registry.lua",
+     "sha1": "e0398de467c443ed682af996a63069be8df94724",
+     "size": 1657,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/core/ui.lua",
+     "sha1": "6d5f31b9aef868c87473445d7f326aecf8ebcf7b",
+     "size": 4265,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/core/ui.otui",
+     "sha1": "be66286668ab5b4ececdb52994a7bea8fc6eaba7",
+     "size": 8779,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/features/buff.lua",
+     "sha1": "7edd3c6999952e96e9f69f3d6b326a8dcb42bde1",
+     "size": 9654,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/features/equip.lua",
+     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
+     "size": 19626,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/features/heal.lua",
+     "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
+     "size": 8042,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/features/icons.lua",
+     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
+     "size": 36474,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/features/main.lua",
+     "sha1": "a4263ac8560892053173732f181c86be15702e0a",
+     "size": 5283,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/features/targeting.lua",
+     "sha1": "bb96770e91c7c380c68eea62ca648a870b793b67",
+     "size": 2580,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/features/tools.lua",
+     "sha1": "226a97ccc0c264180c4db1de9782874ad63cbc42",
+     "size": 21414,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/creature.lua",
+     "sha1": "4641e0b9596303a6926293d855e66d4786d7d5ef",
+     "size": 3033,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/creature_attack.lua",
+     "sha1": "b798ed750c47d2b9222cd89de423402413527dd8",
+     "size": 5635,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/creature_editor.lua",
+     "sha1": "640408c73daef2d3e90036c9fba6bd714ac81063",
+     "size": 4456,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/creature_editor.otui",
+     "sha1": "f4f8f0c334fe586f5e64f8a712fb3574a422377d",
+     "size": 3406,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/creature_priority.lua",
+     "sha1": "f430f0315ef45416f6ccdfc0bc221f699ddd6de1",
+     "size": 2669,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/looting.lua",
+     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
+     "size": 9944,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/looting.otui",
+     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
+     "size": 1562,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/target.lua",
+     "sha1": "a7e1661e455024ce3457d96da0d8e0517abd2273",
+     "size": 8731,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/target.otui",
+     "sha1": "6c158466dbc324347b39072cf2f2e2dd83b0dd7e",
+     "size": 2191,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/targetbot/walking.lua",
+     "sha1": "b1430bf36c8cb9a78a241505a7a2c4c1849327cc",
+     "size": 754,
+     "packed": true
+    },
+    {
+     "path": "bot/ed/vocation.lua",
+     "sha1": "a059400fa7392323a832dddb28e4cbd9ec519abd",
+     "size": 1617,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/_loader.lua",
+     "sha1": "cfb0588cc4a3ad189cc04021dff6e11fb81fc030",
+     "size": 877,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/actions.lua",
+     "sha1": "c9b0a667f42d2b3a5f6104b3fec50dd730a2dbdb",
+     "size": 8092,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/cavebot.lua",
+     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
+     "size": 6011,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/cavebot.otui",
+     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
+     "size": 974,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/config.lua",
+     "sha1": "e413ee7fbb637331667c234d75a85cfd0b933733",
+     "size": 2725,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/config.otui",
+     "sha1": "86d45d3b70bcc1107dea84a7bac92cce8637cbc7",
+     "size": 994,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/depositer.lua",
+     "sha1": "144e311f371370066c5649628894da6de4735584",
+     "size": 883,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/editor.lua",
+     "sha1": "009fc3ef3f7e0fdf9291a62efc5f08abb987d508",
+     "size": 5314,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/editor.otui",
+     "sha1": "bd2b354b84a501d98e555001324a851bbd57c2df",
+     "size": 783,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/example_functions.lua",
+     "sha1": "d6728bc7fda9385c7606cc480ffa9d1379f78398",
+     "size": 2194,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/extension_template.lua",
+     "sha1": "ee98fafdf7923a66245eaee8917f0fe63e0c9f5e",
+     "size": 1929,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/recorder.lua",
+     "sha1": "b98d6ddd9b741d3a8de33da202b26486b6c983c6",
+     "size": 1796,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/supply.lua",
+     "sha1": "7893edbd55d71190e62d454e4406c1055f55e448",
+     "size": 1153,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/supply.otui",
+     "sha1": "c10e2ae9de58fa2c29368b5c805243ccaf1d1277",
+     "size": 1469,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/cavebot/walking.lua",
+     "sha1": "f3a0ffe77024c06e9fb4485991e07e9579a23e95",
+     "size": 2642,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/core/engines.lua",
+     "sha1": "c88acd4cca14d6f78a6aa7fb62a0f9bd5ece5416",
+     "size": 2301,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/core/hunt.lua",
+     "sha1": "13141b3462862c17ca8cbecfa4871d21cc601c75",
+     "size": 3474,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/core/registry.lua",
+     "sha1": "e0398de467c443ed682af996a63069be8df94724",
+     "size": 1657,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/core/ui.lua",
+     "sha1": "6d5f31b9aef868c87473445d7f326aecf8ebcf7b",
+     "size": 4265,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/core/ui.otui",
+     "sha1": "be66286668ab5b4ececdb52994a7bea8fc6eaba7",
+     "size": 8779,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/features/buff.lua",
+     "sha1": "7edd3c6999952e96e9f69f3d6b326a8dcb42bde1",
+     "size": 9654,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/features/equip.lua",
+     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
+     "size": 19626,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/features/heal.lua",
+     "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
+     "size": 8042,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/features/icons.lua",
+     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
+     "size": 36474,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/features/main.lua",
+     "sha1": "a4263ac8560892053173732f181c86be15702e0a",
+     "size": 5283,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/features/targeting.lua",
+     "sha1": "bb96770e91c7c380c68eea62ca648a870b793b67",
+     "size": 2580,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/features/tools.lua",
+     "sha1": "226a97ccc0c264180c4db1de9782874ad63cbc42",
+     "size": 21414,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/creature.lua",
+     "sha1": "4641e0b9596303a6926293d855e66d4786d7d5ef",
+     "size": 3033,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/creature_attack.lua",
+     "sha1": "b798ed750c47d2b9222cd89de423402413527dd8",
+     "size": 5635,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/creature_editor.lua",
+     "sha1": "640408c73daef2d3e90036c9fba6bd714ac81063",
+     "size": 4456,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/creature_editor.otui",
+     "sha1": "f4f8f0c334fe586f5e64f8a712fb3574a422377d",
+     "size": 3406,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/creature_priority.lua",
+     "sha1": "f430f0315ef45416f6ccdfc0bc221f699ddd6de1",
+     "size": 2669,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/looting.lua",
+     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
+     "size": 9944,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/looting.otui",
+     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
+     "size": 1562,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/target.lua",
+     "sha1": "a7e1661e455024ce3457d96da0d8e0517abd2273",
+     "size": 8731,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/target.otui",
+     "sha1": "6c158466dbc324347b39072cf2f2e2dd83b0dd7e",
+     "size": 2191,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/targetbot/walking.lua",
+     "sha1": "b1430bf36c8cb9a78a241505a7a2c4c1849327cc",
+     "size": 754,
+     "packed": true
+    },
+    {
+     "path": "bot/ek/vocation.lua",
+     "sha1": "5f2c565685b37d7cdd7f35af32f0a1f5c0b8d073",
+     "size": 1629,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/_loader.lua",
+     "sha1": "cfb0588cc4a3ad189cc04021dff6e11fb81fc030",
+     "size": 877,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/actions.lua",
+     "sha1": "c9b0a667f42d2b3a5f6104b3fec50dd730a2dbdb",
+     "size": 8092,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/cavebot.lua",
+     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
+     "size": 6011,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/cavebot.otui",
+     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
+     "size": 974,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/config.lua",
+     "sha1": "e413ee7fbb637331667c234d75a85cfd0b933733",
+     "size": 2725,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/config.otui",
+     "sha1": "86d45d3b70bcc1107dea84a7bac92cce8637cbc7",
+     "size": 994,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/depositer.lua",
+     "sha1": "144e311f371370066c5649628894da6de4735584",
+     "size": 883,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/editor.lua",
+     "sha1": "009fc3ef3f7e0fdf9291a62efc5f08abb987d508",
+     "size": 5314,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/editor.otui",
+     "sha1": "bd2b354b84a501d98e555001324a851bbd57c2df",
+     "size": 783,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/example_functions.lua",
+     "sha1": "d6728bc7fda9385c7606cc480ffa9d1379f78398",
+     "size": 2194,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/extension_template.lua",
+     "sha1": "ee98fafdf7923a66245eaee8917f0fe63e0c9f5e",
+     "size": 1929,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/recorder.lua",
+     "sha1": "b98d6ddd9b741d3a8de33da202b26486b6c983c6",
+     "size": 1796,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/supply.lua",
+     "sha1": "7893edbd55d71190e62d454e4406c1055f55e448",
+     "size": 1153,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/supply.otui",
+     "sha1": "c10e2ae9de58fa2c29368b5c805243ccaf1d1277",
+     "size": 1469,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/cavebot/walking.lua",
+     "sha1": "f3a0ffe77024c06e9fb4485991e07e9579a23e95",
+     "size": 2642,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/core/engines.lua",
+     "sha1": "c88acd4cca14d6f78a6aa7fb62a0f9bd5ece5416",
+     "size": 2301,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/core/hunt.lua",
+     "sha1": "13141b3462862c17ca8cbecfa4871d21cc601c75",
+     "size": 3474,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/core/registry.lua",
+     "sha1": "e0398de467c443ed682af996a63069be8df94724",
+     "size": 1657,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/core/ui.lua",
+     "sha1": "6d5f31b9aef868c87473445d7f326aecf8ebcf7b",
+     "size": 4265,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/core/ui.otui",
+     "sha1": "be66286668ab5b4ececdb52994a7bea8fc6eaba7",
+     "size": 8779,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/features/buff.lua",
+     "sha1": "7edd3c6999952e96e9f69f3d6b326a8dcb42bde1",
+     "size": 9654,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/features/equip.lua",
+     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
+     "size": 19626,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/features/heal.lua",
+     "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
+     "size": 8042,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/features/icons.lua",
+     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
+     "size": 36474,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/features/main.lua",
+     "sha1": "a4263ac8560892053173732f181c86be15702e0a",
+     "size": 5283,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/features/targeting.lua",
+     "sha1": "bb96770e91c7c380c68eea62ca648a870b793b67",
+     "size": 2580,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/features/tools.lua",
+     "sha1": "226a97ccc0c264180c4db1de9782874ad63cbc42",
+     "size": 21414,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/creature.lua",
+     "sha1": "4641e0b9596303a6926293d855e66d4786d7d5ef",
+     "size": 3033,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/creature_attack.lua",
+     "sha1": "b798ed750c47d2b9222cd89de423402413527dd8",
+     "size": 5635,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/creature_editor.lua",
+     "sha1": "640408c73daef2d3e90036c9fba6bd714ac81063",
+     "size": 4456,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/creature_editor.otui",
+     "sha1": "f4f8f0c334fe586f5e64f8a712fb3574a422377d",
+     "size": 3406,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/creature_priority.lua",
+     "sha1": "f430f0315ef45416f6ccdfc0bc221f699ddd6de1",
+     "size": 2669,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/looting.lua",
+     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
+     "size": 9944,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/looting.otui",
+     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
+     "size": 1562,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/target.lua",
+     "sha1": "a7e1661e455024ce3457d96da0d8e0517abd2273",
+     "size": 8731,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/target.otui",
+     "sha1": "6c158466dbc324347b39072cf2f2e2dd83b0dd7e",
+     "size": 2191,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/targetbot/walking.lua",
+     "sha1": "b1430bf36c8cb9a78a241505a7a2c4c1849327cc",
+     "size": 754,
+     "packed": true
+    },
+    {
+     "path": "bot/ms/vocation.lua",
+     "sha1": "8a63344944390428b4ae04512605976d833bd9b4",
+     "size": 1621,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/_loader.lua",
+     "sha1": "cfb0588cc4a3ad189cc04021dff6e11fb81fc030",
+     "size": 877,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/actions.lua",
+     "sha1": "c9b0a667f42d2b3a5f6104b3fec50dd730a2dbdb",
+     "size": 8092,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/cavebot.lua",
+     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
+     "size": 6011,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/cavebot.otui",
+     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
+     "size": 974,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/config.lua",
+     "sha1": "e413ee7fbb637331667c234d75a85cfd0b933733",
+     "size": 2725,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/config.otui",
+     "sha1": "86d45d3b70bcc1107dea84a7bac92cce8637cbc7",
+     "size": 994,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/depositer.lua",
+     "sha1": "144e311f371370066c5649628894da6de4735584",
+     "size": 883,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/editor.lua",
+     "sha1": "009fc3ef3f7e0fdf9291a62efc5f08abb987d508",
+     "size": 5314,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/editor.otui",
+     "sha1": "bd2b354b84a501d98e555001324a851bbd57c2df",
+     "size": 783,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/example_functions.lua",
+     "sha1": "d6728bc7fda9385c7606cc480ffa9d1379f78398",
+     "size": 2194,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/extension_template.lua",
+     "sha1": "ee98fafdf7923a66245eaee8917f0fe63e0c9f5e",
+     "size": 1929,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/recorder.lua",
+     "sha1": "b98d6ddd9b741d3a8de33da202b26486b6c983c6",
+     "size": 1796,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/supply.lua",
+     "sha1": "7893edbd55d71190e62d454e4406c1055f55e448",
+     "size": 1153,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/supply.otui",
+     "sha1": "c10e2ae9de58fa2c29368b5c805243ccaf1d1277",
+     "size": 1469,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/cavebot/walking.lua",
+     "sha1": "f3a0ffe77024c06e9fb4485991e07e9579a23e95",
+     "size": 2642,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/core/engines.lua",
+     "sha1": "c88acd4cca14d6f78a6aa7fb62a0f9bd5ece5416",
+     "size": 2301,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/core/hunt.lua",
+     "sha1": "13141b3462862c17ca8cbecfa4871d21cc601c75",
+     "size": 3474,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/core/registry.lua",
+     "sha1": "e0398de467c443ed682af996a63069be8df94724",
+     "size": 1657,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/core/ui.lua",
+     "sha1": "6d5f31b9aef868c87473445d7f326aecf8ebcf7b",
+     "size": 4265,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/core/ui.otui",
+     "sha1": "be66286668ab5b4ececdb52994a7bea8fc6eaba7",
+     "size": 8779,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/features/buff.lua",
+     "sha1": "7edd3c6999952e96e9f69f3d6b326a8dcb42bde1",
+     "size": 9654,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/features/equip.lua",
+     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
+     "size": 19626,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/features/heal.lua",
+     "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
+     "size": 8042,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/features/icons.lua",
+     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
+     "size": 36474,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/features/main.lua",
+     "sha1": "a4263ac8560892053173732f181c86be15702e0a",
+     "size": 5283,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/features/targeting.lua",
+     "sha1": "bb96770e91c7c380c68eea62ca648a870b793b67",
+     "size": 2580,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/features/tools.lua",
+     "sha1": "226a97ccc0c264180c4db1de9782874ad63cbc42",
+     "size": 21414,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/creature.lua",
+     "sha1": "4641e0b9596303a6926293d855e66d4786d7d5ef",
+     "size": 3033,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/creature_attack.lua",
+     "sha1": "b798ed750c47d2b9222cd89de423402413527dd8",
+     "size": 5635,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/creature_editor.lua",
+     "sha1": "640408c73daef2d3e90036c9fba6bd714ac81063",
+     "size": 4456,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/creature_editor.otui",
+     "sha1": "f4f8f0c334fe586f5e64f8a712fb3574a422377d",
+     "size": 3406,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/creature_priority.lua",
+     "sha1": "f430f0315ef45416f6ccdfc0bc221f699ddd6de1",
+     "size": 2669,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/looting.lua",
+     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
+     "size": 9944,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/looting.otui",
+     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
+     "size": 1562,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/target.lua",
+     "sha1": "a7e1661e455024ce3457d96da0d8e0517abd2273",
+     "size": 8731,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/target.otui",
+     "sha1": "6c158466dbc324347b39072cf2f2e2dd83b0dd7e",
+     "size": 2191,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/targetbot/walking.lua",
+     "sha1": "b1430bf36c8cb9a78a241505a7a2c4c1849327cc",
+     "size": 754,
+     "packed": true
+    },
+    {
+     "path": "bot/rp/vocation.lua",
+     "sha1": "10b198753fdd02c16ad840c0f9068175ca4cbc83",
+     "size": 1574,
+     "packed": true
+    },
+    {
+     "path": "modules/game_bot_presets/game_bot_presets.otmod",
+     "sha1": "a83e95cdab7cdfa70feccaf5cb9972b17032fb87",
+     "size": 347,
+     "packed": false
+    },
+    {
+     "path": "modules/game_bot_presets/main.lua",
+     "sha1": "8df6f060cc5e4252781e9e3cd0109a1c372fe641",
+     "size": 15239,
+     "packed": false
+    },
+    {
+     "path": "modules/game_bot_presets/presets.otui",
+     "sha1": "c2afdc514cd5b711f22f366ff932b27806ec48e3",
+     "size": 4648,
+     "packed": false
+    },
+    {
+     "path": "modules/game_bot_presets/presets.png",
+     "sha1": "41e94b967948f5e407cfd39b1ecf62bddbd65c52",
+     "size": 183,
+     "packed": false
+    }
+   ],
+   "archives": [
+    {
+     "path": "bot/ek.zip",
+     "sha1": "7bc76add180b79d15ddc7c77d73bf7e72f375f4a",
+     "size": 67367,
+     "dest": "bot/ek/",
+     "count": 38
+    },
+    {
+     "path": "bot/rp.zip",
+     "sha1": "490dad8a9bbd2e8f98a5c25a2a43592982fdf994",
+     "size": 67360,
+     "dest": "bot/rp/",
+     "count": 38
+    },
+    {
+     "path": "bot/ms.zip",
+     "sha1": "8e0e531b1f82dcb5b32343be627c5690d4ae1b0f",
+     "size": 67360,
+     "dest": "bot/ms/",
+     "count": 38
+    },
+    {
+     "path": "bot/ed.zip",
+     "sha1": "5cf733cd0d7b821a94671eb52a9f26e59f649faa",
+     "size": 67359,
+     "dest": "bot/ed/",
+     "count": 38
+    }
+   ]
+  },
+  {
+   "name": "game_hide_topbar",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Hide top bar",
+   "description": "Hides the client's top bar while you are logged in and brings it back on the login screen, so the game view keeps the space.",
+   "screenshot": "screenshots/game_hide_topbar.png",
+   "screenshotSize": [
+    360,
+    200
+   ],
+   "screenshotSha1": "91eeca2fad7eb49738bd2411bb0a6278cfb0fb1f",
+   "files": [
+    {
+     "path": "modules/game_hide_topbar/game_hide_topbar.otmod",
+     "sha1": "f9c36bc0916ff49a6eed08fa1224f812afc0b863",
+     "size": 339,
+     "packed": false
+    },
+    {
+     "path": "modules/game_hide_topbar/main.lua",
+     "sha1": "030eef1bf30a596eb9089499be355c26c56d94dd",
+     "size": 1138,
+     "packed": false
     }
    ]
   }

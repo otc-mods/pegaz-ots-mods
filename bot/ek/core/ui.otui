@@ -1,0 +1,471 @@
+RpPopup < MainWindow
+  width: 270
+  height: 200
+
+  Panel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: closeButton.top
+    margin-bottom: 8
+    layout:
+      type: verticalBox
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 70 22
+
+RpListPopup < MainWindow
+  width: 300
+  height: 420
+
+  ScrollablePanel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: scroll.left
+    anchors.bottom: applyButton.top
+    margin-right: 4
+    margin-bottom: 8
+    vertical-scrollbar: scroll
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: scroll
+    anchors.top: parent.top
+    anchors.bottom: applyButton.top
+    anchors.right: parent.right
+    margin-bottom: 8
+    step: 24
+
+  Button
+    id: applyButton
+    !text: tr('Apply')
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 70 22
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 70 22
+
+RpSwitchPair < Panel
+  height: 28
+  margin-top: 2
+
+  SmallBotSwitch
+    id: left
+    margin-top: 0
+    height: 26
+    text-wrap: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+    margin-right: 1
+    text-align: center
+
+  SmallBotSwitch
+    id: right
+    margin-top: 0
+    height: 26
+    text-wrap: true
+    anchors.top: parent.top
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    margin-left: 1
+    text-align: center
+
+RpButtonRow < Panel
+  height: 22
+  margin-top: 2
+  layout:
+    type: horizontalBox
+    spacing: 2
+
+RpScrollRow < Panel
+  height: 28
+  margin-top: 3
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+
+  HorizontalScrollBar
+    id: scroll
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 3
+    minimum: 0
+    maximum: 10
+    step: 1
+
+RpSectionHeader < BotButton
+  height: 18
+  margin-top: 8
+  text-align: left
+  text-offset: 5 0
+  color: #ffdd55
+  border-width-top: 1
+  border-color: #4a5160
+
+RpSectionBody < Panel
+  margin-bottom: 6
+  margin-left: 2
+  layout:
+    type: verticalBox
+    fit-children: true
+
+RpGroupLabel < Label
+  height: 15
+  margin-top: 4
+  text-align: left
+  color: #ffdd55
+
+EquipRuleRow < Panel
+  height: 34
+  margin-top: 2
+
+  BotItem
+    id: item
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  Button
+    id: up
+    anchors.top: parent.top
+    anchors.right: parent.right
+    size: 18 16
+    padding: 0
+    text: ^
+
+  Button
+    id: down
+    anchors.top: prev.bottom
+    anchors.right: parent.right
+    margin-top: 1
+    size: 18 16
+    padding: 0
+    text: v
+
+  SmallBotSwitch
+    id: title
+    margin-top: 0
+    anchors.top: parent.top
+    anchors.left: item.right
+    anchors.right: up.left
+    margin-left: 2
+    margin-right: 2
+    text-align: center
+
+  Button
+    id: edit
+    anchors.top: prev.bottom
+    anchors.left: item.right
+    anchors.right: up.left
+    margin-left: 2
+    margin-right: 2
+    margin-top: 2
+    height: 15
+    text: Edit
+
+EquipRuleEditorItemRow < Panel
+  height: 36
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 70 22
+    text-align: left
+
+  BotItem
+    id: item
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+
+EquipRuleEditorSlotRow < Panel
+  height: 24
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 70 22
+    text-align: left
+    text: Slot
+
+  SlotComboBox
+    id: slot
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    &disableScroll: true
+
+EquipRuleEditorCondRow < Panel
+  height: 24
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 70 22
+    text-align: left
+    text: When
+
+  ComboBox
+    id: cond
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    &disableScroll: true
+
+EquipRuleEditorValueRow < Panel
+  height: 24
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 70 22
+    text-align: left
+    text: Value
+
+  HorizontalScrollBar
+    id: value
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    minimum: 0
+    maximum: 100
+    step: 1
+
+EquipRuleEditor < MainWindow
+  !text: tr('Equip rule')
+  width: 280
+  height: 250
+
+  Panel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: ok.top
+    margin-bottom: 8
+    layout:
+      type: verticalBox
+
+  Button
+    id: remove
+    !text: tr('Remove')
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 70 22
+
+  Button
+    id: cancel
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 70 22
+
+  Button
+    id: ok
+    !text: tr('OK')
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 5
+    size: 70 22
+
+EquipRuleList < Panel
+  layout:
+    type: verticalBox
+    fit-children: true
+
+RpIcon < UIWidget
+  focusable: false
+  phantom: false
+  border-width: 1
+  border-color: alpha
+
+  UIItem
+    id: item
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    virtual: true
+    phantom: true
+
+  Label
+    id: label
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    height: 14
+    font: verdana-11px-rounded
+    color: #ffffff
+    text-align: center
+    text-auto-resize: true
+    phantom: true
+
+RpIconRow < Panel
+  height: 36
+  margin-top: 2
+
+  BotItem
+    id: item
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  Button
+    id: remove
+    anchors.top: parent.top
+    anchors.right: parent.right
+    size: 60 22
+    !text: tr('Remove')
+
+  Button
+    id: edit
+    anchors.top: parent.top
+    anchors.right: prev.left
+    margin-right: 4
+    size: 60 22
+    !text: tr('Edit')
+
+  Label
+    id: text
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: item.right
+    anchors.right: edit.left
+    margin-left: 6
+    margin-right: 4
+    text-align: left
+    text-wrap: true
+
+RpIconEditor < MainWindow
+  !text: tr('Icons')
+  width: 360
+  height: 470
+
+  ScrollablePanel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: contentScroll.left
+    anchors.bottom: add.top
+    margin-bottom: 8
+    margin-right: 4
+    vertical-scrollbar: contentScroll
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: contentScroll
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: add.top
+    margin-bottom: 8
+    step: 38
+    pixels-scroll: true
+
+  Button
+    id: add
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    size: 70 22
+    !text: tr('Add')
+
+  Button
+    id: lock
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 6
+    size: 120 22
+
+  Button
+    id: closeButton
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 70 22
+    !text: tr('Close')
+
+RpFormComboRow < Panel
+  height: 24
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 70
+    text-align: left
+
+  ComboBox
+    id: combo
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    &disableScroll: true
+
+RpFormButtonRow < Panel
+  height: 24
+  margin-top: 4
+
+  Label
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 70
+    text-align: left
+
+  Button
+    id: button
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    height: 22
+    text-align: left
+
+RpIconForm < MainWindow
+  !text: tr('Icon')
+  width: 320
+  height: 400
+
+  Panel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: ok.top
+    margin-bottom: 8
+    layout:
+      type: verticalBox
+
+  Button
+    id: cancel
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 70 22
+
+  Button
+    id: ok
+    !text: tr('OK')
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 5
+    size: 70 22

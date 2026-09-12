@@ -3,8 +3,12 @@
 
 INDEX_URL = "https://otc-mods.github.io/pegaz-ots-mods/index.json"
 REPO_URL = "https://github.com/otc-mods/pegaz-ots-mods"
-ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/" }
-VERSION = "1.2.0"  -- keep equal to the catalog entry; the installer records itself with it on first load
+ALLOWED_PREFIXES = { "modules/", "data/images/", "layouts/", "bot/" }
+-- a bot preset ships code only: routes, target lists and saved settings are the player's and must never be
+-- delivered or overwritten by an install
+local PRESET_FORBIDDEN = { "/storage/", "_configs/" }
+local KEEP_BACKUPS = 3          -- how many pre-update copies of a preset to keep on disk
+VERSION = "1.3.1"  -- keep equal to the catalog entry; the installer records itself with it on first load
 SELF = "game_module_installer"
 SELF_FILES = { "modules/game_module_installer/game_module_installer.otmod", "modules/game_module_installer/installer.otui",
                "modules/game_module_installer/main.lua", "modules/game_module_installer/grip.png" }
@@ -45,10 +49,60 @@ end
 
 local function safePath(p)
   if type(p) ~= 'string' or p:find("%.%.") or p:sub(1, 1) == "/" then return false end
+  if p:sub(1, 4) == "bot/" then
+    for _, bad in ipairs(PRESET_FORBIDDEN) do
+      if p:find(bad, 1, true) then return false end
+    end
+  end
   for _, pre in ipairs(ALLOWED_PREFIXES) do
     if p:sub(1, #pre) == pre then return true end
   end
   return false
+end
+
+local function isPreset(entry) return entry.type == "preset" end
+
+local function touchesBot(entry)
+  for _, f in ipairs(entry.files or {}) do
+    if tostring(f.path):sub(1, 4) == "bot/" then return true end
+  end
+  return false
+end
+
+-- before overwriting a preset's code, keep the version that is there: an update must never be a surprise
+local function backupPreset(entry)
+  if not (isPreset(entry) or touchesBot(entry)) then return end
+  local stamp = os.date("%Y%m%d-%H%M%S")
+  local dest = "bot/_backups/" .. entry.name .. "-" .. stamp .. "/"
+  local kept = 0
+  for _, f in ipairs(entry.files or {}) do
+    if f.path:sub(1, 4) == "bot/" and g_resources.fileExists("/" .. f.path) then
+      local data = g_resources.readFileContents("/" .. f.path)
+      if data then
+        local rel = f.path:gsub("^bot/", "")
+        ensureDirs(dest .. rel)
+        g_resources.writeFileContents("/" .. dest .. rel, data)
+        kept = kept + 1
+      end
+    end
+  end
+  if kept > 0 then setStatus("kept " .. kept .. " old file(s) in " .. dest, '#bbbbbb') end
+
+  -- keep the last few backups of this preset, drop the rest: an update every week would otherwise pile up
+  local mine = {}
+  for _, name in ipairs(g_resources.listDirectoryFiles("/bot/_backups", false, false) or {}) do
+    if name:sub(1, #entry.name + 1) == entry.name .. "-" then table.insert(mine, name) end
+  end
+  table.sort(mine)
+  local function removeTree(dir)
+    for _, path in ipairs(g_resources.listDirectoryFiles(dir, true, false) or {}) do
+      if g_resources.directoryExists(path) then removeTree(path) else g_resources.deleteFile(path) end
+    end
+    g_resources.deleteFile(dir)
+  end
+  while #mine > KEEP_BACKUPS do
+    removeTree("/bot/_backups/" .. table.remove(mine, 1))
+  end
 end
 
 local function ensureDirs(path)
@@ -70,6 +124,7 @@ end
 
 -- "bundled" = the client ships the files itself (no install record). Checked on the files, not on
 -- g_modules: an unloaded module whose folder was deleted is still remembered by the client.
+-- any file present at all: enough to call a module "bundled"
 local function filesPresent(entry)
   for _, f in ipairs(entry.files or {}) do
     if g_resources.fileExists("/" .. f.path) then return true end
@@ -77,9 +132,23 @@ local function filesPresent(entry)
   return false
 end
 
+-- every file present: what "installed" has to mean before we believe our own record
+local function allFilesPresent(entry)
+  local files = entry.files or {}
+  if #files == 0 then return false end
+  for _, f in ipairs(files) do
+    if not g_resources.fileExists("/" .. f.path) then return false end
+  end
+  return true
+end
+
 local function moduleState(entry)
   local rec = installed[entry.name]
   if rec then
+    -- The record lives in the client settings, the files live on disk, and the two can part company: copy a
+    -- settings folder to a new client and it "remembers" installing modules whose files never came along, so
+    -- Install all cheerfully reports nothing to do. Trust the disk.
+    if not allFilesPresent(entry) then return "missing" end
     if rec.version == entry.version then return "installed" else return "outdated" end
   end
   if filesPresent(entry) then return "bundled" end
@@ -99,6 +168,19 @@ local nextInQueue
 local function finishInstall(entry, paths)
   installed[entry.name] = { version = entry.version, files = paths }
   save()
+  -- an entry that wrote into /bot needs the bot to re-read its config list
+  if touchesBot(entry) and g_game.isOnline() then
+    pcall(function() modules.game_bot.refresh() end)
+  end
+  if isPreset(entry) then
+    busy = false
+    -- the bot re-reads /bot when it refreshes; it only does that while online
+    if g_game.isOnline() then pcall(function() modules.game_bot.refresh() end) end
+    setStatus(entry.title .. " " .. entry.version .. " installed - pick it in the bot's preset list.", '#66ff66')
+    refreshRows()
+    if queueCurrent == entry.name then scheduleEvent(nextInQueue, 150) end
+    return
+  end
   g_modules.discoverModules()
   local m = g_modules.getModule(entry.name)
   busy = false
@@ -116,21 +198,89 @@ local function finishInstall(entry, paths)
   if queueCurrent == entry.name then scheduleEvent(nextInQueue, 150) end
 end
 
+-- Packaged entries (bot presets) ship one zip per directory: one request instead of a hundred and forty.
+-- The client can unpack in memory, so we write file by file and leave everything else in the folder alone -
+-- unlike the bot's own decompressConfig, which wipes the whole preset first.
+local function installArchives(entry, paths)
+  paths = paths or {}
+  local i = 0
+  local function nextArchive()
+    i = i + 1
+    local a = entry.archives[i]
+    if not a then return finishInstall(entry, paths) end
+    setStatus(string.format("%s: downloading %d/%d (%d files)", entry.title, i, #entry.archives, a.count or 0))
+    HTTP.get(index.base .. a.path, function(data, err)
+      if err or type(data) ~= 'string' then
+        busy = false
+        return setStatus("download failed: " .. a.path .. " (" .. tostring(err) .. ")", '#ff5555')
+      end
+      if a.size and #data ~= a.size then
+        busy = false
+        return setStatus("size mismatch: " .. a.path, '#ff5555')
+      end
+      if a.sha1 and sha1(data) ~= a.sha1 then
+        busy = false
+        return setStatus("checksum mismatch: " .. a.path, '#ff5555')
+      end
+      local tmp = "downloads/" .. a.path:gsub("[/\\]", "_")
+      ensureDirs(tmp)
+      if not g_resources.writeFileContents("/" .. tmp, data) then
+        busy = false
+        return setStatus("cannot write " .. tmp, '#ff5555')
+      end
+      local files = g_resources.decompressArchive("/" .. tmp)
+      g_resources.deleteFile("/" .. tmp)
+      if type(files) ~= 'table' then
+        busy = false
+        return setStatus("cannot unpack " .. a.path, '#ff5555')
+      end
+      local written = 0
+      for rel, contents in pairs(files) do
+        local target = (a.dest or "") .. rel
+        if not safePath(target) then
+          busy = false
+          return setStatus("refusing path from archive: " .. target, '#ff5555')
+        end
+        ensureDirs(target)
+        if g_resources.writeFileContents("/" .. target, contents) then
+          table.insert(paths, target)
+          written = written + 1
+        end
+      end
+      setStatus(string.format("%s: unpacked %d file(s) into %s", entry.title, written, a.dest or "?"))
+      nextArchive()
+    end)
+  end
+  nextArchive()
+end
+
 local function install(entry)
   if busy then return setStatus("busy, wait a moment", '#ffdd55') end
   if not g_game.isOnline() and false then return end
-  local files = entry.files or {}
-  if #files == 0 then return setStatus("nothing to install", '#ff5555') end
-  for _, f in ipairs(files) do
+  local all = entry.files or {}
+  local files = {}
+  for _, f in ipairs(all) do
+    if not f.packed then table.insert(files, f) end     -- packed files arrive inside an archive
+  end
+  if #files == 0 and not (type(entry.archives) == 'table' and #entry.archives > 0) then
+    return setStatus("nothing to install", '#ff5555')
+  end
+  for _, f in ipairs(all) do
     if not safePath(f.path) then return setStatus("refusing unexpected path: " .. tostring(f.path), '#ff5555') end
   end
   busy = true
+  backupPreset(entry)
   local paths = {}
   local i = 0
   local function nextFile()
     i = i + 1
     local f = files[i]
-    if not f then return finishInstall(entry, paths) end
+    if not f then
+      if type(entry.archives) == 'table' and #entry.archives > 0 then
+        return installArchives(entry, paths)
+      end
+      return finishInstall(entry, paths)
+    end
     setStatus(string.format("%s: downloading %d/%d %s", entry.title, i, #files, f.path))
     HTTP.get(index.base .. f.path, function(data, err)
       if err or type(data) ~= 'string' then
@@ -222,7 +372,10 @@ refreshRows = function()
     local row = g_ui.createWidget('InstallerCard', window.list)
     local state = moduleState(entry)
     row.title:setText((entry.title or entry.name) .. "  (" .. entry.name .. ")")
-    row.description:setText(entry.description or "")
+    -- two lines of ~9px text fit about 150 characters; the full text lives in the tooltip
+    local desc = entry.description or ""
+    row.description:setText(#desc > 150 and (desc:sub(1, 147):gsub("%s+%S*$", "") .. "...") or desc)
+    row.description:setTooltip(desc)
     local rec = installed[entry.name]
     local vtext = "available " .. tostring(entry.version)
     if state == "installed" then vtext = "installed " .. rec.version .. ", up to date"

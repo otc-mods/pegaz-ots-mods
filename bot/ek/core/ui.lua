@@ -189,17 +189,38 @@ UI.buttonRow = function(texts, parent)
     b:setHeight(22)
     table.insert(row.buttons, b)
   end
+  table.insert(UI._rows, row)        -- the macro above keeps it fitted for as long as it exists
   return row
 end
 
+-- Buttons in a horizontalBox keep the width their style gives them (106px), so three of them overflow a
+-- 238px panel. Setting the width is not enough either: the layout re-applies the style width a frame later.
+-- So this compares against the width the buttons ACTUALLY have and re-applies whenever they drift - and the
+-- macro below keeps every row registered here fitted, which is why no caller has to remember to call it.
+UI._rows = UI._rows or {}
+
 UI.fitButtonRow = function(row)
+  if not row or row:isDestroyed() then return end
   local w = row:getWidth()
-  if w <= 0 or w == row.fittedWidth then return end
-  row.fittedWidth = w
   local n = #row.buttons
+  if w <= 0 or n == 0 then return end
   local bw = math.floor((w - 2 * (n - 1)) / n)
-  for _, b in ipairs(row.buttons) do b:setWidth(bw) end
+  if bw <= 0 then return end
+  for _, b in ipairs(row.buttons) do
+    if not b:isDestroyed() and b:getWidth() ~= bw then b:setWidth(bw) end
+  end
 end
+
+macro(300, function()
+  for i = #UI._rows, 1, -1 do
+    local row = UI._rows[i]
+    if not row or row:isDestroyed() then
+      table.remove(UI._rows, i)
+    else
+      UI.fitButtonRow(row)
+    end
+  end
+end)
 
 -- label + slider; onChange(value)
 UI.scrollRow = function(title, min, max, value, onChange, parent)

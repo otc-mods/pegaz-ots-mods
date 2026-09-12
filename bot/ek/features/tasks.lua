@@ -408,7 +408,7 @@ end)
 -- overwrote the player's choice - the switch turned itself off on every config reload.
 taskMacro = macro(SETTLE, "Auto tasks", function() run() end)
 
-Features.register{ id = "tasks", name = "Auto tasks", group = "Other", order = 60, macro = taskMacro }
+Features.register{ id = "tasks", name = "Auto tasks", group = "Engine", order = 60, macro = taskMacro }
 
 -- ---- UI ----
 -- One block per task: the name button doubles as the progress readout, below it the goal and the reward.

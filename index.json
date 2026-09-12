@@ -482,9 +482,9 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.1.0",
+   "version": "1.2.0",
    "title": "Bot presets",
-   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, and auto tasks that take, track and claim hunting tasks over the game's own protocol - no windows, no clicking. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
+   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, outfit colour cycling and copying, and a watch for gamemasters standing in ghost mode. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
    "screenshotSize": [
     196,
@@ -494,8 +494,8 @@
    "files": [
     {
      "path": "bot/ed/_loader.lua",
-     "sha1": "a70a2e16019a00923d9e01116c532accd4ae3952",
-     "size": 943,
+     "sha1": "f14de82b7d70ab95e2f7820cd5421574ff6f4708",
+     "size": 1004,
      "packed": true
     },
     {
@@ -602,8 +602,8 @@
     },
     {
      "path": "bot/ed/core/ui.lua",
-     "sha1": "20aaacc11e5952d23501cfe26728e07e6ffba675",
-     "size": 7469,
+     "sha1": "48330d4f0a0cf30f9e4c996d3edbd743529d5acc",
+     "size": 8335,
      "packed": true
     },
     {
@@ -625,6 +625,12 @@
      "packed": true
     },
     {
+     "path": "bot/ed/features/ghost.lua",
+     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
+     "size": 2664,
+     "packed": true
+    },
+    {
      "path": "bot/ed/features/heal.lua",
      "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
      "size": 8042,
@@ -643,6 +649,12 @@
      "packed": true
     },
     {
+     "path": "bot/ed/features/outfit.lua",
+     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
+     "size": 14578,
+     "packed": true
+    },
+    {
      "path": "bot/ed/features/targeting.lua",
      "sha1": "62f2ce43b9d18f72f52fa7fa8329a96e6a5154ef",
      "size": 2583,
@@ -650,14 +662,14 @@
     },
     {
      "path": "bot/ed/features/tasks.lua",
-     "sha1": "2875cacdaff7e24c2baa294c44d6ff882155647d",
-     "size": 25168,
+     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
+     "size": 25169,
      "packed": true
     },
     {
      "path": "bot/ed/features/tools.lua",
-     "sha1": "96faf33c0bf3a6def9c304edaaf5bf6d7f021af9",
-     "size": 21770,
+     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
+     "size": 21989,
      "packed": true
     },
     {
@@ -728,8 +740,8 @@
     },
     {
      "path": "bot/ek/_loader.lua",
-     "sha1": "a70a2e16019a00923d9e01116c532accd4ae3952",
-     "size": 943,
+     "sha1": "f14de82b7d70ab95e2f7820cd5421574ff6f4708",
+     "size": 1004,
      "packed": true
     },
     {
@@ -836,8 +848,8 @@
     },
     {
      "path": "bot/ek/core/ui.lua",
-     "sha1": "20aaacc11e5952d23501cfe26728e07e6ffba675",
-     "size": 7469,
+     "sha1": "48330d4f0a0cf30f9e4c996d3edbd743529d5acc",
+     "size": 8335,
      "packed": true
     },
     {
@@ -859,6 +871,12 @@
      "packed": true
     },
     {
+     "path": "bot/ek/features/ghost.lua",
+     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
+     "size": 2664,
+     "packed": true
+    },
+    {
      "path": "bot/ek/features/heal.lua",
      "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
      "size": 8042,
@@ -877,6 +895,12 @@
      "packed": true
     },
     {
+     "path": "bot/ek/features/outfit.lua",
+     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
+     "size": 14578,
+     "packed": true
+    },
+    {
      "path": "bot/ek/features/targeting.lua",
      "sha1": "62f2ce43b9d18f72f52fa7fa8329a96e6a5154ef",
      "size": 2583,
@@ -884,14 +908,14 @@
     },
     {
      "path": "bot/ek/features/tasks.lua",
-     "sha1": "2875cacdaff7e24c2baa294c44d6ff882155647d",
-     "size": 25168,
+     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
+     "size": 25169,
      "packed": true
     },
     {
      "path": "bot/ek/features/tools.lua",
-     "sha1": "96faf33c0bf3a6def9c304edaaf5bf6d7f021af9",
-     "size": 21770,
+     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
+     "size": 21989,
      "packed": true
     },
     {
@@ -962,8 +986,8 @@
     },
     {
      "path": "bot/ms/_loader.lua",
-     "sha1": "a70a2e16019a00923d9e01116c532accd4ae3952",
-     "size": 943,
+     "sha1": "f14de82b7d70ab95e2f7820cd5421574ff6f4708",
+     "size": 1004,
      "packed": true
     },
     {
@@ -1070,8 +1094,8 @@
     },
     {
      "path": "bot/ms/core/ui.lua",
-     "sha1": "20aaacc11e5952d23501cfe26728e07e6ffba675",
-     "size": 7469,
+     "sha1": "48330d4f0a0cf30f9e4c996d3edbd743529d5acc",
+     "size": 8335,
      "packed": true
     },
     {
@@ -1093,6 +1117,12 @@
      "packed": true
     },
     {
+     "path": "bot/ms/features/ghost.lua",
+     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
+     "size": 2664,
+     "packed": true
+    },
+    {
      "path": "bot/ms/features/heal.lua",
      "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
      "size": 8042,
@@ -1111,6 +1141,12 @@
      "packed": true
     },
     {
+     "path": "bot/ms/features/outfit.lua",
+     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
+     "size": 14578,
+     "packed": true
+    },
+    {
      "path": "bot/ms/features/targeting.lua",
      "sha1": "62f2ce43b9d18f72f52fa7fa8329a96e6a5154ef",
      "size": 2583,
@@ -1118,14 +1154,14 @@
     },
     {
      "path": "bot/ms/features/tasks.lua",
-     "sha1": "2875cacdaff7e24c2baa294c44d6ff882155647d",
-     "size": 25168,
+     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
+     "size": 25169,
      "packed": true
     },
     {
      "path": "bot/ms/features/tools.lua",
-     "sha1": "96faf33c0bf3a6def9c304edaaf5bf6d7f021af9",
-     "size": 21770,
+     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
+     "size": 21989,
      "packed": true
     },
     {
@@ -1196,8 +1232,8 @@
     },
     {
      "path": "bot/rp/_loader.lua",
-     "sha1": "a70a2e16019a00923d9e01116c532accd4ae3952",
-     "size": 943,
+     "sha1": "f14de82b7d70ab95e2f7820cd5421574ff6f4708",
+     "size": 1004,
      "packed": true
     },
     {
@@ -1304,8 +1340,8 @@
     },
     {
      "path": "bot/rp/core/ui.lua",
-     "sha1": "20aaacc11e5952d23501cfe26728e07e6ffba675",
-     "size": 7469,
+     "sha1": "48330d4f0a0cf30f9e4c996d3edbd743529d5acc",
+     "size": 8335,
      "packed": true
     },
     {
@@ -1327,6 +1363,12 @@
      "packed": true
     },
     {
+     "path": "bot/rp/features/ghost.lua",
+     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
+     "size": 2664,
+     "packed": true
+    },
+    {
      "path": "bot/rp/features/heal.lua",
      "sha1": "8413f416fb2d9b697a24965466974d889e9e9b69",
      "size": 8042,
@@ -1345,6 +1387,12 @@
      "packed": true
     },
     {
+     "path": "bot/rp/features/outfit.lua",
+     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
+     "size": 14578,
+     "packed": true
+    },
+    {
      "path": "bot/rp/features/targeting.lua",
      "sha1": "62f2ce43b9d18f72f52fa7fa8329a96e6a5154ef",
      "size": 2583,
@@ -1352,14 +1400,14 @@
     },
     {
      "path": "bot/rp/features/tasks.lua",
-     "sha1": "2875cacdaff7e24c2baa294c44d6ff882155647d",
-     "size": 25168,
+     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
+     "size": 25169,
      "packed": true
     },
     {
      "path": "bot/rp/features/tools.lua",
-     "sha1": "96faf33c0bf3a6def9c304edaaf5bf6d7f021af9",
-     "size": 21770,
+     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
+     "size": 21989,
      "packed": true
     },
     {
@@ -1456,31 +1504,31 @@
    "archives": [
     {
      "path": "bot/ek.zip",
-     "sha1": "a1a5f761db8b2ee4506ad5fd36e4419f25faf9da",
-     "size": 77972,
+     "sha1": "9f99eb38aa9077f99015ab775797e2d275eb7168",
+     "size": 84810,
      "dest": "bot/ek/",
-     "count": 39
+     "count": 41
     },
     {
      "path": "bot/rp.zip",
-     "sha1": "6fee44f287b6e3c8ff66f996b0c89e669785ff6f",
-     "size": 77965,
+     "sha1": "84a44221db6d584fb11f00f3bca8f2b034e865d7",
+     "size": 84803,
      "dest": "bot/rp/",
-     "count": 39
+     "count": 41
     },
     {
      "path": "bot/ms.zip",
-     "sha1": "45a971d5e3ae0f7eb2bda5db84ee37f0cc016de8",
-     "size": 77965,
+     "sha1": "bcf8b3876c48842f7129aab1905ef4ab7f00eb57",
+     "size": 84803,
      "dest": "bot/ms/",
-     "count": 39
+     "count": 41
     },
     {
      "path": "bot/ed.zip",
-     "sha1": "07e26c4f499c86d5cb7647aa5a13cec4980bf2ae",
-     "size": 77964,
+     "sha1": "3dcc065e734a081f8502749a6453f58cfc11f706",
+     "size": 84802,
      "dest": "bot/ed/",
-     "count": 39
+     "count": 41
     }
    ]
   },

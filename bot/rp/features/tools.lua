@@ -89,15 +89,15 @@ Features.register{ id = "mwallTimer", name = "MW timer", group = "PvP", order = 
   isOn = function() return storage.mwallTimer end,
   setOn = function(v) storage.mwallTimer = v; mwallSwitch:setOn(v) end }
 
-local WALLS = { [2129] = 20000, [2130] = 45000 } -- magic wall, wild growth: starting guesses only
+local WALLS = { [2129] = 20000, [2130] = 45000 } -- the longest a magic wall / wild growth can stand
 if type(storage.wallLife) ~= "table" then storage.wallLife = {} end
 local activeTimers, born, warned = {}, {}, {}
 
+-- The server gives a wall a random life (15-20s for a magic wall), so the countdown is drawn from the LONGEST
+-- it can last and the last five seconds are red: "past the minimum, it can drop at any moment". Taking the
+-- shortest life ever seen instead - what this used to do - meant one early removal (a wall replaced, a wall
+-- broken) permanently shortened every future countdown, which is why it started at 15.
 local function wallLife(id)
-  local seen = storage.wallLife[tostring(id)]
-  if type(seen) == "table" and tonumber(seen.min) then
-    return math.max(3000, tonumber(seen.min) - 300)   -- a little slack for the round trip
-  end
   return WALLS[id]
 end
 
@@ -118,7 +118,7 @@ onAddThing(function(tile, thing)
   if not timer then return end
   local p = tile:getPosition()
   local key = p.x .. "," .. p.y .. "," .. p.z
-  if not activeTimers[key] or activeTimers[key] < now then
+  if not activeTimers[key] then                      -- never re-arm: the wall is the same wall
     activeTimers[key] = now + timer
     born[key] = { at = now, id = thing:getId() }
   end
@@ -143,7 +143,7 @@ end)
 local WARN_MS = 5000         -- walls last 15-20s at random, so the last 5s is "it can go at any moment"
 
 local function timerText(left)
-  return tostring(math.ceil(left / 1000))
+  return tostring(math.max(0, math.ceil(left / 1000)))
 end
 
 local function clearTile(tile)
@@ -169,13 +169,9 @@ macro(100, function()
     local tile = tileAt(key)
     local left = expiry - now
     if tile then
-      if left > 0 then
-        warned[key] = true
-        pcall(function() tile:setText(timerText(left), left <= WARN_MS and '#ff5555' or '#ffffff') end)
-      else
-        warned[key] = nil
-        clearTile(tile)
-      end
+      warned[key] = true
+      local shown = (left > 0) and left or 0
+      pcall(function() tile:setText(timerText(shown), shown <= WARN_MS and '#ff5555' or '#ffffff') end)
     end
   end
 end)

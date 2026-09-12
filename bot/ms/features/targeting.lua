@@ -48,5 +48,5 @@ end)
 
 macro(500, function()
   UI.fitButtonRow(modeRow)
-  for i, b in ipairs(modeRow.buttons) do b:setOn(MODES[i].id == Hunt.attackMode()) end
+  for i, b in ipairs(modeRow.buttons) do UI.pick(b, MODES[i].id == Hunt.attackMode()) end
 end)

@@ -19,6 +19,153 @@ RpPopup < MainWindow
     anchors.right: parent.right
     size: 70 22
 
+RpPlainSwitch < SmallBotSwitch
+  image-color: #dfdfdf
+  $on:
+    image-color: #dfdfdf
+  $!on:
+    image-color: #dfdfdf
+
+RpPickSwitch < SmallBotSwitch
+  image-color: #dfdfdf
+  $on:
+    image-color: #3faf3f
+  $!on:
+    image-color: #dfdfdf
+
+RpPickPopup < MainWindow
+  width: 700
+  height: 570
+
+  TextEdit
+    id: search
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: actions.left
+    margin-right: 8
+    height: 22
+
+  UILabel
+    id: hint
+    anchors.verticalCenter: search.verticalCenter
+    anchors.left: search.left
+    margin-left: 6
+    color: #808080
+    phantom: true
+    !text: tr('type to filter...')
+
+  Panel
+    id: actions
+    anchors.top: parent.top
+    anchors.right: parent.right
+    width: 260
+    height: 22
+    layout:
+      type: horizontalBox
+      spacing: 4
+
+  Panel
+    id: filters
+    anchors.top: search.bottom
+    margin-top: 6
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 20
+    layout:
+      type: horizontalBox
+      spacing: 4
+
+  HorizontalSeparator
+    id: sep
+    anchors.top: filters.bottom
+    margin-top: 6
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  ScrollablePanel
+    id: content
+    anchors.top: sep.bottom
+    margin-top: 6
+    anchors.left: parent.left
+    anchors.right: scroll.left
+    margin-right: 4
+    anchors.bottom: closeButton.top
+    margin-bottom: 8
+    vertical-scrollbar: scroll
+    layout:
+      type: grid
+      cell-size: 96 110
+      cell-spacing: 6
+      flow: true
+
+  VerticalScrollBar
+    id: scroll
+    anchors.top: sep.bottom
+    margin-top: 6
+    anchors.bottom: closeButton.top
+    margin-bottom: 8
+    anchors.right: parent.right
+    step: 48
+
+  UILabel
+    id: info
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: closeButton.left
+    margin-right: 8
+    height: 22
+    text-align: left
+    color: #b0b0b0
+
+  Button
+    id: closeButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 70 22
+
+RpTaskCard < UIButton
+  size: 96 110
+  image-source: /images/ui/panel_flat
+  image-border: 1
+  image-color: #dfdfdf
+  $hover:
+    image-color: #ffffff
+  $pressed:
+    image-color: #a0a0a0
+
+  UICreature
+    id: creature
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 6
+    size: 56 56
+    phantom: true
+
+  UILabel
+    id: name
+    anchors.top: creature.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    margin-left: 3
+    margin-right: 3
+    height: 26
+    text-align: top
+    text-wrap: true
+    phantom: true
+
+  UILabel
+    id: lv
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 3
+    height: 12
+    text-align: center
+    color: #9a9a9a
+    phantom: true
+
 RpListPopup < MainWindow
   width: 300
   height: 420

@@ -121,11 +121,11 @@ for _, group in ipairs(GROUPS) do
       end
       row.left.onClick = function() fire(a) end
       row.left:setTooltip(a.action and ("Run " .. a.name) or a.name)
-      if a.isOn then table.insert(switches, { row.left, a }) end
+      if a.isOn then table.insert(switches, { row.left, a }) else UI.plain(row.left) end
       if b then
         row.right.onClick = function() fire(b) end
         row.right:setTooltip(b.action and ("Run " .. b.name) or b.name)
-        if b.isOn then table.insert(switches, { row.right, b }) end
+        if b.isOn then table.insert(switches, { row.right, b }) else UI.plain(row.right) end
       end
     end
   end
@@ -145,5 +145,29 @@ macro(500, function()
     end
   end
 end)
+
+-- built last, so this is the place that can fix the colour of switches other files (and the bot itself) made
+local function repaintOpeners()
+  local win = modules.game_bot and modules.game_bot.botWindow
+  local tabs = win and win:recursiveGetChildById('botTabs')
+  if not tabs or not tabs.tabs then return end
+  for _, tab in pairs(tabs.tabs) do
+    local content = tab.tabPanel and tab.tabPanel.content
+    local function walk(w, d)
+      if d > 8 or not w then return end
+      for _, c in ipairs(w:getChildren()) do
+        local ok, t = pcall(function() return c:getText() end)
+        if ok and type(t) == "string" and c:getClassName():find("Button")
+           and (t:find("^Show ") or t:find("%.%.%.$")) then
+          UI.plain(c)
+        end
+        walk(c, d + 1)
+      end
+    end
+    pcall(walk, content, 0)
+  end
+end
+schedule(1200, repaintOpeners)
+schedule(4000, repaintOpeners)      -- tabs build their panels lazily; a second pass catches the late ones
 
 UI.Button("Hotkeys...", hotkeyDialog)

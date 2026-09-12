@@ -115,9 +115,9 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "title": "Bot presets",
-   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys, buffs that learn their own duration, mwall target and keep-mwall, pre-emptive mana shield, equip rules and per-vocation supply icons. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
+   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, and auto tasks that take, track and claim hunting tasks over the game's own protocol - no windows, no clicking. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
    "roots": [
     "modules/game_bot_presets",

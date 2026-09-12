@@ -15,5 +15,6 @@ dofile("/core/engines.lua")
 dofile("/features/buff.lua")   -- Buffs section on the Target tab (damage buffs)
 dofile("/features/equip.lua") -- top of the Tools tab (a 6th tab would shrink the tab font)
 dofile("/features/tools.lua")
+dofile("/features/tasks.lua")   -- Tasks section on the Tools tab
 dofile("/features/icons.lua")
 dofile("/features/main.lua")

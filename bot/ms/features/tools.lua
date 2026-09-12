@@ -122,7 +122,7 @@ onAddThing(function(tile, thing)
     activeTimers[key] = now + timer
     born[key] = { at = now, id = thing:getId() }
   end
-  tile:setTimer(activeTimers[key] - now)
+  -- the countdown itself is drawn by the macro below, in a colour that tracks the time left
 end)
 onRemoveThing(function(tile, thing)
   if not thing:isItem() or not WALLS[thing:getId()] or not tile:getGround() then return end
@@ -133,36 +133,48 @@ onRemoveThing(function(tile, thing)
   born[key] = nil
   activeTimers[key] = nil
   warned[key] = nil
+  pcall(function() tile:setText("") end)
   pcall(function() tile:setFill('#00000000') end)
-  tile:setTimer(0)
 end)
 
--- The client draws the countdown itself and gives no colour control over it, but a tile can be tinted:
--- red-wash a wall in its last seconds so you see it about to drop without reading the number.
-local WARN_MS = 5000
-macro(250, function()
+-- The countdown is ours, not the client's. tile:setTimer() draws its own number but gives no control over the
+-- colour, and tinting the tile (setFill) colours the whole sprite, which is not what a warning should look
+-- like. tile:setText(text, colour) does take a colour, so the number is drawn here and coloured by time left.
+local WARN_MS = 5000         -- walls last 15-20s at random, so the last 5s is "it can go at any moment"
+
+local function timerText(left)
+  return tostring(math.ceil(left / 1000))
+end
+
+local function clearTile(tile)
+  if not tile then return end
+  pcall(function() tile:setText("") end)
+  pcall(function() tile:setFill('#00000000') end)   -- clears the tint older versions left behind
+end
+
+local function tileAt(key)
+  local x, y, z = key:match("^(-?%d+),(-?%d+),(-?%d+)$")
+  return x and g_map.getTile({ x = tonumber(x), y = tonumber(y), z = tonumber(z) })
+end
+
+macro(100, function()
   if not storage.mwallTimer then
     for key in pairs(warned) do
-      local x, y, z = key:match("^(-?%d+),(-?%d+),(-?%d+)$")
-      local tile = x and g_map.getTile({ x = tonumber(x), y = tonumber(y), z = tonumber(z) })
-      if tile then pcall(function() tile:setFill('#00000000') end) end
+      clearTile(tileAt(key))
       warned[key] = nil
     end
     return
   end
   for key, expiry in pairs(activeTimers) do
-    local x, y, z = key:match("^(-?%d+),(-?%d+),(-?%d+)$")
-    local tile = x and g_map.getTile({ x = tonumber(x), y = tonumber(y), z = tonumber(z) })
+    local tile = tileAt(key)
     local left = expiry - now
     if tile then
-      if left <= WARN_MS and left > 0 then
-        if not warned[key] then
-          warned[key] = true
-          pcall(function() tile:setFill('#ff000055') end)
-        end
-      elseif warned[key] then
+      if left > 0 then
+        warned[key] = true
+        pcall(function() tile:setText(timerText(left), left <= WARN_MS and '#ff5555' or '#ffffff') end)
+      else
         warned[key] = nil
-        pcall(function() tile:setFill('#00000000') end)
+        clearTile(tile)
       end
     end
   end

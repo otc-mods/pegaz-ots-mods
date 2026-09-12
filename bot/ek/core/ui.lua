@@ -24,6 +24,68 @@ UI.listPopup = function(title, height, build)
   return w
 end
 
+-- A popup for choosing one thing out of many: filter box and actions pinned at the top, the choices in a
+-- scrolling grid underneath.
+--
+-- Keyboard handling follows what game_top_buttons had to learn the hard way: walking is bound with
+-- alwaysCall, so a focused text box does NOT stop WSAD by itself - typing "dragon" walks the character.
+-- UITextEdit also swallows onMousePress in C++, so focus has to be polled rather than hooked, and the grab
+-- must be released on every exit path (Escape, Close, the window being destroyed by a config reload), because
+-- a stuck grab leaves the player unable to walk.
+UI.pickPopup = function(title, build)
+  local w = UI.createWindow('RpPickPopup')
+  w:setText(title)
+  w.content:setPhantom(false)
+
+  local grabbed = false
+  local function grab()
+    if grabbed then return end
+    grabbed = true
+    local walking = modules.game_walking
+    if walking and walking.disableWSAD then pcall(walking.disableWSAD) end
+  end
+  local function release()
+    if not grabbed then return end
+    grabbed = false
+    local walking = modules.game_walking
+    if walking and walking.enableWSAD then pcall(walking.enableWSAD) end
+    -- hand the keyboard back to the chat: Tab is bound there, and leaving focus elsewhere kills channel
+    -- switching until the player clicks the console
+    local console = modules.game_console
+    local edit = console and console.consoleTextEdit
+    if edit and not edit:isDestroyed() then pcall(function() edit:focus() end) end
+  end
+
+  local function close()
+    release()
+    w:destroy()
+  end
+  w.closeButton.onClick = close
+  w.onEscape = close
+
+  -- the watchdog: whatever destroys the window, the keyboard comes back
+  local function watch()
+    if not w or w:isDestroyed() then release() return end
+    if w.search:isFocused() then grab() elseif grabbed then release() end
+    schedule(250, watch)
+  end
+  schedule(250, watch)
+
+  w.search.onKeyPress = function(_, keyCode)
+    if keyCode == KeyEscape then
+      if w.search:getText() ~= "" then
+        w.search:setText("")
+        return true
+      end
+      close()
+      return true
+    end
+  end
+  w.search:focus()
+  build(w)
+  return w
+end
+
 -- Press-a-key hotkey picker. The bot hands key combos to onKeyPress as ready-made strings, so capturing one
 -- is a flag plus the next key; Escape keeps the old combo.
 local capturing = nil
@@ -86,6 +148,34 @@ UI.switchPair = function(leftText, rightText, parent)
   row.right:setText(rightText or "")
   if not rightText then row.right:hide() end
   return row
+end
+
+-- Colour policy: the bot's switch styles paint themselves green when on and red when off, which only makes
+-- sense for things that are on or off. A button that runs an action, cycles a value or opens a window gets
+-- the plain button colour instead; a selector marks the chosen one green and leaves the rest plain, so it
+-- never claims something is "off".
+-- Painting over the colour does not hold: hovering re-applies the style's $!on state and the button flashes
+-- red again. These swap in a style whose states are all neutral (the height comes from the old style, so it
+-- is restored afterwards).
+local function restyle(w, style)
+  if not w or w.rpStyle == style then return w end
+  pcall(function()
+    local h = w:getHeight()
+    w:setStyle(style)
+    w:setHeight(h)
+    w.rpStyle = style
+  end)
+  return w
+end
+
+UI.plain = function(w)
+  return restyle(w, 'RpPlainSwitch')
+end
+
+UI.pick = function(w, chosen)
+  restyle(w, 'RpPickSwitch')
+  if w then pcall(function() w:setOn(chosen and true or false) end) end
+  return w
 end
 
 -- N equal switch-styled buttons on one row; widths are set by UI.fitButtonRow once the panel has a width

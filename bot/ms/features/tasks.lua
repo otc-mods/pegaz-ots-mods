@@ -19,6 +19,8 @@ local ROWS = 4               -- task rows the panel offers
 if type(storage.taskCfg) ~= "table" then storage.taskCfg = {} end
 local cfg = storage.taskCfg
 cfg.done = tonumber(cfg.done) or 0
+if cfg.missions == nil then cfg.missions = false end
+cfg.missionsDone = tonumber(cfg.missionsDone) or 0
 cfg.reward = (cfg.reward == "Gold") and "Gold" or "EXP"
 if cfg.dropStray == nil then cfg.dropStray = false end
 if type(cfg.list) ~= "table" then                    -- migrate the single-task config
@@ -36,6 +38,7 @@ if type(cfg.catalog) ~= "table" or cfg.catalogVersion ~= CATALOG_VERSION then
 end
 
 local parkUntil, status = 0, "off"
+local missionStatus = "off"
 
 -- ---- where the numbers come from ------------------------------------------------------------------
 -- The client already holds everything: game_tasks keeps the whole task list in a local (fullInfo), and the
@@ -44,6 +47,7 @@ local parkUntil, status = 0, "off"
 -- ships a different game_tasks one day, this quietly falls back to reading the tracker window.
 local G = modules._G
 local live, liveCount, liveAt = {}, 0, 0
+local missionQueue, missionsSeenAt, missionAsked, missionAltTried = {}, 0, 0, {}
 
 local function upvalue(fn, want)
   if type(fn) ~= "function" or not G or type(G.debug) ~= "table" then return nil end
@@ -91,6 +95,22 @@ local function onFeed(buffer)
   -- both actions carry the same shape: "refreshTrackerKills" while tasks run, "refreshTracker" when the list
   -- changes - including the empty list. Ignoring the latter meant the loop never learned it had no tasks and
   -- kept trusting a stale tracker widget.
+  -- daily and weekly missions ride the same opcode: remember which ones are finished but unclaimed
+  if data.action == "missions" and type(data.data) == "table" then
+    local queue = {}
+    for _, list in pairs(data.data) do
+      if type(list) == "table" then
+        for _, m in pairs(list) do
+          if type(m) == "table" and m.complete and not m.claimed and m.key then
+            queue[#queue + 1] = { key = tostring(m.key), tp = tonumber(m.tp) or 0 }
+          end
+        end
+      end
+    end
+    missionQueue = queue
+    missionsSeenAt = now
+    return
+  end
   if (data.action ~= "refreshTrackerKills" and data.action ~= "refreshTracker")
      or type(data.data) ~= "table" then return end
   local out, n = {}, 0
@@ -169,7 +189,7 @@ local function dismissPopups()
   if not root then return end
   for _, c in ipairs(root:getChildren()) do
     local ok, title = pcall(function() return c:getText() end)
-    if ok and title == "Task" and c:isVisible() then
+    if ok and (title == "Task" or title == "Missions") and c:isVisible() then
       pcall(function() c:hide() end)
       local btn
       local function find(w, d)
@@ -406,6 +426,29 @@ end)
 
 -- No setOn(false) here: the bot persists macro state in storage._macros, so forcing it off at load also
 -- overwrote the player's choice - the switch turned itself off on every config reload.
+-- Missions are the same protocol: "missionsOpen" asks for the list, "missionClaim" takes one reward. The
+-- list only arrives when asked for, so this polls once a minute and claims whatever came back finished.
+local missionMacro
+missionMacro = macro(3000, "Auto missions", function()
+  dismissPopups()
+  if #missionQueue > 0 then
+    local m = table.remove(missionQueue, 1)
+    send("missionClaim", m.key)
+    cfg.missionsDone = cfg.missionsDone + 1
+    missionStatus = "claimed " .. m.key .. (m.tp > 0 and (" (+" .. m.tp .. " tp)") or "")
+    schedule(1500, function() send("missionsOpen", {}) end)   -- confirm, and pick up anything left
+    return
+  end
+  if now - missionAsked > 60000 then
+    missionAsked = now
+    send("missionsOpen", {})
+    if missionsSeenAt > 0 then
+      missionStatus = "nothing to claim"
+    end
+  end
+end)
+Features.register{ id = "missions", name = "Auto missions", group = "Engine", order = 61, macro = missionMacro }
+
 taskMacro = macro(SETTLE, "Auto tasks", function() run() end)
 
 Features.register{ id = "tasks", name = "Auto tasks", group = "Engine", order = 60, macro = taskMacro }
@@ -609,6 +652,7 @@ local strayBtn = UI.Button(cfg.dropStray and "Drop stray tasks" or "Keep stray t
 end)
 strayBtn:setTooltip("When a task you did not ask for blocks the last slot, cancel it (its kills are lost)")
 
+local missionLabel = UI.Label("Missions: off")
 statusLabel = UI.Label("Auto tasks: off")
 macro(500, function()
   for _, b in ipairs(blocks) do UI.fitButtonRow(b.row) end
@@ -617,6 +661,8 @@ macro(500, function()
   UI.pick(strayBtn, cfg.dropStray)
   statusLabel:setText("Auto tasks: " .. (taskMacro.isOn() and status or "off") ..
     (cfg.done > 0 and ("  -  " .. cfg.done .. " done") or ""))
+  missionLabel:setText("Missions: " .. (missionMacro.isOn() and missionStatus or "off") ..
+    (cfg.missionsDone > 0 and ("  -  " .. cfg.missionsDone .. " claimed") or ""))
 end)
 
 panel = tabPanel

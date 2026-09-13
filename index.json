@@ -482,9 +482,9 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.2.0",
+   "version": "1.2.1",
    "title": "Bot presets",
-   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, outfit colour cycling and copying, and a watch for gamemasters standing in ghost mode. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
+   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying, and a watch for gamemasters standing in ghost mode. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
    "screenshotSize": [
     196,
@@ -650,8 +650,8 @@
     },
     {
      "path": "bot/ed/features/outfit.lua",
-     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
-     "size": 14578,
+     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
+     "size": 14590,
      "packed": true
     },
     {
@@ -662,14 +662,14 @@
     },
     {
      "path": "bot/ed/features/tasks.lua",
-     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
-     "size": 25169,
+     "sha1": "781588a24e5c1c0a90cf843810b63fb3df3e0947",
+     "size": 27152,
      "packed": true
     },
     {
      "path": "bot/ed/features/tools.lua",
-     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
-     "size": 21989,
+     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
+     "size": 22051,
      "packed": true
     },
     {
@@ -896,8 +896,8 @@
     },
     {
      "path": "bot/ek/features/outfit.lua",
-     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
-     "size": 14578,
+     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
+     "size": 14590,
      "packed": true
     },
     {
@@ -908,14 +908,14 @@
     },
     {
      "path": "bot/ek/features/tasks.lua",
-     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
-     "size": 25169,
+     "sha1": "781588a24e5c1c0a90cf843810b63fb3df3e0947",
+     "size": 27152,
      "packed": true
     },
     {
      "path": "bot/ek/features/tools.lua",
-     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
-     "size": 21989,
+     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
+     "size": 22051,
      "packed": true
     },
     {
@@ -1142,8 +1142,8 @@
     },
     {
      "path": "bot/ms/features/outfit.lua",
-     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
-     "size": 14578,
+     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
+     "size": 14590,
      "packed": true
     },
     {
@@ -1154,14 +1154,14 @@
     },
     {
      "path": "bot/ms/features/tasks.lua",
-     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
-     "size": 25169,
+     "sha1": "781588a24e5c1c0a90cf843810b63fb3df3e0947",
+     "size": 27152,
      "packed": true
     },
     {
      "path": "bot/ms/features/tools.lua",
-     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
-     "size": 21989,
+     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
+     "size": 22051,
      "packed": true
     },
     {
@@ -1388,8 +1388,8 @@
     },
     {
      "path": "bot/rp/features/outfit.lua",
-     "sha1": "842285a43b823819fb2f83a263a1b04b0cd38fc5",
-     "size": 14578,
+     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
+     "size": 14590,
      "packed": true
     },
     {
@@ -1400,14 +1400,14 @@
     },
     {
      "path": "bot/rp/features/tasks.lua",
-     "sha1": "df811cfe5ae441ebbd14b194d92b8966710dd394",
-     "size": 25169,
+     "sha1": "781588a24e5c1c0a90cf843810b63fb3df3e0947",
+     "size": 27152,
      "packed": true
     },
     {
      "path": "bot/rp/features/tools.lua",
-     "sha1": "c21e6a587bac0e3f52152608de24ac19886460d4",
-     "size": 21989,
+     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
+     "size": 22051,
      "packed": true
     },
     {
@@ -1504,29 +1504,29 @@
    "archives": [
     {
      "path": "bot/ek.zip",
-     "sha1": "9f99eb38aa9077f99015ab775797e2d275eb7168",
-     "size": 84810,
+     "sha1": "0614d2763f293f688962aeb48ca0d68c7b33b67f",
+     "size": 85401,
      "dest": "bot/ek/",
      "count": 41
     },
     {
      "path": "bot/rp.zip",
-     "sha1": "84a44221db6d584fb11f00f3bca8f2b034e865d7",
-     "size": 84803,
+     "sha1": "9a4020f39947ccb62ba5a56dab7911e0acb7b7c0",
+     "size": 85394,
      "dest": "bot/rp/",
      "count": 41
     },
     {
      "path": "bot/ms.zip",
-     "sha1": "bcf8b3876c48842f7129aab1905ef4ab7f00eb57",
-     "size": 84803,
+     "sha1": "7686d4fcb0b09b154397923b49981b23a31a67d8",
+     "size": 85394,
      "dest": "bot/ms/",
      "count": 41
     },
     {
      "path": "bot/ed.zip",
-     "sha1": "3dcc065e734a081f8502749a6453f58cfc11f706",
-     "size": 84802,
+     "sha1": "e717f5fd80d75e08bd6cc12f8fbefe281dd59948",
+     "size": 85393,
      "dest": "bot/ed/",
      "count": 41
     }

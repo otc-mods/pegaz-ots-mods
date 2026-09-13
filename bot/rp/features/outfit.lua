@@ -189,15 +189,13 @@ local function copyFrom(creature)
   end)
 end
 
-local outfitMacro = macro(50, "Outfit", function()
+local outfitMacro = macro(50, "Colour cycle", function()
   if cfg.paused then status = "paused - pick a mode to resume" return end
   if now - lastAt < cfg.speed then return end
   lastAt = now
   phase = phase + 1
   applyCycle()
 end)
-
-Features.register{ id = "outfit", name = "Outfit", group = "Other", order = 70, macro = outfitMacro }
 
 -- Copying a target never touches the game world: clicking a creature walks you to it, hovering breaks the
 -- moment they move, and targeting or following has side effects you do not want mid-fight. Instead the
@@ -255,7 +253,7 @@ local function settings()
   local height = math.min(560, 330 + math.max(1, #targets) * 24)
   UI.listPopup("Outfit", height, function(content, win)
     win.applyButton:hide()
-    UI.Label("CYCLING - runs while the Outfit switch is on", content)
+    UI.Label("CYCLING - runs while the Colour cycle switch is on", content)
     local modeRow = UI.buttonRow({ MODES[1], MODES[2] }, content)
     local modeRow2 = UI.buttonRow({ MODES[3], MODES[4] }, content)
     local modeButtons = { modeRow.buttons[1], modeRow.buttons[2],
@@ -336,10 +334,12 @@ local function settings()
   end)
 end
 
+Features.register{ id = "outfit", name = "Outfit", group = "Other", order = 70, action = settings }
+
 UI.Button("Outfit settings...", settings)
-statusLabel = UI.Label("Outfit: off")
+statusLabel = UI.Label("Colours: off")
 macro(500, function()
-  statusLabel:setText("Outfit: " .. (outfitMacro.isOn() and status or status))
+  statusLabel:setText("Colours: " .. (outfitMacro.isOn() and status or status))
 end)
 
 panel = tabPanel

@@ -384,6 +384,7 @@ local function mwallSpot(creature)
   local step = (lastStep and trackedId == creature:getId()) and lastStep or DIR_STEP[creature:getDirection()]
   if not step then return nil, "nowhere to aim" end
   local base, me = creature:getPosition(), player:getPosition()
+  if not base or not me then return nil, "nowhere to aim" end
   local sight = false
   for _, n in ipairs(MWALL_OFFSETS) do
     local pos = { x = base.x + step.x * n, y = base.y + step.y * n, z = base.z }

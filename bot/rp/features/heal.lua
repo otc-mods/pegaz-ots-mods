@@ -144,7 +144,13 @@ end)
 Features.register{ id = "antiParalyze", order = 3, name = "Anti-paralyze", group = "HP", macro = antiParalyzeMacro }
 
 -- food ----------------------------------------------------------------------------
-if type(storage.foodItems) ~= "table" then storage.foodItems = {3582, 3577} end
+-- the food list is an item container: { {id=, count=}, ... }. Older configs - and this file's own first
+-- default - held bare ids, which the macro then tried to index.
+if type(storage.foodItems) ~= "table" then storage.foodItems = {} end
+for i, f in ipairs(storage.foodItems) do
+  if type(f) == "number" then storage.foodItems[i] = { id = f, count = 1 } end
+end
+if not storage.foodItems[1] then storage.foodItems = { { id = 3582, count = 1 }, { id = 3577, count = 1 } } end
 
 local foodMacro = macro(10000, "eat food", function()
   if not storage.foodItems[1] then return end

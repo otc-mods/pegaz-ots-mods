@@ -12,9 +12,9 @@
   {
    "name": "game_autoloot",
    "type": "module",
-   "version": "1.2.0",
+   "version": "1.2.1",
    "title": "Autoloot",
-   "description": "Loot lists with item search, NPC prices and gold per oz, Add by value, and right-click any item to add or remove it from autoloot.",
+   "description": "Loot lists with item search, NPC prices and gold per oz, Add by value, and right-click any item to add or remove it from autoloot. The list the server actually loots is re-read after login and every few minutes, so edits made with the !autoloot chat command show up on their own.",
    "screenshot": "screenshots/game_autoloot.png",
    "extraFiles": [
     "layouts/retro/images/topbuttons/coin.png",
@@ -24,9 +24,9 @@
   {
    "name": "game_loot_tracker",
    "type": "module",
-   "version": "1.2.0",
+   "version": "1.2.1",
    "title": "Autoloot tracker",
-   "description": "Items the server loots, counts, NPC value per item and total. Right-click a row to remove it from autoloot or copy its name or id.",
+   "description": "Items the server loots, counts, NPC value per item and total. Right-click a row to remove it from autoloot or copy its name or id. The list is re-read when the window opens if it has nothing to show.",
    "requires": [
     "game_autoloot"
    ],

@@ -7,6 +7,7 @@ SLOTS_PER_BAG = 15           -- server maximum
 DEFAULT_UNLOCKED = 3         -- until the server tells us
 CAROUSEL_SIZE = 5
 SEND_INTERVAL = 1100         -- ms between chat commands (server anti-spam)
+SYNC_INTERVAL = 300000       -- ms between unprompted "!autoloot" queries
 SLOTS_PATTERN = "Autoloot:%s*(%d+)%s*/%s*(%d+)"
 GREY = '#555555'
 RED = '#ff6666'
@@ -21,6 +22,7 @@ local collectUntil = 0       -- reply lines arriving before this time are part o
 local nameIndex              -- lower-case name -> id (bundled + custom), built lazily
 local resultsSummary = ""    -- the counts line, restored when the mouse leaves an item
 local sendQueue, sendEvent = {}, nil
+local syncEvent, lastSync = nil, 0
 -- price book: what NPCs pay, learned from every trade window you open. prices[id] = {sell=, weight=, npc=, name=}
 local prices = {}
 -- the picked sort lives in data (saved with the lists), sortMode mirrors it for the sort comparators
@@ -502,6 +504,7 @@ local function pump()
   local next = table.remove(sendQueue, 1)
   if not next then return end
   g_game.talk(next.cmd)
+  if next.cmd == "!autoloot" then lastSync = g_clock.millis() end
   if next.progress then setStatus(next.progress) end
   if #sendQueue > 0 then sendEvent = scheduleEvent(pump, SEND_INTERVAL) end
 end
@@ -678,6 +681,26 @@ function getServerItems() return serverItems end          -- { {id=, name=}, ...
 function getActiveItems() local l = activeList() return l.items, l.name end
 function itemName(id) return nameOf(id) end
 
+-- keeping the server list fresh ------------------------------------------------------
+-- The list can be edited from chat at any time, so it is re-read on login and on a timer, not only when
+-- this window opens. A pumping command batch already ends with a bare "!autoloot", so it is left alone.
+function refreshServerList(force)
+  if not g_game.isOnline() or sendEvent then return false end
+  if not force and g_clock.millis() - lastSync < SYNC_INTERVAL then return false end
+  lastSync = g_clock.millis()
+  g_game.talk("!autoloot")
+  return true
+end
+
+local function syncTick()
+  syncEvent = scheduleEvent(syncTick, 60000)
+  refreshServerList(false)
+end
+
+-- named so terminate() can take them off again: a reload that leaves them connected asks twice per login
+local function onGameStart() scheduleEvent(function() refreshServerList(true) end, 3000) end
+local function onGameEnd() slotsUsed, slotsMax, serverItems, lastSync = nil, nil, {}, 0 end
+
 -- window ------------------------------------------------------------------------------
 function show()
   followSelection()
@@ -687,7 +710,7 @@ function show()
   window.search:focus()
   refreshAll()
   if button then button:setOn(true) end
-  if g_game.isOnline() and not sendEvent then g_game.talk("!autoloot") end
+  refreshServerList(true)
 end
 
 function hide()
@@ -704,7 +727,7 @@ function init()
   load()
   loadPrices()
   connect(g_game, { onTextMessage = onTextMessage, onOpenNpcTrade = onOpenNpcTrade,
-                    onGameEnd = function() slotsUsed, slotsMax, serverItems = nil, nil, {} end })
+                    onGameStart = onGameStart, onGameEnd = onGameEnd })
   window = g_ui.displayUI('autoloot')
   window:hide()
   button = modules.client_topmenu.addRightGameToggleButton('autolootButton', tr('Autoloot'), '/images/topbuttons/coin', toggle, false, 1002)
@@ -757,14 +780,17 @@ function init()
   end
 
   setStatus("")
+  syncTick()
 end
 
 function terminate()
-  disconnect(g_game, { onTextMessage = onTextMessage, onOpenNpcTrade = onOpenNpcTrade })
+  disconnect(g_game, { onTextMessage = onTextMessage, onOpenNpcTrade = onOpenNpcTrade,
+                       onGameStart = onGameStart, onGameEnd = onGameEnd })
   if modules.game_interface and modules.game_interface.removeMenuHook then
     modules.game_interface.removeMenuHook('autoloot')
   end
   removeEvent(sendEvent)
+  removeEvent(syncEvent)
   if button then button:destroy() button = nil end
   if tip then tip:destroy() tip = nil end
   if window then window:destroy() window = nil end

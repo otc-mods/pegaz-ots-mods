@@ -591,7 +591,14 @@ function init()
   window = g_ui.loadUI('tracker', parent)
   contents = window:getChildById('contentsPanel')
   button = modules.client_topmenu.addRightGameToggleButton('lootTrackerButton', tr('Autoloot tracker'), '/images/topbuttons/motd', toggle, false, 1004)
-  window.onOpen = function() if button then button:setOn(true) end end
+  window.onOpen = function()
+    if button then button:setOn(true) end
+    -- forced only when we have nothing to show: reopening the window every minute must not spam the chat
+    local al = autoloot()
+    if al and al.refreshServerList then
+      al.refreshServerList(not al.getServerItems or #al.getServerItems() == 0)
+    end
+  end
   window:setup()
   if button then button:setOn(window:isVisible()) end
   lastKey = ""

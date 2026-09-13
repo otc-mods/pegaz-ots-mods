@@ -222,7 +222,9 @@ end
 local function echoNpc(line)
   pcall(function()
     local console = modules.game_console
-    console.addTabText(player:getName() .. " (to NPC): " .. line, console.SpeakTypesSettings.privatePlayerToNpc, console.getCurrentTab())
+    -- the NPCs tab only exists while a conversation is open; before that the line goes where you are looking
+    local tab = console.getTab("NPCs") or console.getCurrentTab()
+    console.addTabText(player:getName() .. " (to NPC): " .. line, console.SpeakTypesSettings.privatePlayerToNpc, tab)
   end)
 end
 

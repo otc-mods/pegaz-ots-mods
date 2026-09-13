@@ -325,12 +325,15 @@ local function editRule(r, isNew)
         valueRow:show() offRow:show()
         blk.rows = 3
         local step = c.max > 20 and 5 or 1
+        -- setRange pulls the bar to the new minimum and that fires onValueChange, which writes the draft:
+        -- the wanted numbers have to be taken out of the draft before the widget is touched at all
+        local want, wantOff = draft[valueKey], draft[offKey]
         valueRow.value:setRange(c.min, c.max) valueRow.value:setStep(step)
-        valueRow.value:setValue(math.max(c.min, math.min(c.max, draft[valueKey])))
+        valueRow.value:setValue(math.max(c.min, math.min(c.max, want)))
         draft[valueKey] = valueRow.value:getValue()
         valueRow.text:setText("Value: " .. draft[valueKey])
         offRow.value:setRange(0, c.max) offRow.value:setStep(step)
-        offRow.value:setValue(math.max(0, math.min(c.max, draft[offKey])))
+        offRow.value:setValue(math.max(0, math.min(c.max, wantOff)))
         draft[offKey] = offRow.value:getValue()
         offRow.text:setText(offText())
       end

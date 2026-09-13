@@ -482,7 +482,7 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.2.1",
+   "version": "1.2.2",
    "title": "Bot presets",
    "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying, and a watch for gamemasters standing in ghost mode. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
@@ -620,8 +620,8 @@
     },
     {
      "path": "bot/ed/features/equip.lua",
-     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
-     "size": 19626,
+     "sha1": "c62b38c1c2c2d6f5fcf8def11888c985bd8ab668",
+     "size": 19877,
      "packed": true
     },
     {
@@ -638,8 +638,8 @@
     },
     {
      "path": "bot/ed/features/icons.lua",
-     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
-     "size": 36474,
+     "sha1": "6b8f72ba95f0dc950fcf99f1cab18edb10646e3e",
+     "size": 36630,
      "packed": true
     },
     {
@@ -866,8 +866,8 @@
     },
     {
      "path": "bot/ek/features/equip.lua",
-     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
-     "size": 19626,
+     "sha1": "c62b38c1c2c2d6f5fcf8def11888c985bd8ab668",
+     "size": 19877,
      "packed": true
     },
     {
@@ -884,8 +884,8 @@
     },
     {
      "path": "bot/ek/features/icons.lua",
-     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
-     "size": 36474,
+     "sha1": "6b8f72ba95f0dc950fcf99f1cab18edb10646e3e",
+     "size": 36630,
      "packed": true
     },
     {
@@ -1112,8 +1112,8 @@
     },
     {
      "path": "bot/ms/features/equip.lua",
-     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
-     "size": 19626,
+     "sha1": "c62b38c1c2c2d6f5fcf8def11888c985bd8ab668",
+     "size": 19877,
      "packed": true
     },
     {
@@ -1130,8 +1130,8 @@
     },
     {
      "path": "bot/ms/features/icons.lua",
-     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
-     "size": 36474,
+     "sha1": "6b8f72ba95f0dc950fcf99f1cab18edb10646e3e",
+     "size": 36630,
      "packed": true
     },
     {
@@ -1358,8 +1358,8 @@
     },
     {
      "path": "bot/rp/features/equip.lua",
-     "sha1": "d164722b3aefdfbf7c9372ce59c9ea827af4ac6c",
-     "size": 19626,
+     "sha1": "c62b38c1c2c2d6f5fcf8def11888c985bd8ab668",
+     "size": 19877,
      "packed": true
     },
     {
@@ -1376,8 +1376,8 @@
     },
     {
      "path": "bot/rp/features/icons.lua",
-     "sha1": "f4dd6569aef321209779d016f92310a8b11a4d07",
-     "size": 36474,
+     "sha1": "6b8f72ba95f0dc950fcf99f1cab18edb10646e3e",
+     "size": 36630,
      "packed": true
     },
     {
@@ -1504,29 +1504,29 @@
    "archives": [
     {
      "path": "bot/ek.zip",
-     "sha1": "0614d2763f293f688962aeb48ca0d68c7b33b67f",
-     "size": 85401,
+     "sha1": "90574a512bdfd7ecab8362bd2c18d4e585001f45",
+     "size": 85581,
      "dest": "bot/ek/",
      "count": 41
     },
     {
      "path": "bot/rp.zip",
-     "sha1": "9a4020f39947ccb62ba5a56dab7911e0acb7b7c0",
-     "size": 85394,
+     "sha1": "3e213650c0ca8457fa4355c98baefb158b8d112d",
+     "size": 85574,
      "dest": "bot/rp/",
      "count": 41
     },
     {
      "path": "bot/ms.zip",
-     "sha1": "7686d4fcb0b09b154397923b49981b23a31a67d8",
-     "size": 85394,
+     "sha1": "514ab85293ec0ca37261a7733e7975ae2f4b5163",
+     "size": 85574,
      "dest": "bot/ms/",
      "count": 41
     },
     {
      "path": "bot/ed.zip",
-     "sha1": "e717f5fd80d75e08bd6cc12f8fbefe281dd59948",
-     "size": 85393,
+     "sha1": "42a4d72aa066237dcd5f764e3d6442f66695ee8f",
+     "size": 85573,
      "dest": "bot/ed/",
      "count": 41
     }

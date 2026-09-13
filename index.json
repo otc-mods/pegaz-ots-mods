@@ -482,9 +482,9 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.2.2",
+   "version": "1.3.0",
    "title": "Bot presets",
-   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying, and a watch for gamemasters standing in ghost mode. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
+   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying with a choice of how the colours travel - jump, hue ring or pastel fade, and a watch for gamemasters standing in ghost mode. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
    "screenshotSize": [
     196,
@@ -650,8 +650,8 @@
     },
     {
      "path": "bot/ed/features/outfit.lua",
-     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
-     "size": 14590,
+     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
+     "size": 19012,
      "packed": true
     },
     {
@@ -896,8 +896,8 @@
     },
     {
      "path": "bot/ek/features/outfit.lua",
-     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
-     "size": 14590,
+     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
+     "size": 19012,
      "packed": true
     },
     {
@@ -1142,8 +1142,8 @@
     },
     {
      "path": "bot/ms/features/outfit.lua",
-     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
-     "size": 14590,
+     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
+     "size": 19012,
      "packed": true
     },
     {
@@ -1388,8 +1388,8 @@
     },
     {
      "path": "bot/rp/features/outfit.lua",
-     "sha1": "ee42de9e765f2d779fa8253644477b867fbcde76",
-     "size": 14590,
+     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
+     "size": 19012,
      "packed": true
     },
     {
@@ -1504,29 +1504,29 @@
    "archives": [
     {
      "path": "bot/ek.zip",
-     "sha1": "90574a512bdfd7ecab8362bd2c18d4e585001f45",
-     "size": 85581,
+     "sha1": "38b12d36d0a123935a56c8e2d3dc9578bc5f08e8",
+     "size": 86985,
      "dest": "bot/ek/",
      "count": 41
     },
     {
      "path": "bot/rp.zip",
-     "sha1": "3e213650c0ca8457fa4355c98baefb158b8d112d",
-     "size": 85574,
+     "sha1": "caaab98ea2e0f802238ff9249f23846fb75f9ebc",
+     "size": 86978,
      "dest": "bot/rp/",
      "count": 41
     },
     {
      "path": "bot/ms.zip",
-     "sha1": "514ab85293ec0ca37261a7733e7975ae2f4b5163",
-     "size": 85574,
+     "sha1": "1630086d81070da7ddeb19faacbe6d686ebdee4c",
+     "size": 86978,
      "dest": "bot/ms/",
      "count": 41
     },
     {
      "path": "bot/ed.zip",
-     "sha1": "42a4d72aa066237dcd5f764e3d6442f66695ee8f",
-     "size": 85573,
+     "sha1": "94be608095bcb1c8b2e85c7427c5fff26c4d0121",
+     "size": 86977,
      "dest": "bot/ed/",
      "count": 41
     }

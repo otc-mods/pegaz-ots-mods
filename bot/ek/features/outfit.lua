@@ -23,6 +23,7 @@ if cfg.mode == "Copy" then cfg.mode = "Rainbow" end   -- Copy used to be a mode;
 if cfg.paused == nil then cfg.paused = false end
 cfg.speed = math.min(MAX_SPEED, math.max(MIN_SPEED, tonumber(cfg.speed) or 250))
 if cfg.sync == nil then cfg.sync = true end     -- all four channels the same colour
+cfg.transition = (cfg.transition == "Hue" or cfg.transition == "Pastel") and cfg.transition or "Jump"
 if cfg.copyType == nil then cfg.copyType = false end
 if cfg.copyAddons == nil then cfg.copyAddons = false end
 if cfg.randomType == nil then cfg.randomType = false end
@@ -30,6 +31,7 @@ if cfg.randomAddons == nil then cfg.randomAddons = false end
 cfg.lastTarget = type(cfg.lastTarget) == "string" and cfg.lastTarget or ""
 
 local status, phase, lastAt = "off", 0, 0
+local lastSent = nil            -- what we last put on the wire, so repeats are skipped
 
 -- The server refuses any looktype you do not own, so the body pool is the outfit list it sends when the
 -- outfit window is opened. It is read once, the window is closed again straight away, and the list is kept.
@@ -104,6 +106,99 @@ local function outfitOf(creature)
   return ok and o or nil
 end
 
+-- How RGB and CMYK travel between their key colours:
+--   Jump   - straight from one key colour to the next (what the published presets do)
+--   Hue    - along the bright hue ring (row 4), holding ~1s on each key colour
+--   Pastel - fading out through the light tints and white, never through the dark rows
+-- Linear rgb interpolation is deliberately NOT used: the midpoint of two pure hues is a dark colour
+-- (ff0000 -> 00ff00 passes 7f7f00), which is why that version looked like black between the colours.
+local TRANSITIONS = { "Jump", "Hue", "Pastel" }
+local RING, ringPos = {}, {}
+for i = 77, 94 do RING[#RING + 1] = i ringPos[i] = #RING end
+local WHITE = 0
+local PAL, smoothCache = nil, {}
+
+local function palette()
+  if PAL ~= nil then return PAL end
+  local f = G.getOutfitColor
+  if not f then PAL = false return PAL end
+  PAL = {}
+  for i = 0, 132 do
+    local ok, c = pcall(f, i)
+    if ok and c then PAL[i] = { c.r, c.g, c.b } end
+  end
+  return PAL
+end
+
+-- rows 5 and 6 are the dark tier: a fade that is meant to stay bright must not be allowed to land there
+local function nearestLight(r, g, b)
+  local best, bestD = 0, math.huge
+  for i = 0, 94 do
+    local p = PAL[i]
+    if p then
+      local dr, dg, db = p[1] - r, p[2] - g, p[3] - b
+      local d = dr * dr + dg * dg + db * db
+      if d < bestD then best, bestD = i, d end
+    end
+  end
+  return best
+end
+
+local function hueList(wps, dwell)
+  local out, n = {}, #RING
+  for k = 1, #wps do
+    local a, b = wps[k], wps[(k % #wps) + 1]
+    local pa, pb = ringPos[a], ringPos[b]
+    if not pa or not pb then return nil end
+    for _ = 1, dwell do out[#out + 1] = a end
+    local fwd, back = (pb - pa) % n, (pa - pb) % n
+    local dir = (fwd <= back) and 1 or -1
+    for s = 1, math.min(fwd, back) - 1 do
+      out[#out + 1] = RING[((pa - 1 + dir * s) % n) + 1]
+    end
+  end
+  return out
+end
+
+local function pastelList(wps, dwell, half)
+  local out = {}
+  for k = 1, #wps do
+    local a, b = wps[k], wps[(k % #wps) + 1]
+    local ca, cw, cb = PAL[a], PAL[WHITE], PAL[b]
+    if not ca or not cb then return nil end
+    for _ = 1, dwell do out[#out + 1] = a end
+    for s = 1, half do
+      local t = s / (half + 1)
+      out[#out + 1] = nearestLight(ca[1] + (cw[1] - ca[1]) * t,
+                                   ca[2] + (cw[2] - ca[2]) * t,
+                                   ca[3] + (cw[3] - ca[3]) * t)
+    end
+    out[#out + 1] = WHITE
+    for s = 1, half do
+      local t = s / (half + 1)
+      out[#out + 1] = nearestLight(cw[1] + (cb[1] - cw[1]) * t,
+                                   cw[2] + (cb[2] - cw[2]) * t,
+                                   cw[3] + (cb[3] - cw[3]) * t)
+    end
+  end
+  return out
+end
+
+local function cycleList()
+  if cfg.mode == "Rainbow" then return RAINBOW end
+  local wps = (cfg.mode == "RGB") and RGB or CMYK
+  if cfg.transition == "Jump" or not palette() then return wps end
+  local dwell = math.max(1, math.floor(1000 / cfg.speed + 0.5))   -- hold each key colour about a second
+  local key = cfg.mode .. cfg.transition .. dwell
+  if smoothCache[key] then return smoothCache[key] end
+  -- near-black is not on the bright ring and is what made CMYK look dark: the smooth versions drop it
+  local base = (cfg.mode == "CMYK") and { 85, 91, 79 } or wps
+  local out = (cfg.transition == "Hue") and hueList(base, dwell) or pastelList(base, dwell, 4)
+  if not out or #out == 0 then return wps end
+  smoothCache[key] = out
+  return out
+end
+
 local function colorFor(list, channel)
   if cfg.mode == "Random" then return math.random(0, 132) end
   -- independent channels chase each other a quarter of the wheel apart
@@ -116,7 +211,7 @@ local function applyCycle()
   if not me then return end
   local o = outfitOf(me)
   if not o then return end
-  local list = (cfg.mode == "Rainbow" and RAINBOW) or (cfg.mode == "RGB" and RGB) or CMYK
+  local list = cycleList()
   if cfg.sync and cfg.mode ~= "Random" then
     local c = colorFor(list, 1)
     o.head, o.body, o.legs, o.feet = c, c, c, c
@@ -139,7 +234,14 @@ local function applyCycle()
       o.addons = math.random(0, 3)
     end
   end
-  g_game.changeOutfit(o)
+  -- an interpolated step often snaps to the same entry twice: no packet for a colour already worn
+  local same = lastSent and lastSent.head == o.head and lastSent.body == o.body
+               and lastSent.legs == o.legs and lastSent.feet == o.feet
+               and lastSent.type == o.type and lastSent.addons == o.addons
+  if not same then
+    lastSent = { head = o.head, body = o.body, legs = o.legs, feet = o.feet, type = o.type, addons = o.addons }
+    g_game.changeOutfit(o)
+  end
   status = cfg.mode:lower() .. " " .. cfg.speed .. "ms" ..
     (cfg.randomType and (" +body(" .. #owned .. ")") or "")
 end
@@ -250,7 +352,7 @@ local function settings()
   -- a scrolling body: the list of targets grows with whoever is on screen, and a fixed panel simply drew
   -- them past its own bottom edge where nothing is visible
   local targets = visibleTargets()
-  local height = math.min(560, 330 + math.max(1, #targets) * 24)
+  local height = math.min(560, 360 + math.max(1, #targets) * 24)
   UI.listPopup("Outfit", height, function(content, win)
     win.applyButton:hide()
     UI.Label("CYCLING - runs while the Colour cycle switch is on", content)
@@ -258,6 +360,7 @@ local function settings()
     local modeRow2 = UI.buttonRow({ MODES[3], MODES[4] }, content)
     local modeButtons = { modeRow.buttons[1], modeRow.buttons[2],
                           modeRow2.buttons[1], modeRow2.buttons[2] }
+    local transRow = UI.buttonRow({ "Jump", "Hue", "Pastel" }, content)   -- how RGB/CMYK travel between colours
     local syncRow = UI.buttonRow({ "All same", "Independent" }, content)
     local randRow = UI.buttonRow({ "Random body", "Random addons" }, content)
 
@@ -271,6 +374,7 @@ local function settings()
     local copyRow = UI.buttonRow({ "Copy body", "Copy addons" }, content)
     local function paintModes()
       for i, b in ipairs(modeButtons) do UI.pick(b, MODES[i] == cfg.mode and not cfg.paused) end
+      for i, b in ipairs(transRow.buttons) do UI.pick(b, TRANSITIONS[i] == cfg.transition) end
       UI.pick(syncRow.buttons[1], cfg.sync)
       UI.pick(syncRow.buttons[2], not cfg.sync)
       UI.pick(copyRow.buttons[1], cfg.copyType)
@@ -282,6 +386,13 @@ local function settings()
       b.onClick = function()
         cfg.mode = MODES[i]
         cfg.paused = false                -- choosing a mode resumes what a copy stopped
+        phase, lastAt = 0, 0
+        paintModes()
+      end
+    end
+    for i, b in ipairs(transRow.buttons) do
+      b.onClick = function()
+        cfg.transition = TRANSITIONS[i]
         phase, lastAt = 0, 0
         paintModes()
       end

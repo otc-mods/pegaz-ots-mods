@@ -47,6 +47,11 @@ CaveBotPanel < Panel
     $!on:
       text: Show waypoints editor
 
+  BotButton
+    id: drawWaypoints
+    !text: tr('Draw waypoints')
+    margin-top: 2
+
   BotSwitch
     id: showConfig
     margin-top: 2

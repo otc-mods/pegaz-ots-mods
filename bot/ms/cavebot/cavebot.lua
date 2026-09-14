@@ -151,6 +151,16 @@ ui.showEditor.onClick = function()
   end
 end
 
+-- only offered when the map painting module is installed; it opens the full map with the brush menu and
+-- hands over the route selected here, so the editor starts on what the cavebot is actually using
+CaveBot.getConfigName = function() return lastConfig end
+
+if modules.game_route_paint and modules.game_route_paint.show then
+  ui.drawWaypoints.onClick = function() modules.game_route_paint.show(true, lastConfig) end
+else
+  ui.drawWaypoints:setVisible(false)
+end
+
 ui.showConfig.onClick = function()
   if not CaveBot.Config then return end
   if ui.showConfig:isOn() then

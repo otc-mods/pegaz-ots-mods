@@ -24,6 +24,14 @@ RouteTypes.list = {
     editor = 'lua',    hint = 'Run lua. Anything the bot can do - buying, depositing, selling, luring.' },
 }
 
+-- labels and jumps are the bot's bookkeeping: the editor shows them as flavour on real waypoints, never as
+-- things of their own, so they are not offered for placing
+function RouteTypes.hidden(entry) return entry ~= nil and (entry.action == 'label' or entry.action == 'gotolabel') end
+RouteTypes.placeable = {}
+for _, t in ipairs(RouteTypes.list) do
+  if t.id ~= 'label' and t.id ~= 'gotolabel' then RouteTypes.placeable[#RouteTypes.placeable + 1] = t end
+end
+
 RouteTypes.byId = {}
 for _, t in ipairs(RouteTypes.list) do RouteTypes.byId[t.id] = t end
 
@@ -41,8 +49,18 @@ function RouteTypes.positionOf(entry)
   return entry._pos
 end
 
+-- A function has no position of its own - except the one-click jobs, which carry their tile in the script as
+-- `local spot = { x = .., y = .., z = .. }`. That line is the position: the marker sits there, and moving the
+-- marker (or picking a tile) rewrites that line and nothing else, so edited parameters stay.
+local SPOT = 'local%s+spot%s*=%s*{%s*x%s*=%s*(%-?%d+)%s*,%s*y%s*=%s*(%-?%d+)%s*,%s*z%s*=%s*(%-?%d+)%s*}'
+
 function RouteTypes.parsePosition(entry)
   local t = RouteTypes.byId[entry.action]
+  if entry.action == 'function' then
+    local x, y, z = tostring(entry.value or ''):match(SPOT)
+    if x then return { x = tonumber(x), y = tonumber(y), z = tonumber(z) } end
+    return nil
+  end
   if not t or not t.spatial then return nil end
   local value = tostring(entry.value or '')
   if t.spatial == 'pos' then
@@ -58,6 +76,12 @@ end
 
 function RouteTypes.withPosition(entry, pos)
   local t = RouteTypes.byId[entry.action]
+  if entry.action == 'function' then
+    local value = tostring(entry.value or '')
+    local new, n = value:gsub('(local%s+spot%s*=%s*{%s*x%s*=%s*)%-?%d+(%s*,%s*y%s*=%s*)%-?%d+(%s*,%s*z%s*=%s*)%-?%d+',
+      ('%%1%d%%2%d%%3%d'):format(pos.x, pos.y, pos.z), 1)
+    return n > 0 and new or value
+  end
   if not t or not t.spatial then return entry.value end
   if t.spatial == 'pos' then
     return ('%d,%d,%d'):format(pos.x, pos.y, pos.z)
@@ -93,9 +117,11 @@ end
 function RouteTypes.buildDescription(entry)
   local q = RouteTypes.quickOf(entry)
   if q then
-    local spot = tostring(entry.value or ''):match('local spot = { x = (%d+), y = (%d+), z = (%d+) }')
     local x, y, z = tostring(entry.value or ''):match('local spot = { x = (%d+), y = (%d+), z = (%d+) }')
-    return x and ('%s  at %s,%s,%s'):format(q.title, x, y, z) or q.title
+    if x then return ('%s  at %s,%s,%s'):format(q.title, x, y, z) end
+    local target = tostring(entry.value or ''):match("local label%s*=%s*'([^']*)'")
+    if target then return ('%s  -> %s when low'):format(q.title, target) end
+    return q.title
   end
   local t = RouteTypes.byId[entry.action]
   local value = tostring(entry.value or ''):gsub('\n', ' '):gsub('%s+', ' ')
@@ -143,7 +169,7 @@ if me.z ~= spot.z or math.max(math.abs(me.x - spot.x), math.abs(me.y - spot.y)) 
   delay(400)
   return 'retry'
 end
-local depot = modules.game_route_paint.RouteDepot.nearestFreeLocker(8)
+local depot = modules.game_waypoint_editor.RouteDepot.nearestFreeLocker(8)
 if not depot then
   if retries % 10 == 0 then botlog('waiting for a free depot locker') end
   delay(600)
@@ -159,21 +185,65 @@ end
 RouteTypes.quick = {
   { id = 'q_depot',    title = 'Open depot',      glyph = 'DP', colour = '#7fd4ff',
     body = "-- job:q_depot  go to the depot, find a free locker, open it and the chest inside\n" .. DEPOT_WALK ..
-           "return modules.game_route_paint.RouteDepot.openOnly()" },
-  { id = 'q_deposit',  title = 'Deposit loot',    glyph = 'DL', colour = '#7fffb0',
+           "return modules.game_waypoint_editor.RouteDepot.openOnly()" },
+  { id = 'q_deposit',  title = 'Deposit loot (individual items)', glyph = 'DL', colour = '#7fffb0',
     body = "-- job:q_deposit  go to the depot, find a free locker, put these away\n" .. DEPOT_WALK ..
            "-- the items ticked 'depot' in the Loot window\n" ..
-           "return modules.game_route_paint.RouteDepot.tick(modules.game_route_paint.RouteLoot.depositIds())" },
+           "return modules.game_waypoint_editor.RouteDepot.tick(modules.game_waypoint_editor.RouteLoot.depositIds())" },
+  { id = 'q_deposit_bags', title = 'Deposit loot (backpacks)', glyph = 'DB', colour = '#5ce0a0',
+    body = "-- job:q_deposit_bags  go to the depot, sweep loose loot into the loot backpack, drop it off whole, take an empty one\n" ..
+           "local dropWhenAtLeast = 10   -- items at the loot bag's top; lighter than this it is kept when you only came for supplies\n" ..
+           "local RP = modules.game_waypoint_editor\n" ..
+           "if retries == 0 and RP.RouteDepot.refillReason == 'supplies' then\n" ..
+           "  local n = RP.RouteDepot.lootBagLoad()\n" ..
+           "  if n and n < dropWhenAtLeast and not RP.RouteDepot.lootBagFull() then\n" ..
+           "    RP.RouteBags.log(('the loot backpack holds only %d items and you came for supplies - keeping it'):format(n))\n" ..
+           "    return true\n  end\nend\n" .. DEPOT_WALK ..
+           "return RP.RouteDepot.swapBags()" },
   { id = 'q_withdraw', title = 'Take from depot', glyph = 'TD', colour = '#b0e57c',
     body = "-- job:q_withdraw  go to the depot, find a free locker, take these out\n" .. DEPOT_WALK ..
            "local ids, want = { 268, 238 }, 100\n" ..
-           "return modules.game_route_paint.RouteDepot.withdraw(ids, want)" },
+           "return modules.game_waypoint_editor.RouteDepot.withdraw(ids, want)" },
   { id = 'q_supplies', title = 'Buy supplies',    glyph = 'BS', colour = '#ffd166',
-    body = "-- job:q_supplies  walk to the shop and buy what the supply list is short of\n" .. WALK ..
-           "return modules.game_route_paint.RouteSupply.tick()" },
+    body = "-- job:q_supplies  walk to the shop and buy what the supply list is short of\n" ..
+           "-- nothing short (by the counts the game printed or the open bags) means no walk and no npc talk\n" ..
+           "local RP = modules.game_waypoint_editor\n" ..
+           "if #RP.RouteSupply.list() == 0 then return true end\n" ..
+           "if retries == 0 and #RP.RouteSupply.anythingShort() == 0 then\n" ..
+           "  RP.RouteBags.log('supplies are up to the list - skipping the shop')\n  return true\nend\n" .. WALK ..
+           "return RP.RouteSupply.tick()" },
   { id = 'q_sell',     title = 'Sell loot',       glyph = 'SL', colour = '#ffb272',
     body = "-- job:q_sell  walk to the npc and sell all it buys except the 'keep' items in the Loot window\n" .. WALK ..
-           "return modules.game_route_paint.RouteLoot.sell()" },
+           "return modules.game_waypoint_editor.RouteLoot.sell()" },
+  { id = 'q_refill',   title = 'Refill check',    glyph = 'RC', colour = '#ffd7a0',
+    body = "-- job:q_refill  go to a label when free capacity or a supply runs low; otherwise carry on hunting\n" ..
+           "local minCap = 300      -- oz of free capacity: below this you go and refill\n" ..
+           "local lowPct = 25       -- a supply row below this percent of its target sends you too\n" ..
+           "local label  = 'depo'   -- the label the depot trip starts at\n" ..
+           "local lootFull = true   -- also go when the loot backpack (and the bags in it) is full\n" ..
+           "local function botlog(m) local l='BOT: '..m modules.game_console.addText(l,{color='#FFA24D'},'Server Log') local bc=modules.game_better_chat if bc and bc.addServerLine then bc.addServerLine(l,'#F6A731') end end\n" ..
+           [[
+local RP = modules.game_waypoint_editor
+local why, reason
+local free = player:getFreeCapacity()
+if free < minCap then why, reason = ('%.0f oz free, below %d'):format(free, minCap), 'cap' end
+if not why then
+  -- the count the game printed the last time you used the item, else what is visible in open bags
+  for _, row in ipairs(RP.RouteSupply.list()) do
+    local id = RP.RouteItems.id(row.item)
+    if id and not row.fullCap and (row.amount or 0) > 0 then
+      local n, src = RP.RouteSupply.carried(id)
+      if n * 100 < row.amount * lowPct then why, reason = ('%d %s of %d, below %d%% (%s)'):format(n, row.item, row.amount, lowPct, src), 'supplies' break end
+    end
+  end
+end
+if not why and lootFull and RP.RouteDepot.lootBagFull() then why, reason = 'the loot backpack is full', 'loot' end
+if why then
+  RP.RouteDepot.refillReason = reason
+  botlog('refill: ' .. why .. ' - going to ' .. label)
+  if not gotoLabel(label) then botlog('there is no label "' .. label .. '" in this route - carrying on') end
+end
+return true]] },
   { id = 'q_pause',    title = 'Wait for fight',  glyph = 'WF', colour = '#aaaaaa',
     body = "-- job:q_pause  stand here until the targetbot is done\n" ..
            "local function botlog(m) local l='BOT: '..m modules.game_console.addText(l,{color='#FFA24D'},'Server Log') local bc=modules.game_better_chat if bc and bc.addServerLine then bc.addServerLine(l,'#F6A731') end end\n" ..
@@ -259,7 +329,7 @@ return false
 -- open instead of guessing, keeps the window count under the client's limit, and never touches the store
 -- inbox. Returns 'retry' until it has finished, exactly like any other waypoint.
 local ids = { 3031, 3035, 3043 }          -- edit: what you want stored
-return modules.game_route_paint.RouteDepot.tick(ids)
+return modules.game_waypoint_editor.RouteDepot.tick(ids)
 ]] },
   { title = 'Take these items out of the depot', body = [[
 -- The editor's own withdraw engine: counts what you carry (closed bags too), opens the locker and the chest,
@@ -267,7 +337,7 @@ return modules.game_route_paint.RouteDepot.tick(ids)
 -- Returns 'retry' until it has finished, exactly like any other waypoint.
 local ids  = { 268, 238 }                 -- edit: what to withdraw
 local want = 100                          -- how many of each you want to end up carrying
-return modules.game_route_paint.RouteDepot.withdraw(ids, want)
+return modules.game_waypoint_editor.RouteDepot.withdraw(ids, want)
 ]] },
   { title = 'Buy supplies, as many as gold and capacity allow', body = [[
 local id, want   = 268, 100      -- edit: what to buy, and the most you want
@@ -497,6 +567,18 @@ end
 -- Whole blocks of waypoints, not single ones. A full afk system is a handful of these stitched together,
 -- so they are inserted complete and you fill in the positions by clicking the map.
 RouteTypes.recipes = {
+  -- A whole afk loop around the goto waypoints you drew: the label the hunt loops back to goes first in the
+  -- route; the refill check and the depot trip go after the hunt. `quick` entries are one-click jobs placed
+  -- where you stand when you insert the recipe - drag the depot and the shop ones to their real spots.
+  { title = 'AFK loop - refill check, depot trip (deposit + supplies), back to the hunt', entries = {
+      { action = 'label',     value = 'hunt', first = true },
+      { quick = 'q_refill' },
+      { action = 'gotolabel', value = 'hunt' },
+      { action = 'label',     value = 'depo' },
+      { quick = 'q_deposit_bags' },
+      { quick = 'q_supplies' },
+      { action = 'gotolabel', value = 'hunt' },
+    } },
   { title = 'Supply check - jump to refill when potions run low', entries = {
       { action = 'function', value = [[
 -- edit the ids and the amount for your character. A closed backpack counts as zero of everything, so the
@@ -675,6 +757,10 @@ function RouteTypes.auditApi(ctx, extensions)
   for _, r in ipairs(RouteTypes.recipes) do
     for _, e in ipairs(r.entries) do
       if e.action == 'function' then scan('recipe: ' .. r.title, e.value) end
+      if e.quick then
+        local q = RouteTypes.quickGet(e.quick)
+        if q then scan('recipe: ' .. r.title, RouteTypes.quickBody(q, { x = 0, y = 0, z = 0 })) end
+      end
     end
   end
   return unknown

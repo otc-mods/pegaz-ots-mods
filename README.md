@@ -16,7 +16,7 @@ Client modules for the PegazOTS OTClientV8 client (protocol 8.6).
 | Save now | Save settings, hotkeys, layout, bot storage and minimap without exiting (button or `Ctrl+Alt+S`) |
 | Buttons panel fit | Grows the right-side Buttons panel so the extra buttons these modules add stay visible |
 | Bot presets | Preset management in the bot window and four ready presets (EK, RP, MS, ED): grouped tabs, hotkeys, buffs, equip rules, auto tasks and missions, outfit colours, ghost watch |
-| Waypoint editor | Cavebot routes edited on the map: draw the hunt area for the walking waypoints, place the rest by hand, one-click deposit / withdraw / buy / sell jobs with a loot list and a supply list |
+| Waypoint editor | Cavebot routes edited on the map: draw the hunt area for the walking waypoints, labels and jumps on any waypoint, one-click Refill check / deposit (by item or by backpack) / withdraw / buy / sell jobs with a loot list, loot backpacks and a supply list |
 | Module installer | This installer: lists, installs, updates and removes the modules above without a restart |
 
 Install with the in-game module installer (fetches `index.json` from this repo's Pages site), or by hand:

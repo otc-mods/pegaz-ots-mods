@@ -33,45 +33,53 @@ cfg.lastTarget = type(cfg.lastTarget) == "string" and cfg.lastTarget or ""
 local status, phase, lastAt = "off", 0, 0
 local lastSent = nil            -- what we last put on the wire, so repeats are skipped
 
--- The server refuses any looktype you do not own, so the body pool is the outfit list it sends when the
--- outfit window is opened. It is read once, the window is closed again straight away, and the list is kept.
+-- The server refuses any looktype you do not own, so the body pool is the outfit list it sends for the outfit
+-- window. It is taken straight from that event with the client's own "no window this time" switch set (the
+-- way the bot's setOutfit asks), so the window never shows. Reading it from the outfit module instead only
+-- works while a window is open, which is what used to pop the real window up and leave the first copy without
+-- a body.
 local owned = {}
+local ownedKnown = false
+local askedAt, asks = 0, 0
+local whenOwned = {}                  -- what is waiting for the list (a copy, mostly)
 
-local function learnOwnedOutfits()
-  if #owned > 0 then return end
-  local ok = pcall(function()
-    local env = modules.game_outfit
-    local seen, sd = {}, nil
-    local function walk(fn, d)
-      if type(fn) ~= "function" or d > 2 or seen[fn] or sd then return end
-      seen[fn] = true
-      local i = 1
-      while true do
-        local n, v = G.debug.getupvalue(fn, i)
-        if not n then break end
-        if n == "ServerData" and type(v) == "table" then sd = v end
-        if type(v) == "function" then walk(v, d + 1) end
-        i = i + 1
-      end
+local function onOutfitList(list)
+  owned = {}
+  for _, entry in pairs(list or {}) do
+    if type(entry) == "table" and tonumber(entry[1]) then
+      owned[#owned + 1] = { type = tonumber(entry[1]), name = tostring(entry[2] or "?"),
+                            addons = tonumber(entry[3]) or 0 }
     end
-    for _, fn in pairs(env or {}) do walk(fn, 0) end
-    local list = sd and sd.outfits
-    if type(list) ~= "table" then return end
-    for _, entry in pairs(list) do
-      if type(entry) == "table" and tonumber(entry[1]) then
-        owned[#owned + 1] = { type = tonumber(entry[1]), name = tostring(entry[2] or "?"),
-                              addons = tonumber(entry[3]) or 0 }
-      end
-    end
-  end)
-  if #owned == 0 and ok then
-    pcall(function() g_game.requestOutfit() end)          -- ask, then take the list on the next attempt
-    schedule(1200, function()
-      local w = G.g_ui.getRootWidget():recursiveGetChildById('outfitWindow')
-      if w then pcall(function() w:destroy() end) end
-      learnOwnedOutfits()
-    end)
   end
+  ownedKnown = #owned > 0
+  if ownedKnown then asks = 0 end
+  local waiting = whenOwned
+  whenOwned = {}
+  for _, fn in ipairs(waiting) do fn() end
+end
+
+-- one client-wide listener that calls whatever the CURRENT bot load registered: a bot reload swaps the
+-- function instead of piling up another connect
+if not G.__rpOutfitList then
+  G.__rpOutfitList = {}
+  G.connect(g_game, { onOpenOutfitWindow = function(_, list)
+    local fn = G.__rpOutfitList.fn
+    if fn then pcall(fn, list) end
+  end })
+end
+G.__rpOutfitList.fn = onOutfitList
+
+-- ask the server for the list (no window), and run thenDo once it is here - at once if it already is
+local function learnOwnedOutfits(thenDo)
+  if ownedKnown then
+    if thenDo then thenDo() end
+    return
+  end
+  if thenDo then whenOwned[#whenOwned + 1] = thenDo end
+  if asks >= 10 or now - askedAt < 1500 then return end
+  asks, askedAt = asks + 1, now
+  modules.game_outfit.ignoreNextOutfitWindow = G.g_clock.millis()
+  g_game.requestOutfit()
 end
 
 -- Outfits come in pairs, one looktype per gender, and the gap between them is irregular: 8 apart for the
@@ -94,7 +102,6 @@ local function ownedEntry(t)
 end
 
 local function wearableVersionOf(srcType)
-  learnOwnedOutfits()
   local mine = ownedEntry(srcType)
   if mine then return mine end
   local other = GENDER_PAIR[srcType]
@@ -248,11 +255,12 @@ end
 
 -- Copy: one shot, never a loop. The server validates the looktype, so borrowing someone's body only works if
 -- you own that outfit - the colours always apply, and the check below says so when the body snaps back.
-local function copyFrom(creature)
+local function applyCopy(creature)
   local src = outfitOf(creature)
   local me = g_game.getLocalPlayer()
   local mine = me and outfitOf(me)
-  if not src or not mine then return end
+  if not src then status = "that creature is no longer in sight" return end
+  if not mine then return end
   if (tonumber(src.type) or 0) == 0 then       -- invisible source: copying it would hide you too
     status = creature:getName() .. " has no visible outfit"
     return
@@ -288,6 +296,27 @@ local function copyFrom(creature)
       warning("[outfit] the server would not give you outfit " .. tostring(wantType) ..
               "; the colours were applied")
     end
+  end)
+end
+
+-- Copying a body needs the owned list; the first time it is not here yet, so the copy waits for it (a few
+-- hundred ms) instead of going out with colours only. If the server never answers, colours only, and say so.
+local copyToken = nil
+local function copyFrom(creature)
+  if not cfg.copyType or ownedKnown then applyCopy(creature) return end
+  local token = {}
+  copyToken = token
+  status = "asking the server which outfits you own..."
+  learnOwnedOutfits(function()
+    if copyToken ~= token then return end
+    copyToken = nil
+    applyCopy(creature)
+  end)
+  schedule(2500, function()
+    if copyToken ~= token then return end
+    copyToken = nil
+    applyCopy(creature)
+    status = status .. " (no outfit list from the server - colours only)"
   end)
 end
 
@@ -399,7 +428,11 @@ local function settings()
     end
     syncRow.buttons[1].onClick = function() cfg.sync = true paintModes() end
     syncRow.buttons[2].onClick = function() cfg.sync = false paintModes() end
-    copyRow.buttons[1].onClick = function() cfg.copyType = not cfg.copyType paintModes() end
+    copyRow.buttons[1].onClick = function()
+      cfg.copyType = not cfg.copyType
+      if cfg.copyType then learnOwnedOutfits() end
+      paintModes()
+    end
     copyRow.buttons[2].onClick = function() cfg.copyAddons = not cfg.copyAddons paintModes() end
     randRow.buttons[1].onClick = function()
       cfg.randomType = not cfg.randomType
@@ -452,5 +485,7 @@ statusLabel = UI.Label("Colours: off")
 macro(500, function()
   statusLabel:setText("Colours: " .. (outfitMacro.isOn() and status or status))
 end)
+
+if cfg.copyType or cfg.randomType then schedule(1500, function() learnOwnedOutfits() end) end
 
 panel = tabPanel

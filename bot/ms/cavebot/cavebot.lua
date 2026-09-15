@@ -155,8 +155,8 @@ end
 -- hands over the route selected here, so the editor starts on what the cavebot is actually using
 CaveBot.getConfigName = function() return lastConfig end
 
-if modules.game_route_paint and modules.game_route_paint.show then
-  ui.drawWaypoints.onClick = function() modules.game_route_paint.show(true, lastConfig) end
+if modules.game_waypoint_editor and modules.game_waypoint_editor.show then
+  ui.drawWaypoints.onClick = function() modules.game_waypoint_editor.show(true, lastConfig) end
 else
   ui.drawWaypoints:setVisible(false)
 end

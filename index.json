@@ -482,7 +482,7 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.4.0",
+   "version": "1.4.1",
    "title": "Bot presets",
    "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying with a choice of how the colours travel - jump, hue ring or pastel fade, and a watch for gamemasters standing in ghost mode that keeps its on/off setting across reloads. The looting panel has Loot manager and Supplies manager buttons that open the waypoint editor's lists when that module is installed. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
@@ -506,8 +506,8 @@
     },
     {
      "path": "bot/ed/cavebot/cavebot.lua",
-     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
-     "size": 6478,
+     "sha1": "6f6035d53b7ad0b3a3ecd702cdca80c004b4bb7a",
+     "size": 6490,
      "packed": true
     },
     {
@@ -650,8 +650,8 @@
     },
     {
      "path": "bot/ed/features/outfit.lua",
-     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
-     "size": 19012,
+     "sha1": "1caea5127272cbfbd161012ee079f868a56eb922",
+     "size": 20340,
      "packed": true
     },
     {
@@ -704,8 +704,8 @@
     },
     {
      "path": "bot/ed/targetbot/looting.lua",
-     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
-     "size": 10694,
+     "sha1": "99bfb4dc1355f1eb838bf2290900ea83d2c1f577",
+     "size": 10718,
      "packed": true
     },
     {
@@ -752,8 +752,8 @@
     },
     {
      "path": "bot/ek/cavebot/cavebot.lua",
-     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
-     "size": 6478,
+     "sha1": "6f6035d53b7ad0b3a3ecd702cdca80c004b4bb7a",
+     "size": 6490,
      "packed": true
     },
     {
@@ -896,8 +896,8 @@
     },
     {
      "path": "bot/ek/features/outfit.lua",
-     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
-     "size": 19012,
+     "sha1": "1caea5127272cbfbd161012ee079f868a56eb922",
+     "size": 20340,
      "packed": true
     },
     {
@@ -950,8 +950,8 @@
     },
     {
      "path": "bot/ek/targetbot/looting.lua",
-     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
-     "size": 10694,
+     "sha1": "99bfb4dc1355f1eb838bf2290900ea83d2c1f577",
+     "size": 10718,
      "packed": true
     },
     {
@@ -998,8 +998,8 @@
     },
     {
      "path": "bot/ms/cavebot/cavebot.lua",
-     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
-     "size": 6478,
+     "sha1": "6f6035d53b7ad0b3a3ecd702cdca80c004b4bb7a",
+     "size": 6490,
      "packed": true
     },
     {
@@ -1142,8 +1142,8 @@
     },
     {
      "path": "bot/ms/features/outfit.lua",
-     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
-     "size": 19012,
+     "sha1": "1caea5127272cbfbd161012ee079f868a56eb922",
+     "size": 20340,
      "packed": true
     },
     {
@@ -1196,8 +1196,8 @@
     },
     {
      "path": "bot/ms/targetbot/looting.lua",
-     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
-     "size": 10694,
+     "sha1": "99bfb4dc1355f1eb838bf2290900ea83d2c1f577",
+     "size": 10718,
      "packed": true
     },
     {
@@ -1244,8 +1244,8 @@
     },
     {
      "path": "bot/rp/cavebot/cavebot.lua",
-     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
-     "size": 6478,
+     "sha1": "6f6035d53b7ad0b3a3ecd702cdca80c004b4bb7a",
+     "size": 6490,
      "packed": true
     },
     {
@@ -1388,8 +1388,8 @@
     },
     {
      "path": "bot/rp/features/outfit.lua",
-     "sha1": "cee18baae1dd1f97db9d9e22596656443676b7fc",
-     "size": 19012,
+     "sha1": "1caea5127272cbfbd161012ee079f868a56eb922",
+     "size": 20340,
      "packed": true
     },
     {
@@ -1442,8 +1442,8 @@
     },
     {
      "path": "bot/rp/targetbot/looting.lua",
-     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
-     "size": 10694,
+     "sha1": "99bfb4dc1355f1eb838bf2290900ea83d2c1f577",
+     "size": 10718,
      "packed": true
     },
     {
@@ -1504,100 +1504,106 @@
    "archives": [
     {
      "path": "bot/ek.zip",
-     "sha1": "2964e87eb3e4d5587968665cc6e4f71fcdacde8c",
-     "size": 87695,
+     "sha1": "fbfcb7fa61f857fba37204a7b483042164b1433c",
+     "size": 88103,
      "dest": "bot/ek/",
      "count": 41
     },
     {
      "path": "bot/rp.zip",
-     "sha1": "ff0f7d38ab2f5a1afddbda983ad0af4f2306492b",
-     "size": 87688,
+     "sha1": "040722abe2c1d111777800bc3162b826ce233446",
+     "size": 88096,
      "dest": "bot/rp/",
      "count": 41
     },
     {
      "path": "bot/ms.zip",
-     "sha1": "44aba83e378bed3252768f22d25b7bf7960d9f48",
-     "size": 87688,
+     "sha1": "accb54247958ad3a7fac14889021d4d75f2b4639",
+     "size": 88096,
      "dest": "bot/ms/",
      "count": 41
     },
     {
      "path": "bot/ed.zip",
-     "sha1": "e7bf14930ee91d41950b35f3fd32aca214a69b8d",
-     "size": 87687,
+     "sha1": "30b23670ef7bcd79730b108fd76ecdaed629c860",
+     "size": 88095,
      "dest": "bot/ed/",
      "count": 41
     }
    ]
   },
   {
-   "name": "game_route_paint",
+   "name": "game_waypoint_editor",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "title": "Waypoint editor",
-   "description": "Edit cavebot routes on the map instead of a list of coordinates: draw the area you hunt to get the walking waypoints, then place use, use with, say, delay, label and function waypoints by hand and edit each one in its own window. One-click jobs for the whole afk loop - deposit loot, take supplies out of the depot, buy supplies, sell loot, open the depot, wait for the fight - driven by a Loot manager (deposit / sell / keep per item, one click loads your autoloot list) and a Supplies manager (how many of each to carry; closed bags are counted before buying, so nothing is bought twice). Depot jobs walk every bag you carry and every bag in the depot, however deeply nested, one window at a time, report what they did and stop the cavebot with a reason rather than lose loot. Bot on/off from the editor, live route line, undo, templates and recipes for hand-written functions. Made for the bot presets; item names come from Autoloot when it is installed.",
+   "description": "Edit cavebot routes on the map instead of a list of coordinates: draw the area you hunt to get the walking waypoints, place use, use with, say, delay and function waypoints by hand, and put labels and jumps on any waypoint from its right-click menu. One drawing = one route; right button pans in every mode; Loop end and Snap to stairs shape the loop. One-click jobs for the whole afk loop - Refill check (free capacity, supplies below a percent, loot backpack full), deposit loot by the item or by the whole backpack (three backpack kinds, Build sets tidies the depot chest into complete sets), take supplies out of the depot, buy supplies, sell loot, open the depot, wait for the fight - driven by a Loot manager (deposit / sell / keep per item, one click loads your autoloot list) and a Supplies manager (how many of each to carry; counts come from the game's own 'Using one of N' lines, or from opening the bags). A loot sweep keeps loose loot moving into the loot backpack while you hunt. Every job skips itself when there is nothing to do; the cavebot is stopped only when it cannot go on hunting. Made for the bot presets; item names come from Autoloot when it is installed.",
    "requires": [],
+   "screenshot": "screenshots/game_waypoint_editor.png",
+   "screenshotSize": [
+    1085,
+    592
+   ],
+   "screenshotSha1": "b24aa26941516201f19815f3f2c9738c7b4c0e91",
    "files": [
     {
-     "path": "modules/game_route_paint/README.md",
-     "sha1": "bbc517af472fcc11ba22f0f16637000c5fd5831c",
-     "size": 10584,
+     "path": "modules/game_waypoint_editor/README.md",
+     "sha1": "520933d0c2f277375541150ea6504678d945fa0d",
+     "size": 14621,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/bags.lua",
-     "sha1": "0b523bd95ee564f789c7558bad67084371067b97",
-     "size": 8670,
+     "path": "modules/game_waypoint_editor/bags.lua",
+     "sha1": "0d0e99e140ffbf795a239641c77281f617298f55",
+     "size": 12157,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/cfg.lua",
+     "path": "modules/game_waypoint_editor/cfg.lua",
      "sha1": "8a74d996121bb09dc2949031287bf93e42dbc1b1",
      "size": 2752,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/depot.lua",
-     "sha1": "435bc3a331c7efa421c6b7630f789073feeb1e31",
-     "size": 23284,
+     "path": "modules/game_waypoint_editor/depot.lua",
+     "sha1": "a8d998fd35848367f49cd25119cf7f67ace777c5",
+     "size": 59018,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/editor.otui",
-     "sha1": "0be15206fcd28d104fb98d5090b20179f1ca4a0c",
-     "size": 19090,
+     "path": "modules/game_waypoint_editor/editor.otui",
+     "sha1": "ef780b4ff6babaf72d1c9380014fc0cc4d90b7da",
+     "size": 22132,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/game_route_paint.otmod",
-     "sha1": "cc8fdf33ad1d07cf6bc29a4beaa149ad5b121135",
-     "size": 416,
+     "path": "modules/game_waypoint_editor/game_waypoint_editor.otmod",
+     "sha1": "0abcd941b3bddf2a970f46781314a3d1a91ff668",
+     "size": 420,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/library.lua",
-     "sha1": "c1283ff262ca0fc1343af583db7c02b57bf5dcb4",
-     "size": 20587,
+     "path": "modules/game_waypoint_editor/library.lua",
+     "sha1": "3c94f16259f07f43c063dc0d4f355c53513e2f91",
+     "size": 26991,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/main.lua",
-     "sha1": "b4e3e8326af5872ab3f367366ae9a6fa8e25539a",
-     "size": 131141,
+     "path": "modules/game_waypoint_editor/main.lua",
+     "sha1": "294cfd0f429b11b17f5216442d81bec59eb258b6",
+     "size": 149066,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/png.lua",
+     "path": "modules/game_waypoint_editor/png.lua",
      "sha1": "fb5d7e7cc3c0be11267ca70a94352ff5d3ae1df5",
      "size": 2931,
      "packed": false
     },
     {
-     "path": "modules/game_route_paint/types.lua",
-     "sha1": "00c8fd1a7fe7ce4a0576decdc9e69f0038381c66",
-     "size": 32133,
+     "path": "modules/game_waypoint_editor/types.lua",
+     "sha1": "b0e4e00f75f6d1e86d3e76e5a5adea7417089c2a",
+     "size": 37724,
      "packed": false
     }
    ]

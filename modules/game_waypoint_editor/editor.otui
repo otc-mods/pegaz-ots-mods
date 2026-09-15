@@ -279,7 +279,7 @@ RpEditorWindow < MainWindow
     anchors.left: parent.left
     anchors.right: parent.right
     margin-top: 3
-    height: 18
+    height: 36
 
   RpHeader
     id: drawHeader
@@ -682,10 +682,37 @@ RpLootRow < UIWidget
     width: 22
     height: 20
 
+RpBagRow < UIWidget
+  height: 22
+
+  Label
+    id: label
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 170
+    text-align: right
+    color: #bdbdbd
+
+  UIItem
+    id: icon
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 6
+    size: 22 22
+    phantom: true
+
+  TextEdit
+    id: itemEdit
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 3
+    width: 200
+    height: 20
+
 RpLootWindow < MainWindow
   id: rpLootWindow
   !text: tr('Loot - what goes to the depot, what gets sold')
-  size: 500 520
+  size: 500 689
   padding: 4
 
   Label
@@ -746,6 +773,92 @@ RpLootWindow < MainWindow
     margin-left: 6
     width: 150
     height: 22
+
+  Label
+    id: bagsHeader
+    !text: tr('  LOOT BACKPACKS - the whole bag is dropped off, told apart by kind')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 8
+    height: 17
+    text-align: left
+    color: #ffffff
+    background-color: #ffffff22
+
+  RpBagRow
+    id: bagLoot
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+
+  RpBagRow
+    id: bagFull
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  RpBagRow
+    id: bagEmpty
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  CheckBox
+    id: sweepBox
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 16
+    !text: tr('while hunting, keep moving loose loot from the main backpack into the loot bag')
+
+  CheckBox
+    id: stopBox
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 16
+    !text: tr('no empty loot backpack left at the depot: stop the cavebot (off: keep hunting)')
+    !tooltip: tr('Also when the depot cannot take your loot backpack (full storage full or missing). Off: the route carries on without a loot backpack, and the next depot trip deposits the loose loot item by item.')
+
+  UIWidget
+    id: bagsTools
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 22
+    layout:
+      type: horizontalBox
+      spacing: 6
+
+    Label
+      !text: tr('plain bags per set:')
+      width: 170
+      text-align: right
+      color: #bdbdbd
+
+    TextEdit
+      id: setSizeEdit
+      width: 36
+      height: 20
+
+    Button
+      id: setupButton
+      !text: tr('Build sets')
+      !tooltip: tr('Standing at the depot: unpack the chest, fill every loot bag to the number on the left, park the complete ones in the empty storage.')
+      width: 110
+      height: 22
+
+    Button
+      id: swapButton
+      !text: tr('Swap now')
+      !tooltip: tr('Standing at the depot: sweep loose loot into the loot bag, drop it off whole, take a complete empty set out.')
+      width: 110
+      height: 22
 
   Label
     id: itemsHeader
@@ -810,7 +923,7 @@ RpLootWindow < MainWindow
 RpSupplyWindow < MainWindow
   id: rpSupplyWindow
   !text: tr('Supplies and named items')
-  size: 500 520
+  size: 500 540
   padding: 4
 
   Label
@@ -824,6 +937,15 @@ RpSupplyWindow < MainWindow
     text-wrap: true
     color: #bdbdbd
     !text: tr('The target is how many you want to HAVE. Buy supplies buys the difference (target 200, carrying 50 -> buys 150). Tick "fill cap" instead to top that item up until only N capacity is left - only one row may do that.')
+
+  CheckBox
+    id: walkBox
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    height: 16
+    !text: tr('count by opening every bag (exact, slow) - off: trust the count the game prints when you use an item')
 
   RpSupplyHeader
     id: supplyHeader

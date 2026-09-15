@@ -8,6 +8,40 @@
 --    every 20-50 ms, so every wait here is wall-clock
 RouteBags = {}
 
+-- the server's last refusal ("Sorry, not possible.", "You cannot put more objects in this container.", ...),
+-- so a job can tell a refused move from a slow one and say why it stopped
+RouteBags.lastFailure = nil
+-- only the texts a refused MOVE produces: the bot's own "You cannot use this object." must not count as one
+connect(g_game, { onTextMessage = function(mode, text)
+  local s = tostring(text or '')
+  local l = s:lower()
+  if l:find('not possible') or l:find('more objects') or l:find('enough room') or l:find('not enough') or l:find('too heavy')
+     or l:find('cannot move') or l:find('cannot put') or l:find('depot') then
+    RouteBags.lastFailure = { text = s, at = g_clock.millis() }
+  end
+end })
+
+-- the one reason to turn the cavebot off: it cannot go on hunting. Everything else is logged and walked past.
+function RouteBags.stopCavebot(why)
+  local rp = modules.game_waypoint_editor
+  local ok, ctx = pcall(function() return rp.botContext and rp.botContext() end)
+  local cave = ok and ctx and ctx.CaveBot
+  if cave and type(cave.setOff) == 'function' then pcall(function() cave.setOff() end) end
+  log((why or 'cannot go on') .. ' - stopped the cavebot')
+end
+
+-- Items are moved on their own (the hunt-time sweep) only while the cavebot runs: with it off, your bags are yours.
+function RouteBags.cavebotOn()
+  local rp = modules.game_waypoint_editor
+  local ok, ctx = pcall(function() return rp.botContext and rp.botContext() end)
+  local cave = ok and ctx and ctx.CaveBot
+  local ok2, on = pcall(function() return cave and cave.isOn and cave.isOn() end)
+  return ok2 and on == true
+end
+
+-- what counts as a bag: the client's own word for it. (35577, unnamed in the old item table, is the raccoon backpack.)
+function RouteBags.isBag(item) return item ~= nil and item:isContainer() end
+
 local OPEN_TIMEOUT = 4000          -- a use queued behind another is delayed ~1.4 s by the server; two in a row pass 2.5 s
 local CLOSE_TIMEOUT = 1500
 local WINDOW_SOFT_CAP = 10
@@ -56,10 +90,15 @@ function RouteBags.nextContainerId()
   return id
 end
 
--- an item inside an open container has a position (window id + slot); that is its key
-function RouteBags.keyOf(item)
+-- An item inside an open window is known by window + slot. Window ids are reused as soon as a window closes,
+-- so the id alone would make a bag in a later window look like one already opened in an earlier one at the
+-- same slot - and skip it. The window's opening sequence number makes the key belong to one window only.
+function RouteBags.keyOf(item, st)
   local q = item:getPosition()
-  return q and (q.x .. ':' .. q.y .. ':' .. q.z) or tostring(item)
+  if not q then return tostring(item) end
+  local cid = q.y - 64
+  local seq = st and st.seq and st.seq[cid] or 0
+  return seq .. ':' .. cid .. ':' .. q.z
 end
 
 function RouteBags.closeAll(st)
@@ -75,11 +114,16 @@ function RouteBags.closing(st)
 end
 
 -- st.side[cid] remembers what was opened into each window; side is 'carried', 'depot', 'chest' or 'locker'
-function RouteBags.issueOpen(st, item, side)
+function RouteBags.issueOpen(st, item, side, extra)
   st.side = st.side or {}
   local cid = RouteBags.nextContainerId()
-  st.side[cid] = { side = side, itemId = item:getId() }
+  local rec = { side = side, itemId = item:getId() }
+  for k, v in pairs(extra or {}) do rec[k] = v end
+  st.side[cid] = rec
   if st.counted then st.counted[cid] = nil end       -- a reused window id is a new container
+  st.seq = st.seq or {}
+  st.seqN = (st.seqN or 0) + 1
+  st.seq[cid] = st.seqN                              -- opening order: the newest window is searched first
   st.opening = { id = item:getId(), cid = cid, side = side, since = g_clock.millis() }
   RouteBags.minimizeOpen()
   g_game.open(item)
@@ -112,6 +156,16 @@ function RouteBags.openPending(st)
     return false
   end
   return true
+end
+
+-- The open windows, newest first. Looking for the next bag to open in this order goes DOWN a branch before
+-- moving to the next sibling: a bag holding 19 bags then costs one window at a time, not 19 at once, which is
+-- what kept the server's ~16-window limit from being hit and branches from being skipped.
+function RouteBags.windowsDeepFirst(st)
+  local list = {}
+  for cid, c in pairs(g_game.getContainers()) do list[#list + 1] = { cid = cid, c = c, seq = (st.seq or {})[cid] or 0 } end
+  table.sort(list, function(a, b) return a.seq > b.seq end)
+  return list
 end
 
 -- the worn bags loot lives in: back and ammo. The purse is the store inbox on this server - never touched.
@@ -163,7 +217,7 @@ function RouteBags.countStep(st)
       if RouteBags.isMine(c) and c:hasParent() and st.counted[cid] then
         local pending = false
         for _, it in ipairs(c:getItems()) do
-          if it:isContainer() and not st.opened[RouteBags.keyOf(it)] then pending = true end
+          if RouteBags.isBag(it) and not st.opened[RouteBags.keyOf(it, st)] then pending = true end
         end
         if not pending then pcall(function() g_game.close(c) end) return 'busy' end
       end
@@ -178,11 +232,11 @@ function RouteBags.countStep(st)
     end
   end
 
-  for _, c in pairs(g_game.getContainers()) do
-    if RouteBags.isMine(c) then
-      for _, it in ipairs(c:getItems()) do
-        if it:isContainer() and not st.opened[RouteBags.keyOf(it)] then
-          st.opened[RouteBags.keyOf(it)] = true
+  for _, w in ipairs(RouteBags.windowsDeepFirst(st)) do
+    if RouteBags.isMine(w.c) then
+      for _, it in ipairs(w.c:getItems()) do
+        if RouteBags.isBag(it) and not st.opened[RouteBags.keyOf(it, st)] then
+          st.opened[RouteBags.keyOf(it, st)] = true
           RouteBags.issueOpen(st, it, 'carried')
           return 'busy'
         end
@@ -190,6 +244,16 @@ function RouteBags.countStep(st)
     end
   end
   return 'done'
+end
+
+-- "17x stone skin amulet, 9x winning lottery ticket, ..." - the most numerous ids in a counts table
+function RouteBags.summarise(counts, limit)
+  local rows = {}
+  for id, n in pairs(counts or {}) do rows[#rows + 1] = { id = id, n = n } end
+  table.sort(rows, function(a, b) return a.n > b.n end)
+  local parts = {}
+  for i = 1, math.min(limit or 6, #rows) do parts[#parts + 1] = ('%dx %s'):format(rows[i].n, RouteItems.name(rows[i].id)) end
+  return #parts > 0 and table.concat(parts, ', ') or 'nothing'
 end
 
 -- gold, platinum and crystal coins plus golden nuggets (100 cc each on this server) in a counts table, in gold

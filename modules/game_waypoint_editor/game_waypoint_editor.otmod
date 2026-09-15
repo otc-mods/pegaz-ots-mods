@@ -1,5 +1,5 @@
 Module
-  name: game_route_paint
+  name: game_waypoint_editor
   description: Waypoint editor on the map - draw an area for goto waypoints, place and edit every cavebot waypoint type
   author: otc-mods
   website: local

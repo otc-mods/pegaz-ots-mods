@@ -86,10 +86,14 @@ local function autolootReverse()
 end
 
 -- "great mana potion", "great_mana_potion" and 238 all resolve to 238; any autoloot-known item resolves too
+-- names the server uses where the autoloot table has something else
+local SERVER_NAMES = { [3040] = 'golden nugget', [35577] = 'raccoon backpack' }
+
 function RouteItems.id(name)
   if not data then load() end
   if type(name) == 'number' then return name end
   local raw = tostring(name)
+  for id, nm in pairs(SERVER_NAMES) do if nm == raw:lower():gsub('_', ' ') then return id end end
   local key = raw:lower():gsub('%s+', '_')
   local direct = data.items[key]
   if direct then return direct end
@@ -97,9 +101,6 @@ function RouteItems.id(name)
   if n then return n end
   return autolootReverse()[raw:lower():gsub('_', ' '):gsub('%s+', ' ')]
 end
-
--- names the server uses where the autoloot table has something else
-local SERVER_NAMES = { [3040] = 'golden nugget' }
 
 function RouteItems.name(id)
   if SERVER_NAMES[id] then return SERVER_NAMES[id] end
@@ -178,9 +179,10 @@ function RouteSupply.describe()
 end
 
 -- What is still missing, given what the character carries and what the shop sells. `carried` is id -> count,
--- `shop` is id -> { price, weight }, and the answer is a list of { id, count, price }.
+-- `shop` is id -> { price, weight }. Returns the buys { id, count, price, name } and the shortfalls - rows that
+-- cannot be filled and why: { name, want, count, why = 'capacity' | 'gold' }.
 function RouteSupply.plan(carried, shop, freeCapacity, money)
-  local plan = {}
+  local plan, short = {}, {}
   local budget = money or 0
   local cap = freeCapacity or 0
   for _, row in ipairs(RouteSupply.list()) do
@@ -189,8 +191,8 @@ function RouteSupply.plan(carried, shop, freeCapacity, money)
     if id and offer then
       local have = (carried and carried[id]) or 0
       local want
+      local weight = (offer.weight and offer.weight > 0) and offer.weight or nil
       if row.fullCap then
-        local weight = (offer.weight and offer.weight > 0) and offer.weight or nil
         -- without a usable weight there is nothing to compute a full-cap amount from, so the row is skipped
         want = weight and math.floor(math.max(0, cap - row.fullCap) / weight) or nil
       else
@@ -198,17 +200,21 @@ function RouteSupply.plan(carried, shop, freeCapacity, money)
       end
       if want and want > 0 then
         local price = offer.price or 0
-        local affordable = price > 0 and math.floor(budget / price) or want
-        local count = math.min(want, affordable)
+        local byGold = price > 0 and math.floor(budget / price) or want
+        local byCap = weight and math.floor(cap / weight) or want
+        local count = math.min(want, byGold, byCap)
+        if count < want and not row.fullCap then
+          short[#short + 1] = { name = RouteItems.name(id), want = want, count = count, why = (byCap < byGold) and 'capacity' or 'gold' }
+        end
         if count > 0 then
           plan[#plan + 1] = { id = id, count = count, price = price, name = RouteItems.name(id) }
           budget = budget - count * price
-          if offer.weight and offer.weight > 0 then cap = cap - count * offer.weight end
+          if weight then cap = cap - count * weight end
         end
       end
     end
   end
-  return plan
+  return plan, short
 end
 
 -- ---------------------------------------------------------------- buying against the supply list
@@ -264,6 +270,77 @@ local function openTotals(ids)
   return totals
 end
 
+-- The game says how many you have left whenever you use something - "Using one of 100 great mana potions..."
+-- - so the count of every supply you actually use is known without opening a single bag. Remembered per item
+-- id with its time; the Buy supplies job and the Refill check trust a count that is at most CHAT_FRESH_MS old.
+RouteSupply.seen = {}
+local CHAT_FRESH_MS = 45 * 60 * 1000
+
+local function idFromPlural(name)
+  local n = tostring(name or ''):lower()
+  return RouteItems.id(n) or RouteItems.id((n:gsub('ies$', 'y'))) or RouteItems.id((n:gsub('es$', ''))) or RouteItems.id((n:gsub('s$', '')))
+end
+
+connect(g_game, { onTextMessage = function(mode, text)
+  local n, name = tostring(text or ''):match('^Using one of (%d+) (.-)%.%.%.%s*$')
+  if not n then return end
+  local id = idFromPlural(name)
+  if id then RouteSupply.seen[id] = { count = math.max(0, tonumber(n) - 1), at = g_clock.millis() } end
+end })
+
+-- how many of an item you carry, and where that number comes from: a fresh chat count, else the open bags
+function RouteSupply.carried(id)
+  local s = RouteSupply.seen[id]
+  if s and g_clock.millis() - s.at < CHAT_FRESH_MS then
+    return s.count, ('chat %d min ago'):format(math.floor((g_clock.millis() - s.at) / 60000))
+  end
+  local n = 0
+  for _, c in pairs(g_game.getContainers()) do
+    if RouteBags.isMine(c) then for _, it in ipairs(c:getItems()) do if it:getId() == id then n = n + it:getCount() end end end
+  end
+  return n, 'open bags'
+end
+
+-- is any supply row below its target, by the count the game printed or the open bags? Rows whose item is not
+-- known count as short: better a walk to the shop than a skipped purchase on no information.
+function RouteSupply.anythingShort()
+  local short = {}
+  for _, row in ipairs(RouteSupply.list()) do
+    local id = RouteItems.id(row.item)
+    if row.fullCap then short[#short + 1] = row.item
+    elseif not id then short[#short + 1] = row.item
+    else
+      local n = RouteSupply.carried(id)
+      if n < (row.amount or 0) then short[#short + 1] = ('%s %d/%d'):format(row.item, n, row.amount or 0) end
+    end
+  end
+  return short
+end
+
+-- true when the Buy supplies job must open every bag to count (the exact, slow way)
+function RouteSupply.walkMode()
+  if not data then load() end
+  return data.supplyWalk == true
+end
+function RouteSupply.setWalkMode(on)
+  if not data then load() end
+  data.supplyWalk = on and true or false
+  persist()
+end
+
+-- every supply row's count from chat, and the rows no fresh chat count exists for
+function RouteSupply.chatCounts()
+  local counts, missing = {}, {}
+  for _, row in ipairs(RouteSupply.list()) do
+    local id = RouteItems.id(row.item)
+    if id and not row.fullCap then
+      local s = RouteSupply.seen[id]
+      if s and g_clock.millis() - s.at < CHAT_FRESH_MS then counts[id] = s.count else missing[#missing + 1] = row.item end
+    end
+  end
+  return counts, missing
+end
+
 -- Called from a "buy supplies" waypoint. Counts what you carry first (closed bags included), then greets the
 -- npc and buys what the supply list is short of - once - and checks what arrived. It never re-plans from a
 -- stale count: that is how it used to buy the same amount several times over.
@@ -271,11 +348,16 @@ local supplyJob
 function RouteSupply.tick()
   local me = g_game.getLocalPlayer()
   if not me then return false end
+  if #RouteSupply.list() == 0 then log('the supply list is empty - nothing to buy') supplyJob = nil return true end
   supplyJob = supplyJob or { count = {}, since = g_clock.millis() }
   local j = supplyJob
   if j.finishing then
     local r = RouteBags.finishStep(j.finishing)
-    if r == true then supplyJob = nil return true end
+    if r == true then
+      if j.stopAfter then RouteBags.stopCavebot(j.stopAfter) end
+      supplyJob = nil
+      return true
+    end
     return r
   end
 
@@ -283,6 +365,23 @@ function RouteSupply.tick()
   if not j.counted then
     if not j.countLogged then
       j.countLogged = true
+      -- the game's own counts first, unless told to open every bag
+      if not RouteSupply.walkMode() then
+        local counts, missing = RouteSupply.chatCounts()
+        if #missing == 0 then
+          j.counted, j.counts, j.fromChat = true, counts, true
+          local parts = {}
+          for _, row in ipairs(RouteSupply.list()) do
+            local id = RouteItems.id(row.item)
+            if id and not row.fullCap then parts[#parts + 1] = ('%dx %s (target %d)'):format(counts[id] or 0, row.item, row.amount or 0) end
+          end
+          log('supplies from the counts the game printed when you used them: ' .. (#parts > 0 and table.concat(parts, ', ') or 'nothing on the list'))
+          return 'retry'
+        end
+        if #missing < #RouteSupply.list() or #missing > 0 then
+          log(('no recent chat count for %s - opening the bags to count'):format(table.concat(missing, ', ')))
+        end
+      end
       log('counting your supplies (closed bags too) before buying')
       -- stop opening bags once every target on the list is met; capacity rows do not depend on the count
       j.count.enough = function(counts)
@@ -332,9 +431,15 @@ function RouteSupply.tick()
     local t = modules.game_npctrade
     local money = (type(t.playerMoney) == 'number' and t.playerMoney > 0) and t.playerMoney or RouteBags.moneyOf(j.counts)
     log(('%d gold to spend, %.0f oz free'):format(money, me:getFreeCapacity()))
-    j.plan = RouteSupply.plan(j.counts, shop, me:getFreeCapacity(), money)
+    j.plan, j.short = RouteSupply.plan(j.counts, shop, me:getFreeCapacity(), money)
+    for _, s in ipairs(j.short) do
+      warn(('%s: short of %d, %s for %d (%s)'):format(s.name, s.want, s.count > 0 and 'room' or 'no room', s.count, s.why))
+    end
     if #j.plan == 0 then
-      log('supplies are already up to the list')
+      if #j.short == 0 then log('supplies are already up to the list') end
+      local capShort = {}
+      for _, s in ipairs(j.short) do if s.why == 'capacity' then capShort[#capShort + 1] = ('%dx %s'):format(s.want - s.count, s.name) end end
+      if #capShort > 0 then j.stopAfter = 'no capacity for supplies: still short of ' .. table.concat(capShort, ', ') end
       modules.game_npctrade.closeNpcTrade()
       j.finishing = {}
       return 'retry'
@@ -376,6 +481,12 @@ function RouteSupply.tick()
     else log(('nothing of %s arrived - out of gold or capacity?'):format(buy.name)) end
   end
   modules.game_npctrade.closeNpcTrade()
+  -- the one reason to stop hunting: no room left for the supplies you are short of
+  local capShort = {}
+  for _, s in ipairs(j.short or {}) do
+    if s.why == 'capacity' then capShort[#capShort + 1] = ('%dx %s'):format(s.want - s.count, s.name) end
+  end
+  if #capShort > 0 then j.stopAfter = 'no capacity for supplies: still short of ' .. table.concat(capShort, ', ') end
   log('done - closing the bags, leaving your backpack open')
   j.finishing = {}
   return 'retry'
@@ -434,6 +545,25 @@ local function lootIds(field)
   end
   return ids
 end
+-- The three backpack kinds of the by-the-backpack deposit, by item id: loot (the bag you carry loot in),
+-- full (the depot bag that collects full loot bags), empty (the depot bag that hands out empty ones), and how
+-- many plain bags a fresh loot bag is filled with.
+function RouteLoot.bags()
+  if not data then load() end
+  local b = data.lootBags or {}
+  return { loot = tonumber(b.loot), full = tonumber(b.full), empty = tonumber(b.empty), setSize = tonumber(b.setSize) or 4,
+           sweep = (b.sweep == true or b.sweep == 'true'),
+           whenOut = (b.whenOut == 'hunt') and 'hunt' or 'stop' }    -- no loot backpack to be had at the depot: stop the cavebot, or hunt on
+end
+
+function RouteLoot.setBags(t)
+  if not data then load() end
+  data.lootBags = { loot = tonumber(t.loot), full = tonumber(t.full), empty = tonumber(t.empty), setSize = tonumber(t.setSize) or 4,
+                    sweep = t.sweep and true or false, whenOut = (t.whenOut == 'hunt') and 'hunt' or 'stop' }
+  persist()
+  return RouteLoot.bags()
+end
+
 function RouteLoot.depositIds() return lootIds('deposit') end
 function RouteLoot.sellIds() return lootIds('sell') end
 -- what must never be sold: anything ticked keep, plus anything meant for the depot (selling it first would

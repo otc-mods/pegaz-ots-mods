@@ -115,7 +115,7 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.4.0",
+   "version": "1.4.1",
    "title": "Bot presets",
    "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying with a choice of how the colours travel - jump, hue ring or pastel fade, and a watch for gamemasters standing in ghost mode that keeps its on/off setting across reloads. The looting panel has Loot manager and Supplies manager buttons that open the waypoint editor's lists when that module is installed. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
@@ -129,12 +129,13 @@
    "package": true
   },
   {
-   "name": "game_route_paint",
+   "name": "game_waypoint_editor",
    "type": "module",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "title": "Waypoint editor",
-   "description": "Edit cavebot routes on the map instead of a list of coordinates: draw the area you hunt to get the walking waypoints, then place use, use with, say, delay, label and function waypoints by hand and edit each one in its own window. One-click jobs for the whole afk loop - deposit loot, take supplies out of the depot, buy supplies, sell loot, open the depot, wait for the fight - driven by a Loot manager (deposit / sell / keep per item, one click loads your autoloot list) and a Supplies manager (how many of each to carry; closed bags are counted before buying, so nothing is bought twice). Depot jobs walk every bag you carry and every bag in the depot, however deeply nested, one window at a time, report what they did and stop the cavebot with a reason rather than lose loot. Bot on/off from the editor, live route line, undo, templates and recipes for hand-written functions. Made for the bot presets; item names come from Autoloot when it is installed.",
-   "requires": []
+   "description": "Edit cavebot routes on the map instead of a list of coordinates: draw the area you hunt to get the walking waypoints, place use, use with, say, delay and function waypoints by hand, and put labels and jumps on any waypoint from its right-click menu. One drawing = one route; right button pans in every mode; Loop end and Snap to stairs shape the loop. One-click jobs for the whole afk loop - Refill check (free capacity, supplies below a percent, loot backpack full), deposit loot by the item or by the whole backpack (three backpack kinds, Build sets tidies the depot chest into complete sets), take supplies out of the depot, buy supplies, sell loot, open the depot, wait for the fight - driven by a Loot manager (deposit / sell / keep per item, one click loads your autoloot list) and a Supplies manager (how many of each to carry; counts come from the game's own 'Using one of N' lines, or from opening the bags). A loot sweep keeps loose loot moving into the loot backpack while you hunt. Every job skips itself when there is nothing to do; the cavebot is stopped only when it cannot go on hunting. Made for the bot presets; item names come from Autoloot when it is installed.",
+   "requires": [],
+   "screenshot": "screenshots/game_waypoint_editor.png"
   },
   {
    "name": "game_hide_topbar",

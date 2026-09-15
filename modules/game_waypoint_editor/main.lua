@@ -19,6 +19,7 @@ local ALPHA = 26          -- the drawing is a tint over the map, not a coat of p
 local PIXEL_BUDGET = 45000
 local STRAY_DISTANCE = 50
 local SNAP_RADIUS = 6
+local FLOOR_CHANGE_COLOUR = 210   -- the minimap's yellow: stairs, ladders, holes, ramps, teleports
 local BLOCKED_COLOUR = { [0] = true, [24] = true, [40] = true, [186] = true, [192] = true, [255] = true }
 
 local minimap, window, toolbar, button, mapButton, closeButton
@@ -63,7 +64,7 @@ local strayCount, movedCount, droppedCount = 0, 0, 0
 -- the toolbar is sized to the panel that is showing; move/select fit their hint, draw fits its rows,
 -- place fits a button per type and per job
 local TOOLBAR_HEIGHT = { move = 132, draw = 224 }
-TOOLBAR_HEIGHT.place = 74 + (#RouteTypes.list + #RouteTypes.quick) * 24 + 22
+TOOLBAR_HEIGHT.place = 74 + (#RouteTypes.placeable + #RouteTypes.quick) * 24 + 22
 local closeMenus, setUiHidden, suppressMap, refreshLive, refreshBotSwitch
 
 local function now() return g_clock.millis() end
@@ -71,9 +72,22 @@ local function now() return g_clock.millis() end
 -- ---------------------------------------------------------------- settings and state
 local function defaults() return { masks = {}, spacing = 12, autoLoad = true, showLive = true } end
 
+local function copyTable(v)
+  if type(v) ~= 'table' then return v end
+  local out = {}
+  for k, x in pairs(v) do out[k] = copyTable(x) end
+  return out
+end
+
 local function load()
   data = g_settings.getNode('routePaint') or defaults()
   data.masks = data.masks or {}
+  -- one drawing = one route: masks[name] is what you are drawing on, saved[name] is what Save wrote with the
+  -- route. Drawings from before this split count as saved.
+  if not data.saved then
+    data.saved = {}
+    for key, m in pairs(data.masks) do if key ~= '(unnamed)' then data.saved[key] = copyTable(m) end end
+  end
   data.spacing = tonumber(data.spacing) or 12
   data.lastRoute = data.lastRoute or ''
   -- auto-load was off by default for a while and that false got persisted without anyone ticking anything;
@@ -91,8 +105,10 @@ local function viewedFloor()
   return p and p.z or 7
 end
 
+local function maskKey(name) return (name ~= '' and name) or '(unnamed)' end
+
 local function maskFor(name, create)
-  local key = (name ~= '' and name) or '(unnamed)'
+  local key = maskKey(name)
   local m = data.masks[key]
   if not m and create then m = { floors = {} } data.masks[key] = m end
   if m then m.floors = m.floors or {} end
@@ -219,7 +235,7 @@ end
 
 local function scheduleRender(soon)
   if renderEvent then return end
-  renderEvent = scheduleEvent(function() renderEvent = nil modules.game_route_paint.render() end, soon and 40 or 110)
+  renderEvent = scheduleEvent(function() renderEvent = nil modules.game_waypoint_editor.render() end, soon and 40 or 110)
 end
 
 local function paintAround(pos, erase)
@@ -292,7 +308,22 @@ local function restack()
   raiseMapControls()
 end
 
+-- everything the editor draws stays off the small minimap unless the option says otherwise
+function drawSuppressed()
+  return not modules.game_minimap.fullmapView and not (data and data.showOnMinimap)
+end
+
+function hideDrawings()
+  for _, m in ipairs(markers) do if not m:isDestroyed() then m:hide() end end
+  for _, c in ipairs(chips) do if not c:isDestroyed() then c:hide() end end
+  if overlay and not overlay:isDestroyed() then overlay:hide() end
+  if lineOverlay and not lineOverlay:isDestroyed() then lineOverlay:hide() end
+  if mapLegend and not mapLegend:isDestroyed() then mapLegend:hide() end
+  if cursorGhost and not cursorGhost:isDestroyed() then cursorGhost:hide() end
+end
+
 function render(force)
+  if drawSuppressed() then hideDrawings() return end
   if not minimap then return end
   local z = viewedFloor()
   local layer = layerFor(z, false)
@@ -420,6 +451,7 @@ function liveSegmentFor(pts, idx)
 end
 
 local function drawRouteLine()
+  if drawSuppressed() then if lineOverlay and not lineOverlay:isDestroyed() then lineOverlay:hide() end return end
   local pts = {}
   local z = viewedFloor()
   for index, entry in ipairs(route) do
@@ -435,7 +467,12 @@ local function drawRouteLine()
   -- meant a different cell size and a different rasterisation.
   local key = routeVersion .. ':' .. z .. ':' .. tostring(liveIndex)
   if key == lineKey and lineOverlay and not lineOverlay:isDestroyed() and lineOverlay:isVisible() then return end
-  lineKey = key
+  -- an image that could not be drawn must not stay on screen as if it were current: hide it and try again
+  -- on the next pass (the key is only taken once the new image is really up)
+  local function stale()
+    lineKey = nil
+    if lineOverlay and not lineOverlay:isDestroyed() then lineOverlay:hide() end
+  end
   local liveFrom, liveTo = liveSegmentFor(pts, liveIndex)
 
   local minX, maxX, minY, maxY = math.huge, -math.huge, math.huge, -math.huge
@@ -446,7 +483,7 @@ local function drawRouteLine()
     if p.y > maxY then maxY = p.y end
   end
   local cols, rows = maxX - minX + 1, maxY - minY + 1
-  if cols * rows > 400000 then return end
+  if cols * rows > 400000 then stale() return end
   local cell = cellFor(cols, rows)
   local lit = {}
   local W = cols * cell
@@ -504,13 +541,14 @@ local function drawRouteLine()
   end)
   renderSeq = renderSeq + 1
   local path = DIR .. '/line' .. renderSeq .. '.png'
-  if not g_resources.writeFileContents(path, png) then return end
+  if not g_resources.writeFileContents(path, png) then stale() return end
   if not lineOverlay or lineOverlay:isDestroyed() then
     lineOverlay = g_ui.createWidget('RpOverlay', minimap)
     lineOverlay:setId('rpLine')
     lineOverlay:setImageSmooth(false)
   end
   lineOverlay:setImageSource(path)
+  lineKey = key
   if lineFile then pcall(function() g_resources.deleteFile(lineFile) end) end
   lineFile = path
   lineBox = { x = minX + math.floor(cols / 2), y = minY + math.floor(rows / 2), z = z, cols = cols, rows = rows }
@@ -621,15 +659,20 @@ end
 -- moving a waypoint to a different place in the order, which is what dropping one onto another means
 function reorderWaypoint(from, to)
   if not route[from] or not route[to] or from == to then return false end
+  if isHidden(route[to]) then to = visibleNeighbour(to, to > from and 1 or -1) or to end
   pushUndo('reordering waypoints')
-  local moved = table.remove(route, from)
-  table.insert(route, to, moved)
-  selected = to
+  local at = moveBlock(from, to)
+  selected = at
   routeVersion = routeVersion + 1
   drawMarkers()
   refreshSeq()
-  info(('moved waypoint %d to position %d'):format(from, to))
+  info(('moved waypoint %d to position %d'):format(shownNumber(from), shownNumber(at)))
   return true
+end
+
+-- "7 G" fits the 32 px box, "122 BS" does not: the box grows with its text
+local function fitMarker(w)
+  w:setWidth(math.max(32, w:getTextSize().width + 8))
 end
 
 local function markerAt(mousePos)
@@ -645,6 +688,71 @@ end
 -- The five types that carry no position of their own (label, go to label, delay, say, function) used to be
 -- invisible on the map. They run between two goto waypoints, so they are drawn as small chips hanging off
 -- the waypoint before them - several in a row when a block of them sits at the same point.
+-- Labels and jumps are shown on real waypoints: a label tags the waypoint it lands on (the next visible row),
+-- a jump hangs off the waypoint it follows (the previous visible row). Rows for them are not shown, and the
+-- numbers you see count only visible rows.
+local isHidden = RouteTypes.hidden
+
+local function flavourOf(index)
+  local tags, jumps = {}, {}
+  local i = index - 1
+  while i >= 1 and isHidden(route[i]) do
+    if route[i].action == 'label' then table.insert(tags, 1, tostring(route[i].value)) end
+    i = i - 1
+  end
+  i = index + 1
+  while i <= #route and isHidden(route[i]) do
+    if route[i].action == 'gotolabel' then jumps[#jumps + 1] = tostring(route[i].value) end
+    i = i + 1
+  end
+  return tags, jumps
+end
+
+local function flavourText(index)
+  local tags, jumps = flavourOf(index)
+  local s = ''
+  if #tags > 0 then s = s .. ('  [label %s]'):format(table.concat(tags, ', ')) end
+  if #jumps > 0 then s = s .. ('  -> jump to %s'):format(table.concat(jumps, ', ')) end
+  return s
+end
+
+function shownNumber(index)
+  local n = 0
+  for i = 1, math.min(index, #route) do if not isHidden(route[i]) then n = n + 1 end end
+  return n
+end
+
+-- the labels right before a row and the jumps right after it move with it
+local function blockRange(index)
+  local s, e = index, index
+  while s > 1 and route[s - 1].action == 'label' do s = s - 1 end
+  while e < #route and route[e + 1].action == 'gotolabel' do e = e + 1 end
+  return s, e
+end
+
+local function visibleNeighbour(index, dir)
+  local i = index + dir
+  while i >= 1 and i <= #route do
+    if not isHidden(route[i]) then return i end
+    i = i + dir
+  end
+  return nil
+end
+
+-- move the block of `from` next to the block of `to`: before it when moving up, after it when moving down.
+-- Returns the new index of the moved row.
+local function moveBlock(from, to)
+  local fs, fe = blockRange(from)
+  local block = {}
+  for i = fs, fe do block[#block + 1] = route[i] end
+  for i = fe, fs, -1 do table.remove(route, i) end
+  local shift = (to > fe) and (fe - fs + 1) or 0
+  local ts, te = blockRange(to - shift)
+  local at = (from < to) and (te + 1) or ts
+  for k, e in ipairs(block) do table.insert(route, at + k - 1, e) end
+  return at + (from - fs)
+end
+
 local function drawChips(z)
   -- Each flat waypoint hangs off the positioned one before it; the ones that open a route (a label, usually)
   -- have nothing before them, so they borrow the first position that comes after instead. Slots are counted
@@ -663,7 +771,7 @@ local function drawChips(z)
   local used, taken = 0, {}
   for index, entry in ipairs(route) do
     local anchor = anchors[index]
-    if anchor and anchor.z == z then
+    if anchor and anchor.z == z and not isHidden(entry) then
       local key = anchor.x .. ',' .. anchor.y
       taken[key] = (taken[key] or 0) + 1
       local slot = taken[key]
@@ -717,9 +825,8 @@ local function drawChips(z)
           if not pos or not entry2 then info('dropped outside the map - nothing moved') return true end
           pushUndo('moving a waypoint')
           entry2._pin = { x = pos.x, y = pos.y, z = pos.z }
-          -- a job carries its tile in its script: move that with it
-          local q = RouteTypes.quickOf(entry2)
-          if q then entry2.value = RouteTypes.quickBody(q, pos) end
+          -- a job carries its tile in its script: only that line moves, edited parameters stay
+          entry2.value = RouteTypes.withPosition(entry2, pos)
           routeVersion = routeVersion + 1
           drawMarkers()
           refreshSeq()
@@ -730,7 +837,9 @@ local function drawChips(z)
       local stamp = ('%s:%d:%d:%d:%s'):format(entry.action, anchor.x, anchor.y, slot, tostring(index == selected))
       if c.stamp ~= stamp then
         c.stamp = stamp
-        c.face:setText(('%d %s'):format(index, t and t.glyph or '?'))
+        c.face:setText(('%d %s'):format(shownNumber(index), t and t.glyph or '?'))
+        fitMarker(c.face)
+        c.face:setTooltip(RouteTypes.describe(entry) .. flavourText(index))
         c.face:setBackgroundColor(t and t.colour or '#ffffff')
         c.face:setBorderColor(index == selected and '#ffffff' or '#101010')
         c.face.liveOn = nil
@@ -751,6 +860,7 @@ local function drawChips(z)
 end
 
 function drawMarkers()
+  if drawSuppressed() then hideDrawings() return end
   local z = viewedFloor()
   local used = 0
   for index, entry in ipairs(route) do
@@ -817,11 +927,15 @@ function drawMarkers()
           return true
         end
       end
-      local stamp = ('%s:%d:%d:%s'):format(entry.action, p.x, p.y, tostring(index == selected))
+      -- the index is part of the stamp: inserting a label above a goto changes its number but not its tile
+      local flavour = flavourText(index)
+      local stamp = ('%d:%s:%d:%d:%s:%s'):format(index, entry.action, p.x, p.y, tostring(index == selected), flavour)
       if m.stamp ~= stamp then
         m.stamp = stamp
         m.index = index
-        m:setText(('%d %s'):format(index, t and t.glyph or '?'))
+        m:setText(('%d %s'):format(shownNumber(index), t and t.glyph or '?'))
+        fitMarker(m)
+        m:setTooltip(RouteTypes.describe(entry) .. flavour)
         m:setBackgroundColor(t and t.colour or '#ffffff')
         m:setBorderColor(index == selected and '#ffffff' or '#101010')
         minimap:centerInPosition(m, p)
@@ -875,7 +989,12 @@ end
 
 -- ---------------------------------------------------------------- the sequence list
 function info(text)
-  if window and window:isVisible() then window.infoLabel:setText(text) end
+  if window and window:isVisible() then window.infoLabel:setText(text) window.infoLabel:setColor('#c8c8c8') end
+end
+
+-- a refusal: same line, in red, so "it did nothing" always says why
+function warn(text)
+  if window and window:isVisible() then window.infoLabel:setText(text) window.infoLabel:setColor('#ff6b6b') end
 end
 
 local seqDrag
@@ -884,6 +1003,29 @@ local function seqRowAt(mousePos)
     if r and not r:isDestroyed() and r:isVisible() and r:containsPoint(mousePos) then return r.index or i end
   end
   return nil
+end
+
+-- The gotos around a waypoint are a cycle, so making one of them the last is a rotation of that block: the
+-- path stays the same, only where the loop "ends" changes - which is where the refill check belongs.
+function makeLoopEnd(index)
+  local entry = route[index]
+  if not entry or entry.action ~= 'goto' then warn('select a Go to inside the hunt loop first') return end
+  local first, last = index, index
+  while first > 1 and route[first - 1].action == 'goto' do first = first - 1 end
+  while last < #route and route[last + 1].action == 'goto' do last = last + 1 end
+  if index == last then info('this Go to is already the last of its block') return end
+  pushUndo('rotating the loop')
+  local block = {}
+  for i = index + 1, last do block[#block + 1] = route[i] end
+  for i = first, index do block[#block + 1] = route[i] end
+  for k, e in ipairs(block) do route[first + k - 1] = e end
+  selected = last
+  routeVersion = routeVersion + 1
+  drawMarkers()
+  refreshSeq()
+  local p = RouteTypes.positionOf(entry)
+  info(('the loop now ends at %s (waypoint %d) - %d gotos rotated, their order kept; put the Refill check right after it')
+    :format(p and (p.x .. ',' .. p.y) or '?', last, last - first + 1))
 end
 
 function refreshSeq()
@@ -920,22 +1062,32 @@ function refreshSeq()
       end
     end
     local live = (index == liveIndex)
-    local text = ('%d. %s'):format(index, RouteTypes.describe(entry))
-    local stamp = text .. (live and '|live' or '')
+    if isHidden(entry) then
+      row:hide()
+      row.index = index
+      row.stamp = nil
+    else
+    -- a waypoint with no position of its own runs wherever the one above leaves you: shown indented under it
+    local attached = RouteTypes.positionOf(entry) == nil
+    local text = ('%d. %s%s'):format(shownNumber(index), RouteTypes.describe(entry), flavourText(index))
+    local stamp = text .. (live and '|live' or '') .. (attached and '|attached' or '')
     if row.stamp ~= stamp then
       row.stamp = stamp
       row.dot:setText(t and t.glyph or '?')
       row.dot:setBackgroundColor(t and t.colour or '#888888')
+      row.dot:setMarginLeft(attached and 20 or 2)
       row.text:setText((live and '> ' or '') .. text)
-      row.text:setColor(live and '#ffffff' or '#d8d8d8')
+      row.text:setColor(live and '#ffffff' or (attached and '#b8b8b8' or '#d8d8d8'))
       row.dot:setBorderWidth(live and 1 or 0)
       row.dot:setBorderColor('#ffffff')
+      row:setTooltip(attached and 'No position of its own: it runs where the waypoint above leaves you. Put a Go to before it to run it somewhere specific.' or '')
     end
     if not row:isVisible() then row:show() end
     row.index = index
     if index == selected then
       row:focus()
       pcall(function() window.seqList:ensureChildVisible(row) end)   -- a selection you cannot see is no help
+    end
     end
   end
   for i = #route + 1, #seqRows do
@@ -1033,11 +1185,12 @@ function refreshLegend()
 end
 
 function selectIndex(index)
+  if route[index] and isHidden(route[index]) then index = visibleNeighbour(index, 1) or visibleNeighbour(index, -1) end
   selected = index
   local entry = route[index]
   if entry then
     local p = RouteTypes.positionOf(entry)
-    info(('%d. %s%s'):format(index, RouteTypes.describe(entry),
+    info(('%d. %s%s%s'):format(shownNumber(index), RouteTypes.describe(entry), flavourText(index),
       p and '' or '   (no position - it runs in order)'))
   end
   drawMarkers()
@@ -1119,18 +1272,31 @@ function openEditor(index)
     -- waypoint there.
     if t.spatial then
       local snap = g_ui.createWidget('RpSmall', w)
-      snap:setText('Snap to item')
+      snap:setText('Snap to stairs')
       snap:setWidth(96)
       snap:addAnchor(AnchorBottom, 'parent', AnchorBottom)
       snap:addAnchor(AnchorLeft, 'extraButton', AnchorRight)
       snap:setMarginLeft(6)
-      snap:setTooltip('Search three squares around this position for something usable (a rope spot, a hole, a ladder) and move the waypoint onto that exact tile. It changes the position now - the bot does not search while it runs.')
+      snap:setTooltip('Move the waypoint onto the nearest floor change within three squares: the yellow tiles of the minimap (stairs, ladder, hole, ramp, teleport) anywhere on the map, or a usable item on a tile near you. It changes the position now - the bot does not search while it runs.')
       snap.onClick = function()
         local value = w.valueEdit:getText()
         local px, py, pz = tostring(value):match('(-?%d+),%s*(-?%d+),%s*(-?%d+)%s*$')
         if not px then info('this waypoint has no x,y,z to search around') return end
         local base = { x = tonumber(px), y = tonumber(py), z = tonumber(pz) }
         local found, foundName
+        -- first the minimap: a floor change is yellow, and the minimap is known for the whole explored map
+        for r = 0, 3 do
+          for dx = -r, r do
+            for dy = -r, r do
+              if math.max(math.abs(dx), math.abs(dy)) == r and not found then
+                local q = { x = base.x + dx, y = base.y + dy, z = base.z }
+                if g_map.getMinimapColor(q) == FLOOR_CHANGE_COLOUR then found, foundName = q, 'a floor change (yellow on the minimap)' end
+              end
+            end
+          end
+          if found then break end
+        end
+        -- then real tiles, which the client only has around you: anything usable
         for r = 0, 3 do
           for dx = -r, r do
             for dy = -r, r do
@@ -1142,7 +1308,7 @@ function openEditor(index)
                       local ok, usable = pcall(function() return thing:isUsable() end)
                       if ok and usable then
                         found = { x = base.x + dx, y = base.y + dy, z = base.z }
-                        foundName = thing:getId()
+                        foundName = 'item ' .. thing:getId()
                       end
                     end
                   end
@@ -1152,11 +1318,11 @@ function openEditor(index)
           end
           if found then break end
         end
-        if not found then info('nothing usable within three squares - the waypoint was left where it was') return end
+        if not found then warn('no floor change (yellow on the minimap) and nothing usable within three squares - the waypoint was left where it was') return end
         local entry2 = route[index]
         local newValue = RouteTypes.withPosition(entry2, found)
         w.valueEdit:setText(newValue)
-        info(('found item %s at %d,%d,%d - press OK to keep it'):format(tostring(foundName), found.x, found.y, found.z))
+        info(('found %s at %d,%d,%d - press OK to keep it'):format(tostring(foundName), found.x, found.y, found.z))
       end
     end
   end
@@ -1254,6 +1420,50 @@ function openLootWindow()
   end
   for _, entry in ipairs(RouteLoot.list()) do addRow(entry) end
   if #rows == 0 then for _ = 1, 3 do addRow(nil) end end
+  -- the three backpack kinds of the by-the-backpack deposit
+  local bags = RouteLoot.bags()
+  local bagRows = { { row = w.bagLoot, key = 'loot', label = 'loot bag (top of main bp)' },
+                    { row = w.bagFull, key = 'full', label = 'full-loot storage (chest)' },
+                    { row = w.bagEmpty, key = 'empty', label = 'empty-set storage (chest)' } }
+  for _, br in ipairs(bagRows) do
+    br.row.label:setText(br.label)
+    local function showIcon(text)
+      local id = RouteItems.id(text)
+      br.row.icon:setItemId((id and id > 100) and id or 0)
+    end
+    br.row.itemEdit.onTextChange = function(widget, text) showIcon(text) end
+    br.row.itemEdit:setText(bags[br.key] and RouteItems.name(bags[br.key]) or '')
+    showIcon(br.row.itemEdit:getText())
+  end
+  w.bagsTools.setSizeEdit:setText(tostring(bags.setSize or 4))
+  w.sweepBox:setChecked(bags.sweep and true or false)
+  w.stopBox:setChecked(bags.whenOut ~= 'hunt')
+  local function bagsFromUi()
+    return { loot = RouteItems.id(w.bagLoot.itemEdit:getText()), full = RouteItems.id(w.bagFull.itemEdit:getText()),
+             empty = RouteItems.id(w.bagEmpty.itemEdit:getText()), setSize = tonumber(w.bagsTools.setSizeEdit:getText()) or 4,
+             sweep = w.sweepBox:isChecked(), whenOut = w.stopBox:isChecked() and 'stop' or 'hunt' }
+  end
+  w.stopBox.onCheckChange = function(widget, checked)
+    RouteLoot.setBags(bagsFromUi())
+    info(checked and 'no loot backpack to be had at the depot: the cavebot is stopped'
+                  or 'no loot backpack to be had at the depot: hunting goes on without one')
+  end
+  w.sweepBox.onCheckChange = function(widget, checked)
+    RouteLoot.setBags(bagsFromUi())
+    RouteDepot.setHuntSweep(checked)
+    info(checked and 'loot sweep on: loose loot in the main backpack goes into the loot bag every few seconds'
+                  or 'loot sweep off')
+  end
+  w.bagsTools.setupButton.onClick = function()
+    RouteLoot.setBags(bagsFromUi())
+    info('building loot sets at the depot - the server log says what happens')
+    RouteDepot.runSetup()
+  end
+  w.bagsTools.swapButton.onClick = function()
+    RouteLoot.setBags(bagsFromUi())
+    info('dropping the loot backpack off at the depot - the server log says what happens')
+    RouteDepot.runSwap()
+  end
   w.addButton.onClick = function()
     local r = addRow(nil)
     pcall(function() w.lootList:ensureChildVisible(r) end)
@@ -1316,6 +1526,7 @@ function openLootWindow()
       if not RouteItems.id(row.item) then bad[#bad + 1] = row.item end
     end
     local saved = RouteLoot.set(list)
+    RouteLoot.setBags(bagsFromUi())
     w:destroy()
     if #bad > 0 then
       info(('loot saved, but these names are not recognised and were ignored: %s'):format(table.concat(bad, ', ')))
@@ -1336,6 +1547,11 @@ function openSupplyWindow()
   if old then old:destroy() end
   local w = g_ui.createWidget('RpSupplyWindow', g_ui.getRootWidget())
   local rows = {}
+  w.walkBox:setChecked(RouteSupply.walkMode())
+  w.walkBox.onCheckChange = function(widget, checked)
+    RouteSupply.setWalkMode(checked)
+    info(checked and 'Buy supplies will open every bag to count' or 'Buy supplies trusts the counts the game prints; bags are opened only for items it has not seen you use')
+  end
 
   local function addRow(entry)
     local r = g_ui.createWidget('RpSupplyRow', w.supplyList)
@@ -1463,7 +1679,7 @@ function addWaypoint(action, pos, openIt)
   drawMarkers()
   refreshSeq()
   local t = quick or RouteTypes.get(action)
-  info(('added %s as waypoint %d'):format(t and t.title or action, where))
+  info(('added %s as waypoint %d'):format(t and t.title or action, shownNumber(where)))
   if openIt then openEditor(where) end
   return where
 end
@@ -1476,7 +1692,7 @@ function removeWaypoint(index)
   routeVersion = routeVersion + 1
   drawMarkers()
   refreshSeq()
-  info(('removed waypoint %d'):format(index))
+  info(('removed waypoint %d'):format(shownNumber(index)))
 end
 
 -- ---------------------------------------------------------------- the right click menu
@@ -1538,19 +1754,55 @@ function showMenu(mousePos, index)
       selectIndex(index + 1)
     end)
     row('Move up', nil, function()
-      if index > 1 then
-        route[index], route[index - 1] = route[index - 1], route[index]
-        routeVersion = routeVersion + 1
-        selectIndex(index - 1)
-      end
+      local prev = visibleNeighbour(index, -1)
+      if prev then pushUndo('moving a waypoint up') local at = moveBlock(index, prev) routeVersion = routeVersion + 1 selectIndex(at) end
     end)
     row('Move down', nil, function()
-      if index < #route then
-        route[index], route[index + 1] = route[index + 1], route[index]
+      local nxt = visibleNeighbour(index, 1)
+      if nxt then pushUndo('moving a waypoint down') local at = moveBlock(index, nxt) routeVersion = routeVersion + 1 selectIndex(at) end
+    end)
+    if entry.action == 'goto' then row('Make this the loop end', nil, function() makeLoopEnd(index) end) end
+    -- labels and jumps live on the waypoint: a label lands here, a jump leaves from here
+    local tags, jumps = flavourOf(index)
+    if #tags == 0 then
+      row('Label this waypoint...', '#ffff55', function()
+        pushUndo('labelling a waypoint')
+        table.insert(route, index, { action = 'label', value = 'hunt' })
         routeVersion = routeVersion + 1
         selectIndex(index + 1)
-      end
-    end)
+        openEditor(index)
+      end)
+    else
+      row(('Remove label %s'):format(table.concat(tags, ', ')), '#ffff55', function()
+        pushUndo('removing a label')
+        local i = index - 1
+        while i >= 1 and isHidden(route[i]) do
+          if route[i].action == 'label' then table.remove(route, i) index = index - 1 end
+          i = i - 1
+        end
+        routeVersion = routeVersion + 1
+        selectIndex(index)
+      end)
+    end
+    if #jumps == 0 then
+      row('After this, jump to label...', '#ffe14d', function()
+        pushUndo('adding a jump')
+        table.insert(route, index + 1, { action = 'gotolabel', value = 'hunt' })
+        routeVersion = routeVersion + 1
+        selectIndex(index)
+        openEditor(index + 1)
+      end)
+    else
+      row(('Remove jump to %s'):format(table.concat(jumps, ', ')), '#ffe14d', function()
+        pushUndo('removing a jump')
+        local i = index + 1
+        while i <= #route and isHidden(route[i]) do
+          if route[i].action == 'gotolabel' then table.remove(route, i) else i = i + 1 end
+        end
+        routeVersion = routeVersion + 1
+        selectIndex(index)
+      end)
+    end
     row('Change type...', nil, function()
       closeMenus()
       local sub = g_ui.createWidget('RpMenu', g_ui.getRootWidget())
@@ -1610,7 +1862,7 @@ function showMenu(mousePos, index)
     if not pos then menu:destroy() return end
     local head = row(('Add here  (%d,%d,%d)'):format(pos.x, pos.y, pos.z), '#cccccc', function() end)
     if head then head:setEnabled(false) end
-    for _, t in ipairs(RouteTypes.list) do
+    for _, t in ipairs(RouteTypes.placeable) do
       row(t.title, t.colour, function() addWaypoint(t.id, pos, false) end)
     end
     local sep = row('one click jobs', '#9a9a9a', function() end)
@@ -1837,7 +2089,7 @@ function schedulePreview()
     if not (data.livePreview and mode == 'draw' and window and window:isVisible() and not uiHidden) then return end
     local sampled = sampleWaypoints()
     if #sampled > previewCap then
-      info(('that drawing would make %d waypoints - too many to preview while you draw, press Generate goto when you are done')
+      warn(('that drawing would make %d waypoints - too many to preview while you draw, press Generate goto when you are done')
         :format(#sampled))
       return
     end
@@ -1850,14 +2102,14 @@ function generateGotos(quiet)
   -- spacing 1 on a big drawing means one waypoint per tile: thousands of markers, a huge cfg, and a route
   -- no cavebot should walk. Say so instead of building it.
   if #sampled > MAX_GENERATED then
-    info(('that drawing at one waypoint per %d squares would make %d waypoints - raise the spacing')
+    warn(('that drawing at one waypoint per %d squares would make %d waypoints - raise the spacing')
       :format(data.spacing, #sampled))
     return 0
   end
   local pts = orderRoute(sampled)
   if #pts > 0 and not quiet then pushUndo('generating goto waypoints') end
   if #pts == 0 then
-    info('nothing painted on this floor yet - press Draw in the map toolbar, then drag over the map')
+    warn('nothing painted on this floor yet - press Draw in the map toolbar, then drag over the map')
     return 0
   end
   local z = viewedFloor()
@@ -1890,19 +2142,39 @@ function generateGotos(quiet)
 end
 
 -- ---------------------------------------------------------------- load and save
+-- one drawing = one route: starting over drops the open route's unsaved strokes and the unnamed scratch drawing
+function newRoute()
+  pushUndo('starting a new route')
+  data.masks[maskKey(routeName)] = nil
+  data.masks['(unnamed)'] = nil
+  route, routeTail, selected = {}, {}, nil
+  tailFrom = nil
+  routeName = ''
+  if window then window.nameEdit:setText('') end     -- an empty name, so Save cannot quietly hit the route you loaded
+  routeVersion = routeVersion + 1
+  layerVersion = layerVersion + 1
+  persist()
+  render(true)
+  drawMarkers() refreshSeq()
+  info('empty route - name it, draw an area and press Generate goto, or place waypoints by hand')
+end
+
 function loadRoute(name)
   local dir, cfg = routeDir()
-  if not dir then info('no bot config selected') return false end
+  if not dir then warn('no bot config selected') return false end
   local path = dir .. '/' .. name .. '.cfg'
-  if not g_resources.fileExists(path) then info('no route called "' .. name .. '"') return false end
+  if not g_resources.fileExists(path) then warn('no route called "' .. name .. '"') return false end
   local list = RouteCfg.parse(g_resources.readFileContents(path))
   if list.unterminated then
-    info(('"%s" has a %s waypoint whose [[ block is never closed - fix the file before editing it here')
+    warn(('"%s" has a %s waypoint whose [[ block is never closed - fix the file before editing it here')
       :format(name, list.unterminated))
     return false
   end
   route, routeTail = RouteCfg.split(list)
   tailFrom = name
+  if maskKey(routeName) ~= maskKey(name) then data.masks[maskKey(routeName)] = nil end   -- unsaved strokes go
+  data.masks['(unnamed)'] = nil
+  data.masks[maskKey(name)] = copyTable(data.saved[maskKey(name)])
   routeName = name
   data.lastRoute = name
   selected = nil
@@ -1930,10 +2202,10 @@ end
 
 function saveRoute(name)
   name = name or routeName
-  if not name or name == '' then info('give the route a name first') return false end
+  if not name or name == '' then warn('give the route a name first') return false end
   local dir, cfg = routeDir()
-  if not dir then info('no bot config selected') return false end
-  if #route == 0 then info('nothing to save - draw an area and press Generate goto, or place waypoints') return false end
+  if not dir then warn('no bot config selected') return false end
+  if #route == 0 then warn('nothing to save - draw an area and press Generate goto, or place waypoints') return false end
   pcall(function() g_resources.makeDir(dir) end)
   local path = dir .. '/' .. name .. '.cfg'
   -- An existing route keeps its own cavebot settings and supply/depositer data. The cached tail belongs to
@@ -1951,16 +2223,29 @@ function saveRoute(name)
   end
   local bad, entry = RouteCfg.unwritable(route)
   if bad then
-    info(('waypoint %d (%s) has a line of just ]] in it - the cavebot could not read that file back, so nothing was saved')
+    warn(('waypoint %d (%s) has a line of just ]] in it - the cavebot could not read that file back, so nothing was saved')
       :format(bad, entry.action))
     return false
+  end
+  -- a route written before the rename: its function waypoints move to the new module name as it is saved
+  for _, e in ipairs(route) do
+    if type(e.value) == 'string' and e.value:find('modules.game_route_paint', 1, true) then
+      e.value = e.value:gsub('modules%.game_route_paint', 'modules.game_waypoint_editor')
+    end
   end
   local text = RouteCfg.serialise(RouteCfg.join(route, routeTail))
   if not g_resources.writeFileContents(path, text) then
     -- the client refuses a name holding / \ : * ? " < > | and returns false rather than raising
-    info(('could not write "%s" - a route name cannot contain / \\ : * ? " < > or |'):format(name))
+    warn(('could not write "%s" - a route name cannot contain / \\ : * ? " < > or |'):format(name))
     return false
   end
+  local from, to = maskKey(routeName), maskKey(name)
+  if from ~= to then
+    data.masks[to] = data.masks[from]
+    data.masks[from] = nil
+    layerVersion = layerVersion + 1
+  end
+  data.saved[to] = copyTable(data.masks[to])
   routeName = name
   data.lastRoute = name
   persist()
@@ -1991,7 +2276,7 @@ local function overUI(mousePos)
   local function hit(w)
     return w and not w:isDestroyed() and w:isVisible() and w:containsPoint(mousePos)
   end
-  if hit(toolbar) or hit(openMenu) or hit(window) or hit(mapButton) then return true end
+  if hit(toolbar) or hit(openMenu) or hit(window) or hit(mapButton) or hit(closeButton) then return true end
   for _, c in ipairs(g_ui.getRootWidget():getChildren()) do
     local id = c:getId()
     if (id == 'rpMenu' or id == 'rpValueWindow' or id == 'rpSupplyWindow' or id == 'rpLootWindow') and hit(c) then return true end
@@ -2002,6 +2287,11 @@ end
 -- clicking any of our buttons arms this, so the press that follows cannot fall through to the map
 function suppressMap() suppressMapUntil = now() + 150 end
 
+-- The right button does two things in every mode: a click opens the menu, a press-and-drag pans the map (the
+-- left button is busy painting or placing in Draw and Place). The menu therefore opens on release, and only
+-- when the pointer did not move.
+local rightDrag
+
 local function handleMapPress(widget, mousePos, mouseButton)
   if uiHidden then return false end
   if openMenu and not openMenu:isDestroyed() then closeMenus() return true end   -- belt and braces
@@ -2009,7 +2299,7 @@ local function handleMapPress(widget, mousePos, mouseButton)
   local pos = minimap:getTilePosition(mousePos)
   if mouseButton == MouseRightButton then
     if markerAt(mousePos) then return false end        -- the marker handles its own menu
-    showMenu(mousePos, nil)
+    rightDrag = { start = mousePos, last = mousePos, moved = false, ax = 0, ay = 0 }
     return true
   end
   if pickingFor then
@@ -2038,6 +2328,7 @@ local function handleMapPress(widget, mousePos, mouseButton)
   end
   if mode == 'draw' and recording and not dragging then
     paintAround(pos)
+    dirty = false persist()
     return true
   end
   -- Draw and Place take the click. Letting it through would send the character walking across the map
@@ -2088,8 +2379,37 @@ function installHooks()
     minimap.onMousePress, minimap.onDragEnter, minimap.onDragMove, minimap.onDragLeave
   hooks.move = minimap.onMouseMove
   minimap.onMouseMove = function(widget, mousePos, moved)
+    if rightDrag then
+      local d = rightDrag
+      local dx, dy = mousePos.x - d.last.x, mousePos.y - d.last.y
+      d.last = mousePos
+      if math.abs(mousePos.x - d.start.x) + math.abs(mousePos.y - d.start.y) > 4 then d.moved = true end
+      if d.moved then
+        -- pixels dragged become tiles of camera movement; the remainder is kept so slow drags still move
+        local scale = minimap:getScale() or 1
+        d.ax, d.ay = d.ax - dx / scale, d.ay - dy / scale
+        local tx = d.ax >= 0 and math.floor(d.ax) or math.ceil(d.ax)
+        local ty = d.ay >= 0 and math.floor(d.ay) or math.ceil(d.ay)
+        if tx ~= 0 or ty ~= 0 then
+          local cam = minimap:getCameraPosition()
+          minimap:setCameraPosition({ x = cam.x + tx, y = cam.y + ty, z = cam.z })
+          d.ax, d.ay = d.ax - tx, d.ay - ty
+        end
+      end
+      return true
+    end
     updateCursor(mousePos)
     return hooks.move and hooks.move(widget, mousePos, moved) or false
+  end
+  hooks.release = minimap.onMouseRelease
+  minimap.onMouseRelease = function(widget, mousePos, mouseButton)
+    if mouseButton == MouseRightButton and rightDrag then
+      local d = rightDrag
+      rightDrag = nil
+      if not d.moved and not uiHidden then showMenu(mousePos, nil) end
+      return true
+    end
+    return hooks.release and hooks.release(widget, mousePos, mouseButton) or false
   end
 
   minimap.onMousePress = function(widget, mousePos, mouseButton)
@@ -2109,7 +2429,8 @@ function installHooks()
   end
   minimap.onDragLeave = function(widget, dropped, mousePos)
     if mode == 'draw' and recording then
-      modules.game_route_paint.render(true)
+      modules.game_waypoint_editor.render(true)
+      dirty = false persist()
       return true
     end
     return hooks.dragLeave and hooks.dragLeave(widget, dropped, mousePos) or false
@@ -2125,6 +2446,7 @@ local function removeHooks()
   minimap.onMousePress, minimap.onDragEnter, minimap.onDragMove, minimap.onDragLeave =
     hooks.press, hooks.dragEnter, hooks.dragMove, hooks.dragLeave
   minimap.onMouseMove = hooks.move
+  minimap.onMouseRelease = hooks.release
   if cursorGhost and not cursorGhost:isDestroyed() then cursorGhost:destroy() cursorGhost = nil end
   hooks.installed = false
 end
@@ -2302,7 +2624,7 @@ function buildToolbar()
   place:addAnchor(AnchorBottom, 'parent', AnchorBottom)
   toolbar.placePanel = place
   typeButtons = {}
-  for i, t in ipairs(RouteTypes.list) do
+  for i, t in ipairs(RouteTypes.placeable) do
     local b = g_ui.createWidget('RpTypeButton', place)
     b:setText(' ' .. t.glyph .. '   ' .. t.title)
     b:addAnchor(AnchorTop, 'parent', AnchorTop)
@@ -2322,14 +2644,14 @@ function buildToolbar()
   head:addAnchor(AnchorTop, 'parent', AnchorTop)
   head:addAnchor(AnchorLeft, 'parent', AnchorLeft)
   head:addAnchor(AnchorRight, 'parent', AnchorRight)
-  head:setMarginTop(#RouteTypes.list * 24 + 4)
+  head:setMarginTop(#RouteTypes.placeable * 24 + 4)
   for i, q in ipairs(RouteTypes.quick) do
     local b = g_ui.createWidget('RpTypeButton', place)
     b:setText(' ' .. q.glyph .. '   ' .. q.title)
     b:addAnchor(AnchorTop, 'parent', AnchorTop)
     b:addAnchor(AnchorLeft, 'parent', AnchorLeft)
     b:addAnchor(AnchorRight, 'parent', AnchorRight)
-    b:setMarginTop(#RouteTypes.list * 24 + 20 + (i - 1) * 24)
+    b:setMarginTop(#RouteTypes.placeable * 24 + 20 + (i - 1) * 24)
     b.type = q.id
     b.colour = q.colour
     b:setTooltip('Drops a function waypoint with this job already written in it')
@@ -2466,7 +2788,7 @@ local function buildPanel()
   small(window.routeRow, 'Running', 'Load the route the cavebot is set to right now.', function()
     suppressMap()
     local name = botRouteName()
-    if not name or name == '' then info('the cavebot has no route selected') return end
+    if not name or name == '' then warn('the cavebot has no route selected') return end
     if name == routeName then info(('"%s" is already open'):format(name)) return end
     loadRoute(name)
   end, 70)
@@ -2492,7 +2814,7 @@ local function buildPanel()
       local exists = dir and name ~= '' and g_resources.fileExists(dir .. '/' .. name .. '.cfg')
       if exists and name ~= routeName and not (saveArmedName == name and g_clock.millis() - saveArmed < 3000) then
         saveArmed, saveArmedName = g_clock.millis(), name
-        info(('"%s" already exists and is not the route you loaded - press Save again to overwrite it'):format(name))
+        warn(('"%s" already exists and is not the route you loaded - press Save again to overwrite it'):format(name))
         return
       end
       saveArmed, saveArmedName = 0, nil
@@ -2502,26 +2824,18 @@ local function buildPanel()
     function()
       local name = window.nameEdit:getText()
       local dir = routeDir()
-      if not dir then info('no bot config selected') return end
-      if name == '' then info('type a name for the new route first') return end
+      if not dir then warn('no bot config selected') return end
+      if name == '' then warn('type a name for the new route first') return end
       if g_resources.fileExists(dir .. '/' .. name .. '.cfg') then
-        info(('"%s" already exists - change the name, or press Save to overwrite it'):format(name))
+        warn(('"%s" already exists - change the name, or press Save to overwrite it'):format(name))
         return
       end
       routeTail, tailFrom = {}, name
       saveRoute(name)
     end, 76)
   local newArmed = 0
-  arm(window.routeRow, 'New', 'Start an empty route.', 'this throws away every waypoint you have open', function()
-    pushUndo('starting a new route')
-    route, routeTail, selected = {}, {}, nil
-    tailFrom = nil
-    routeName = ''
-    window.nameEdit:setText('')          -- an empty name, so Save cannot quietly hit the route you loaded
-    routeVersion = routeVersion + 1
-    drawMarkers() refreshSeq()
-    info('empty route - name it, draw an area and press Generate goto, or place waypoints by hand')
-  end, 56)
+  arm(window.routeRow, 'New', 'Start an empty route.', 'this throws away every waypoint and the drawing you have open',
+      function() newRoute() end, 56)
 
   spacingButtons = {}
   for _, n in ipairs(SPACINGS) do
@@ -2562,14 +2876,30 @@ local function buildPanel()
           closeMenus()
           pushUndo('inserting ' .. recipe.title)
           local at = (selected or #route) + 1
-          for i, e in ipairs(recipe.entries) do
-            insertAt(at + i - 1, e.action, e.value, true)
+          local me = g_game.getLocalPlayer()
+          local here = (me and me:getPosition()) or { x = 0, y = 0, z = viewedFloor() }
+          local placed, quicks = 0, 0
+          for _, e in ipairs(recipe.entries) do
+            local action, value = e.action, e.value
+            if e.quick then
+              local q = RouteTypes.quickGet(e.quick)
+              action, value = 'function', RouteTypes.quickBody(q, here)
+              quicks = quicks + 1
+            end
+            if e.first then
+              insertAt(1, action, value, true)
+              at = at + 1
+            else
+              insertAt(at + placed, action, value, true)
+              placed = placed + 1
+            end
           end
           selected = at
           routeVersion = routeVersion + 1
           drawMarkers()
           refreshSeq()
-          info(('inserted "%s" - %d waypoints at position %d'):format(recipe.title, #recipe.entries, at))
+          info(('inserted "%s" - %d waypoints%s'):format(recipe.title, #recipe.entries,
+            quicks > 0 and '; the depot and shop jobs sit where you stand - drag them to the depot and the npc, then Save' or ''))
         end
       end
       menu:setPosition({ x = window:getX() + 10, y = window:getY() + 150 })
@@ -2579,7 +2909,7 @@ local function buildPanel()
   local botSwitch = small(window.routeRow, 'Bot: ?', 'Turn the cavebot on or off while you edit.', function()
     local ctx = botContext()
     local cave = ctx and ctx.CaveBot
-    if not cave or type(cave.isOn) ~= 'function' then info('the bot is not running') return end
+    if not cave or type(cave.isOn) ~= 'function' then warn('the bot is not running') return end
     if cave.isOn() then
       cave.setOff()
       info('cavebot off')
@@ -2588,7 +2918,7 @@ local function buildPanel()
       local dir = routeDir()
       local onDisk = dir and routeName ~= '' and g_resources.fileExists(dir .. '/' .. routeName .. '.cfg')
       if routeName == '' or not onDisk then
-        info(('this route is not saved yet - Save it, then Bot: on will run it (the bot is set to "%s")')
+        warn(('this route is not saved yet - Save it, then Bot: on will run it (the bot is set to "%s")')
           :format(tostring(botRouteName())))
         return
       end
@@ -2596,7 +2926,7 @@ local function buildPanel()
         if selectBotRoute(routeName) then
           info(('cavebot switched to "%s" and started'):format(routeName))
         else
-          info(('could not point the cavebot at "%s" - it will run "%s"'):format(routeName, tostring(botRouteName())))
+          warn(('could not point the cavebot at "%s" - it will run "%s"'):format(routeName, tostring(botRouteName())))
         end
       else
         info(('cavebot on - running "%s"'):format(routeName))
@@ -2614,7 +2944,7 @@ local function buildPanel()
     function() suppressMap() openLootWindow() end, 60)
   arm(window.clearRow, 'Clear waypoints', 'Remove every waypoint but keep the route name, the drawing and the cavebot settings.',
       'this removes every waypoint in the route', function()
-    if #route == 0 then info('there are no waypoints to clear') return end
+    if #route == 0 then warn('there are no waypoints to clear') return end
     pushUndo('clearing every waypoint')
     local had = #route
     route = {}
@@ -2628,32 +2958,48 @@ local function buildPanel()
   arm(window.clearRow, 'Clear drawing', 'Remove the painted area on this floor. Waypoints are untouched.',
       'this wipes the drawing on this floor', function()
     local m = maskFor(routeName, false)
-    if m then m.floors[tostring(viewedFloor())] = nil end
+    local z = viewedFloor()
+    local had = m and layerCount(m.floors[tostring(z)]) or 0
+    if m then m.floors[tostring(z)] = nil end
     layerVersion = layerVersion + 1
     persist()
     render(true)
-    info('cleared the painted area on floor ' .. viewedFloor())
+    if had > 0 then
+      info(('cleared %d painted tiles on floor %d'):format(had, z))
+    else
+      local others = {}
+      for key, layer in pairs(m and m.floors or {}) do
+        local n = layerCount(layer)
+        if n > 0 then others[#others + 1] = ('floor %s: %d'):format(key, n) end
+      end
+      table.sort(others)
+      warn(('nothing drawn on floor %d%s'):format(z, #others > 0 and (' - the drawing is on ' .. table.concat(others, ', ') .. '; switch the map there to clear it') or ''))
+    end
   end, 120)
 
   small(window.seqTools, 'Edit', 'Edit the selected waypoint.', function()
     if selected then openEditor(selected) else info('select a waypoint first') end
   end, 56)
-  small(window.seqTools, 'Up', 'Move the selected waypoint earlier in the route.', function()
-    if not selected then info('select a waypoint first') return end
-    if selected and selected > 1 then
-      route[selected], route[selected - 1] = route[selected - 1], route[selected]
-      routeVersion = routeVersion + 1
-      selectIndex(selected - 1)
-    end
+  small(window.seqTools, 'Up', 'Move the selected waypoint earlier in the route (its label and jump move with it).', function()
+    if not selected then warn('select a waypoint first') return end
+    local prev = visibleNeighbour(selected, -1)
+    if not prev then return end
+    pushUndo('moving a waypoint up')
+    local at = moveBlock(selected, prev)
+    routeVersion = routeVersion + 1
+    selectIndex(at)
   end, 46)
-  small(window.seqTools, 'Down', 'Move the selected waypoint later in the route.', function()
-    if not selected then info('select a waypoint first') return end
-    if selected and selected < #route then
-      route[selected], route[selected + 1] = route[selected + 1], route[selected]
-      routeVersion = routeVersion + 1
-      selectIndex(selected + 1)
-    end
+  small(window.seqTools, 'Down', 'Move the selected waypoint later in the route (its label and jump move with it).', function()
+    if not selected then warn('select a waypoint first') return end
+    local nxt = visibleNeighbour(selected, 1)
+    if not nxt then return end
+    pushUndo('moving a waypoint down')
+    local at = moveBlock(selected, nxt)
+    routeVersion = routeVersion + 1
+    selectIndex(at)
   end, 56)
+  small(window.seqTools, 'Loop end', 'Make the selected Go to the last one of its block: the gotos are rotated, their order is kept. Put the Refill check after it.',
+    function() if selected then makeLoopEnd(selected) else warn('select a waypoint first') end end, 70)
   small(window.seqTools, 'Remove', 'Remove the selected waypoint.', function()
     if not selected then info('select a waypoint first') return end
     if selected then
@@ -2689,6 +3035,22 @@ local function buildPanel()
     info(checked and 'the editor will open with this route next time' or 'the editor will start empty next time')
   end
   window.autoBox = auto
+  -- the small minimap is for playing; the route is drawn there only when asked
+  local mini = g_ui.createWidget('CheckBox', window.optRow)
+  mini:setText('also draw the route on the small minimap (off: full map only)')
+  mini:addAnchor(AnchorTop, 'parent', AnchorTop)
+  mini:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+  mini:addAnchor(AnchorRight, 'parent', AnchorRight)
+  mini:setMarginTop(18)
+  mini:setHeight(16)
+  mini:setChecked(data.showOnMinimap and true or false)
+  mini.onCheckChange = function(widget, checked)
+    data.showOnMinimap = checked
+    persist()
+    render(true)
+    drawMarkers()
+  end
+  window.miniBox = mini
 
   -- the editor opens on an empty route: the name box is only filled in once something is loaded
   window.nameEdit:setText(data.autoLoad and (data.lastRoute or '') or '')
@@ -2808,16 +3170,25 @@ local function syncFullmap()
       hideWindow()
       if escBound then g_keyboard.unbindKeyDown('Escape', closeFullMap) escBound = false end
     end
+    render(true)
+    drawMarkers()
   end
   local scale, floor = minimap:getScale(), viewedFloor()
   if scale ~= lastScale or floor ~= lastFloor then
+    local floorChanged = floor ~= lastFloor
     lastScale, lastFloor = scale, floor
     render()
     drawMarkers()
-    -- the line images are built in tile space: rescale them rather than encoding them again
     if lineOverlay and not lineOverlay:isDestroyed() and lineBox then
-      minimap:centerInPosition(lineOverlay, lineBox)
-      lineOverlay:resize(screenSize(lineBox.cols), screenSize(lineBox.rows))
+      if floorChanged then
+        -- the image on screen belongs to the floor we just left; a big route takes seconds to encode, so
+        -- showing the old one meanwhile draws another floor's route over this one
+        lineOverlay:hide()
+      else
+        -- a zoom only: the line images are built in tile space, rescale rather than encode again
+        minimap:centerInPosition(lineOverlay, lineBox)
+        lineOverlay:resize(screenSize(lineBox.cols), screenSize(lineBox.rows))
+      end
     end
   end
   if dirty and now() - lastPersist > 5000 then
@@ -3005,15 +3376,20 @@ local function setup()
 end
 
 function init()
+  -- routes saved before the rename still call modules.game_route_paint from their function waypoints
+  pcall(function() modules.game_route_paint = modules.game_waypoint_editor or getfenv(1) end)
   local ok, err = pcall(setup)
+  pcall(function() RouteDepot.setHuntSweep(RouteLoot.bags().sweep) end)
   if not ok then
     -- autoload runs this at boot: an error thrown here would stop the client from starting at all
-    g_logger.error('game_route_paint: ' .. tostring(err))
+    g_logger.error('game_waypoint_editor: ' .. tostring(err))
     pcall(terminate)
   end
 end
 
 function terminate()
+  pcall(function() if modules.game_route_paint == (modules.game_waypoint_editor or getfenv(1)) then modules.game_route_paint = nil end end)
+  pcall(function() RouteDepot.setHuntSweep(false) end)
   pcall(removeHooks)
   if syncEvent then removeEvent(syncEvent) end
   if renderEvent then removeEvent(renderEvent) end
@@ -3086,7 +3462,7 @@ function _setName(name) routeName = name if window then window.nameEdit:setText(
 function _setRoute(list) route = list routeVersion = routeVersion + 1 drawMarkers() refreshSeq() end
 
 -- A self test that can be run at any time from the console:
---   modules.game_route_paint.selftest()
+--   modules.game_waypoint_editor.selftest()
 -- It works on a throwaway route, touches nothing of yours, and reports what it checked.
 -- The bot keeps its function scope private (G.botContext only exists while the executor is built), so the
 -- only way to audit against the live preset is the executor's own upvalue.
@@ -3214,8 +3590,8 @@ function selftest()
   local drawn = 0
   for _, m in ipairs(markers) do if not m:isDestroyed() and m:isVisible() then drawn = drawn + 1 end end
   for _, c in ipairs(chips) do if not c:isDestroyed() and c:isVisible() then drawn = drawn + 1 end end
-  check('every type draws on the map', drawn == #RouteTypes.list,
-        ('%d of %d types drawn'):format(drawn, #RouteTypes.list))
+  check('every placeable type draws on the map', drawn == #RouteTypes.placeable,
+        ('%d of %d types drawn'):format(drawn, #RouteTypes.placeable))
 
   -- the waypoints that carry no position still show on the map, hanging off the one before them
   route, routeTail, routeName = {}, {}, '__selftest'
@@ -3260,7 +3636,7 @@ function selftest()
   local summary = ('%s - %d checks, %d failed'):format(failures == 0 and 'PASS' or 'FAIL', #report, failures)
   table.insert(report, 1, summary)
   local text2 = table.concat(report, '\n')
-  pcall(function() g_resources.writeFileContents('/route_paint_selftest.txt', text2) end)
-  info(summary .. ' (written to userdata/route_paint_selftest.txt)')
+  pcall(function() g_resources.writeFileContents('/waypoint_editor_selftest.txt', text2) end)
+  info(summary .. ' (written to userdata/waypoint_editor_selftest.txt)')
   return text2
 end

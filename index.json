@@ -482,7 +482,7 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.4.1",
+   "version": "1.4.2",
    "title": "Bot presets",
    "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying with a choice of how the colours travel - jump, hue ring or pastel fade, and a watch for gamemasters standing in ghost mode that keeps its on/off setting across reloads. The looting panel has Loot manager and Supplies manager buttons that open the waypoint editor's lists when that module is installed. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
@@ -668,8 +668,8 @@
     },
     {
      "path": "bot/ed/features/tools.lua",
-     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
-     "size": 22051,
+     "sha1": "57d2f1acb00e7a79d986e9c4689a1626f996da08",
+     "size": 23468,
      "packed": true
     },
     {
@@ -914,8 +914,8 @@
     },
     {
      "path": "bot/ek/features/tools.lua",
-     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
-     "size": 22051,
+     "sha1": "57d2f1acb00e7a79d986e9c4689a1626f996da08",
+     "size": 23468,
      "packed": true
     },
     {
@@ -1160,8 +1160,8 @@
     },
     {
      "path": "bot/ms/features/tools.lua",
-     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
-     "size": 22051,
+     "sha1": "57d2f1acb00e7a79d986e9c4689a1626f996da08",
+     "size": 23468,
      "packed": true
     },
     {
@@ -1406,8 +1406,8 @@
     },
     {
      "path": "bot/rp/features/tools.lua",
-     "sha1": "b418b99321f3e77cfbe703d962abaa1f438cfecb",
-     "size": 22051,
+     "sha1": "57d2f1acb00e7a79d986e9c4689a1626f996da08",
+     "size": 23468,
      "packed": true
     },
     {
@@ -1504,29 +1504,29 @@
    "archives": [
     {
      "path": "bot/ek.zip",
-     "sha1": "fbfcb7fa61f857fba37204a7b483042164b1433c",
-     "size": 88103,
+     "sha1": "30c1d79df79481ccb5f233f8c393aea1c09f1ca7",
+     "size": 88526,
      "dest": "bot/ek/",
      "count": 41
     },
     {
      "path": "bot/rp.zip",
-     "sha1": "040722abe2c1d111777800bc3162b826ce233446",
-     "size": 88096,
+     "sha1": "01f169e030f3e0e5684d46e2e575c58d0ade788f",
+     "size": 88519,
      "dest": "bot/rp/",
      "count": 41
     },
     {
      "path": "bot/ms.zip",
-     "sha1": "accb54247958ad3a7fac14889021d4d75f2b4639",
-     "size": 88096,
+     "sha1": "a6abf0b1b758504a829568928c7a886d70891723",
+     "size": 88519,
      "dest": "bot/ms/",
      "count": 41
     },
     {
      "path": "bot/ed.zip",
-     "sha1": "30b23670ef7bcd79730b108fd76ecdaed629c860",
-     "size": 88095,
+     "sha1": "d6737cbeb8b4453a52e17887434654c441ddab3a",
+     "size": 88518,
      "dest": "bot/ed/",
      "count": 41
     }

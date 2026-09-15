@@ -345,7 +345,9 @@ Features.register{ id = "keepCrosshair", name = "Keep crosshair", group = "PvP",
 
 
 -- mwall target: drop a magic wall a few squares ahead of your target, the way elfbot's mwall did. 2 sqm is the
--- useful default, 3 and 4 are tried when it is blocked, out of sight, or would land on us.
+-- useful default; when a square is blocked, out of sight or would land on us, the two squares beside it (left,
+-- then right of the target's path) are tried before going one further out - a target facing a wall walks round
+-- it at that distance, so a second wall behind the first would block nothing.
 MWALL_RUNE = 3180                 -- magic wall rune
 local MWALL_OFFSETS = { 2, 3, 4 }
 local MWALL_RANGE = 8             -- rune throwing range for the sight/range check
@@ -380,24 +382,47 @@ local function stepName(step)
   return (step.y < 0 and "N" or step.y > 0 and "S" or "") .. (step.x > 0 and "E" or step.x < 0 and "W" or "")
 end
 
+-- the two squares beside the forward tile at distance n, left of the heading first. Cardinal headings take the
+-- perpendicular neighbours; a diagonal heading takes the two squares hugging the forward tile.
+local function besideForward(step, n)
+  local fwd = { x = step.x * n, y = step.y * n }
+  local a, b
+  if step.x == 0 or step.y == 0 then
+    a = { x = fwd.x + step.y, y = fwd.y - step.x }
+    b = { x = fwd.x - step.y, y = fwd.y + step.x }
+  else
+    a = { x = fwd.x - step.x, y = fwd.y }
+    b = { x = fwd.x, y = fwd.y - step.y }
+  end
+  local leftX, leftY = step.y, -step.x           -- 90 degrees counter-clockwise of the heading (y grows south)
+  local function leftness(p) return (p.x - fwd.x) * leftX + (p.y - fwd.y) * leftY end
+  if leftness(a) >= leftness(b) then return a, b end
+  return b, a
+end
+
 local function mwallSpot(creature)
   local step = (lastStep and trackedId == creature:getId()) and lastStep or DIR_STEP[creature:getDirection()]
   if not step then return nil, "nowhere to aim" end
   local base, me = creature:getPosition(), player:getPosition()
   if not base or not me then return nil, "nowhere to aim" end
   local sight = false
-  for _, n in ipairs(MWALL_OFFSETS) do
-    local pos = { x = base.x + step.x * n, y = base.y + step.y * n, z = base.z }
-    local onMe = pos.x == me.x and pos.y == me.y and pos.z == me.z
+  local function try(off, label)
+    local pos = { x = base.x + off.x, y = base.y + off.y, z = base.z }
+    if pos.x == me.x and pos.y == me.y and pos.z == me.z then return nil end
     local tile = g_map.getTile(pos)
-    if tile and not onMe and tile:isWalkable() and not tile:hasCreature() then
-      if canShoot(pos, MWALL_RANGE) then
-        local thing = tile:getTopUseThing() or tile:getGround()
-        if thing then return thing, n, stepName(step) end
-      else
-        sight = true
-      end
-    end
+    if not tile or not tile:isWalkable() or tile:hasCreature() then return nil end
+    if not canShoot(pos, MWALL_RANGE) then sight = true return nil end
+    local thing = tile:getTopUseThing() or tile:getGround()
+    if thing then return thing, label end
+  end
+  for _, n in ipairs(MWALL_OFFSETS) do
+    local thing, label = try({ x = step.x * n, y = step.y * n }, n .. " ahead")
+    if thing then return thing, label, stepName(step) end
+    local left, right = besideForward(step, n)
+    thing, label = try(left, n .. " left")
+    if thing then return thing, label, stepName(step) end
+    thing, label = try(right, n .. " right")
+    if thing then return thing, label, stepName(step) end
   end
   return nil, sight and "no clear line" or "all blocked"
 end

@@ -11,10 +11,12 @@ Client modules for the PegazOTS OTClientV8 client (protocol 8.6).
 | Autoloot tracker | Mini-window listing the items the server loots for you with carried counts |
 | Player info | Other players shown as `[RP 250] Name` (vocation and level from an automatic look) |
 | Exiva | Exiva replies drawn on the minimap: ring sectors, several casts intersected, masked to explored tiles |
-| Position HUD | Your x, y, z in one line at the top-right corner of the minimap |
+| Position HUD | Your x, y, z in one line at the top-right corner of the minimap; the tile under the cursor on the full map |
 | Better chat | Split view beside the console with coloured `[!]` filter tabs (alerts, trade, raids, private), resizable, keeps channels open |
 | Save now | Save settings, hotkeys, layout, bot storage and minimap without exiting (button or `Ctrl+Alt+S`) |
 | Buttons panel fit | Grows the right-side Buttons panel so the extra buttons these modules add stay visible |
+| Bot presets | Preset management in the bot window and four ready presets (EK, RP, MS, ED): grouped tabs, hotkeys, buffs, equip rules, auto tasks and missions, outfit colours, ghost watch |
+| Waypoint editor | Cavebot routes edited on the map: draw the hunt area for the walking waypoints, place the rest by hand, one-click deposit / withdraw / buy / sell jobs with a loot list and a supply list |
 | Module installer | This installer: lists, installs, updates and removes the modules above without a restart |
 
 Install with the in-game module installer (fetches `index.json` from this repo's Pages site), or by hand:

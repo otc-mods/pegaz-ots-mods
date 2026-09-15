@@ -17,6 +17,25 @@ TargetBot.Looting.setup = function()
     ui.everyItem:setOn(not ui.everyItem:isOn())
     TargetBot.save()
   end
+  -- the waypoint editor owns the depot/sell loot list and the supply list; open them from here too
+  if ui.lootManager then
+    ui.lootManager.onClick = function()
+      if modules.game_route_paint and modules.game_route_paint.openLootWindow then
+        modules.game_route_paint.openLootWindow()
+      else
+        warn("The waypoint editor module is not installed - no loot manager to open")
+      end
+    end
+  end
+  if ui.supplyManager then
+    ui.supplyManager.onClick = function()
+      if modules.game_route_paint and modules.game_route_paint.openSupplyWindow then
+        modules.game_route_paint.openSupplyWindow()
+      else
+        warn("The waypoint editor module is not installed - no supplies manager to open")
+      end
+    end
+  end
   ui.maxDangerPanel.value.onTextChange = function()
     local value = tonumber(ui.maxDangerPanel.value:getText())
     if not value then

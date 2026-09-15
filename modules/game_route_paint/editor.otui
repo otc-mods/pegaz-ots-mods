@@ -1,0 +1,952 @@
+// ---- small parts -------------------------------------------------------------------
+RpButton < Button
+  height: 22
+
+RpSmall < Button
+  height: 20
+  width: 46
+  border-width: 0
+  border-color: alpha
+  $hover:
+    border-width: 1
+    border-color: #ffffff
+  $!hover:
+    border-width: 0
+    border-color: alpha
+
+RpTypeButton < Button
+  height: 22
+  text-align: left
+  text-offset: 6 0
+  margin-top: 2
+  border-width: 0
+  border-color: alpha
+  $hover:
+    border-width: 1
+    border-color: #ffffff
+  $!hover:
+    border-width: 0
+    border-color: alpha
+
+RpHeader < Label
+  height: 17
+  margin-top: 8
+  text-align: left
+  color: #ffffff
+  background-color: #ffffff22
+
+RpNote < Label
+  height: 14
+  text-align: left
+  color: #9d9d9d
+
+RpHint < Label
+  text-align: topLeft
+  text-wrap: true
+  text-auto-resize: true
+  color: #9d9d9d
+
+RpOverlay < UIWidget
+  phantom: true
+  focusable: false
+
+RpMarker < Label
+  size: 32 16
+  text-align: center
+  color: #101010
+  border-width: 1
+  border-color: #101010
+  phantom: false
+  focusable: false
+  draggable: true
+
+RpItemLine < UIWidget
+  height: 20
+  phantom: false
+  background-color: alpha
+  $hover:
+    background-color: #ffffff18
+  $!hover:
+    background-color: alpha
+
+  UIItem
+    id: icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    margin-left: 2
+    phantom: true
+
+  Label
+    id: text
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 6
+    text-align: left
+    color: #bdbdbd
+    phantom: true
+
+RpMapLegend < UIWidget
+  id: rpLegend
+  width: 150
+  background-color: #1c1c1cdd
+  border-width: 1
+  border-color: #000000
+  phantom: false
+  layout:
+    type: verticalBox
+    fit-children: true
+
+RpLegendLine < Label
+  height: 15
+  text-align: left
+  text-offset: 4 0
+  color: #dddddd
+
+RpDropMark < UIWidget
+  height: 2
+  background-color: #ffd166
+  phantom: true
+
+// The minimap centres this container on its tile and owns its position, so the visible face is an inner child
+// pushed off-centre with margins - the only offset that survives the minimap repositioning it.
+RpChip < UIWidget
+  size: 160 72
+  phantom: true
+  focusable: false
+
+  Label
+    id: face
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 28 14
+    text-align: center
+    color: #101010
+    border-width: 1
+    border-color: #101010
+    phantom: false
+    focusable: false
+    draggable: true
+
+RpGhost < Label
+  size: 18 18
+  text-align: center
+  color: #101010
+  border-width: 1
+  border-color: #ffffff
+  phantom: true
+  focusable: false
+  opacity: 0.8
+
+RpLegendChip < Label
+  height: 15
+  width: 44
+  text-align: center
+  color: #101010
+
+RpSeqRow < UIWidget
+  height: 17
+  focusable: true
+  draggable: true
+  background-color: alpha
+  $hover:
+    background-color: #ffffff18
+  $!hover:
+    background-color: alpha
+  $focus:
+    background-color: #ffffff28
+
+  Label
+    id: dot
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 22 13
+    margin-left: 2
+    text-align: center
+    color: #101010
+
+  Label
+    id: text
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    text-align: left
+    color: #d8d8d8
+
+// ---- the toolbar that sits on the map ----------------------------------------------
+RpToolbar < UIWidget
+  id: rpToolbar
+  size: 232 300
+  background-color: #1c1c1cdd
+  border-width: 1
+  border-color: #000000
+  phantom: false
+
+  Label
+    id: title
+    !text: tr('  MAP TOOLS')
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 18
+    text-align: left
+    background-color: #ffffff22
+    color: #ffffff
+    draggable: true
+    $hover:
+      background-color: #ffffff33
+
+  Panel
+    id: modeRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 4 4 0 4
+    height: 20
+    layout:
+      type: horizontalBox
+      spacing: 2
+
+  Panel
+    id: actionRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 3 4 0 4
+    height: 20
+    layout:
+      type: horizontalBox
+      spacing: 2
+
+  Panel
+    id: toolPanel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 4 4 4 4
+
+// ---- the route panel ---------------------------------------------------------------
+RpEditorWindow < MainWindow
+  id: rpEditorWindow
+  !text: tr('Waypoint editor')
+  size: 470 540
+  padding: 4
+
+  RpHeader
+    id: routeHeader
+    !text: tr('  ROUTE')
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 22
+
+  Label
+    id: nameNote
+    !text: tr('  route name - Save writes it under this name')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    height: 13
+    text-align: left
+    color: #9d9d9d
+
+  TextEdit
+    id: nameEdit
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    height: 22
+
+  Panel
+    id: routeRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 22
+    layout:
+      type: horizontalBox
+      spacing: 3
+
+  Panel
+    id: optRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 18
+
+  RpHeader
+    id: drawHeader
+    !text: tr('  DRAW AN AREA, GET GOTO WAYPOINTS')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  Label
+    id: spacingNote
+    !text: tr('  waypoint density - one waypoint per how many squares')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 13
+    text-align: left
+    color: #9d9d9d
+
+  Panel
+    id: spacingRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 22
+    layout:
+      type: horizontalBox
+      spacing: 3
+
+  Panel
+    id: genRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 22
+    layout:
+      type: horizontalBox
+      spacing: 3
+
+  Panel
+    id: clearRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 22
+    layout:
+      type: horizontalBox
+      spacing: 3
+
+  RpHeader
+    id: seqHeader
+    !text: tr('  WAYPOINTS')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  Panel
+    id: seqTools
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 20
+    layout:
+      type: horizontalBox
+      spacing: 3
+
+  Panel
+    id: legendRow
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 3
+    height: 15
+    layout:
+      type: horizontalBox
+      spacing: 2
+
+  VerticalScrollBar
+    id: seqScroll
+    anchors.top: prev.bottom
+    anchors.bottom: infoLabel.top
+    anchors.right: parent.right
+    margin-top: 3
+    margin-bottom: 4
+    step: 17
+    pixels-scroll: true
+
+  UIScrollArea
+    id: seqList
+    anchors.top: legendRow.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    anchors.bottom: infoLabel.top
+    margin-top: 3
+    margin-right: 3
+    margin-bottom: 4
+    vertical-scrollbar: seqScroll
+    layout:
+      type: verticalBox
+
+  Label
+    id: infoLabel
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 58
+    text-align: topLeft
+    text-wrap: true
+    color: #bbbbbb
+
+
+// ---- value editors -----------------------------------------------------------------
+RpValueWindow < MainWindow
+  id: rpValueWindow
+  size: 420 240
+  padding: 4
+
+  Label
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 22
+    height: 30
+    text-align: topLeft
+    text-wrap: true
+    color: #bdbdbd
+
+  Button
+    id: okButton
+    !text: tr('OK')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 90
+    height: 22
+
+  Button
+    id: cancelButton
+    !text: tr('Cancel')
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 4
+    width: 90
+    height: 22
+
+  Button
+    id: extraButton
+    !text: tr('Pick on map')
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    width: 110
+    height: 22
+
+  UIItem
+    id: itemPreview
+    anchors.top: hint.bottom
+    anchors.right: parent.right
+    size: 34 34
+    margin-top: 2
+    phantom: true
+
+  TextEdit
+    id: valueEdit
+    anchors.top: hint.bottom
+    anchors.left: parent.left
+    anchors.right: itemPreview.left
+    margin-top: 4
+    margin-right: 6
+    height: 22
+
+  VerticalScrollBar
+    id: valueScroll
+    anchors.top: hint.bottom
+    anchors.right: parent.right
+    anchors.bottom: okButton.top
+    margin-top: 4
+    margin-bottom: 6
+    step: 14
+    pixels-scroll: true
+
+  MultilineTextEdit
+    id: valueMulti
+    anchors.top: hint.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    anchors.bottom: okButton.top
+    margin-top: 4
+    margin-right: 3
+    margin-bottom: 6
+    vertical-scrollbar: valueScroll
+
+
+RpMenuRow < Button
+  height: 20
+  text-align: left
+  text-offset: 6 0
+  margin-top: 1
+  background-color: alpha
+  $hover:
+    background-color: #ffffff40
+  $!hover:
+    background-color: alpha
+  $pressed:
+    background-color: #ffffff60
+
+RpMenu < UIWidget
+  id: rpMenu
+  width: 170
+  background-color: #232323f0
+  border-width: 1
+  border-color: #000000
+  phantom: false
+  layout:
+    type: verticalBox
+    fit-children: true
+
+RpEditorWindow
+  id: rpEditorWindow
+
+// ---- supplies and named items ------------------------------------------------------
+RpSupplyHeader < UIWidget
+  height: 15
+
+  Label
+    id: c1
+    !text: tr('  item')
+    anchors.left: parent.left
+    width: 170
+    text-align: left
+    color: #9d9d9d
+
+  Label
+    id: c2
+    !text: tr('target')
+    anchors.left: prev.right
+    margin-left: 4
+    width: 60
+    text-align: left
+    color: #9d9d9d
+
+  Label
+    id: c3
+    !text: tr('or: fill cap, keeping N free')
+    anchors.left: prev.right
+    margin-left: 6
+    width: 160
+    text-align: left
+    color: #9d9d9d
+
+RpSupplyRow < UIWidget
+  height: 24
+
+  UIItem
+    id: icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 22 22
+    phantom: true
+
+  TextEdit
+    id: itemEdit
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 3
+    width: 145
+    height: 20
+
+  TextEdit
+    id: amountEdit
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    width: 60
+    height: 20
+
+  CheckBox
+    id: fullCapBox
+    !text: tr('fill cap')
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 6
+    width: 70
+    height: 18
+
+  TextEdit
+    id: capEdit
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    width: 52
+    height: 20
+
+  Label
+    id: capNote
+    !text: tr('free')
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 3
+    width: 30
+    text-align: left
+    color: #9d9d9d
+
+  Button
+    id: removeButton
+    !text: tr('x')
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    width: 22
+    height: 20
+
+RpLootHeader < UIWidget
+  height: 15
+
+  Label
+    id: c1
+    !text: tr('  item')
+    anchors.left: parent.left
+    width: 168
+    text-align: left
+    color: #9d9d9d
+
+  Label
+    id: c2
+    !text: tr('depot')
+    anchors.left: prev.right
+    margin-left: 4
+    width: 66
+    text-align: left
+    color: #9d9d9d
+
+  Label
+    id: c3
+    !text: tr('sell')
+    anchors.left: prev.right
+    margin-left: 4
+    width: 60
+    text-align: left
+    color: #9d9d9d
+
+  Label
+    id: c4
+    !text: tr('keep')
+    anchors.left: prev.right
+    margin-left: 4
+    width: 60
+    text-align: left
+    color: #9d9d9d
+
+RpLootRow < UIWidget
+  height: 24
+
+  UIItem
+    id: icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 22 22
+    phantom: true
+
+  TextEdit
+    id: itemEdit
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 3
+    width: 142
+    height: 20
+
+  CheckBox
+    id: depositBox
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    width: 62
+    height: 18
+
+  CheckBox
+    id: sellBox
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    width: 56
+    height: 18
+
+  CheckBox
+    id: keepBox
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    width: 56
+    height: 18
+
+  Button
+    id: removeButton
+    !text: tr('x')
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    width: 22
+    height: 20
+
+RpLootWindow < MainWindow
+  id: rpLootWindow
+  !text: tr('Loot - what goes to the depot, what gets sold')
+  size: 500 520
+  padding: 4
+
+  Label
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 22
+    height: 30
+    text-align: topLeft
+    text-wrap: true
+    color: #bdbdbd
+    !text: tr('Deposit loot puts "depot" items in the depot. Sell loot: if any row is ticked "sell" it sells only those; otherwise it sells everything the npc buys except the "keep" items. Depot items are always kept from selling.')
+
+  RpLootHeader
+    id: lootHeader
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 4
+
+  VerticalScrollBar
+    id: lootScroll
+    anchors.top: prev.bottom
+    anchors.right: parent.right
+    margin-top: 2
+    height: 180
+    step: 26
+    pixels-scroll: true
+
+  UIScrollArea
+    id: lootList
+    anchors.top: lootHeader.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    margin-top: 2
+    margin-right: 3
+    height: 180
+    vertical-scrollbar: lootScroll
+    layout:
+      type: verticalBox
+      spacing: 2
+
+  Button
+    id: addButton
+    !text: tr('Add a line')
+    anchors.top: lootList.bottom
+    anchors.left: parent.left
+    margin-top: 4
+    width: 100
+    height: 22
+
+  Button
+    id: autolootButton
+    !text: tr('Load from autoloot')
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 6
+    width: 150
+    height: 22
+
+  Label
+    id: itemsHeader
+    !text: tr('  NAMED ITEMS - click one to add it')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 8
+    height: 17
+    text-align: left
+    color: #ffffff
+    background-color: #ffffff22
+
+  TextEdit
+    id: nameEdit
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 4
+    height: 20
+
+  VerticalScrollBar
+    id: itemScroll
+    anchors.top: nameEdit.bottom
+    anchors.right: parent.right
+    anchors.bottom: okButton.top
+    margin-top: 4
+    margin-bottom: 6
+    step: 20
+    pixels-scroll: true
+
+  UIScrollArea
+    id: itemList
+    anchors.top: nameEdit.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    anchors.bottom: okButton.top
+    margin-top: 4
+    margin-right: 3
+    margin-bottom: 6
+    vertical-scrollbar: itemScroll
+    layout:
+      type: verticalBox
+
+  Button
+    id: okButton
+    !text: tr('Save')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 90
+    height: 22
+
+  Button
+    id: cancelButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 4
+    width: 90
+    height: 22
+
+RpSupplyWindow < MainWindow
+  id: rpSupplyWindow
+  !text: tr('Supplies and named items')
+  size: 500 520
+  padding: 4
+
+  Label
+    id: hint
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 22
+    height: 44
+    text-align: topLeft
+    text-wrap: true
+    color: #bdbdbd
+    !text: tr('The target is how many you want to HAVE. Buy supplies buys the difference (target 200, carrying 50 -> buys 150). Tick "fill cap" instead to top that item up until only N capacity is left - only one row may do that.')
+
+  RpSupplyHeader
+    id: supplyHeader
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 4
+
+  VerticalScrollBar
+    id: supplyScroll
+    anchors.top: prev.bottom
+    anchors.right: parent.right
+    margin-top: 2
+    height: 160
+    step: 26
+    pixels-scroll: true
+
+  UIScrollArea
+    id: supplyList
+    anchors.top: supplyHeader.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    margin-top: 2
+    margin-right: 3
+    height: 160
+    vertical-scrollbar: supplyScroll
+    layout:
+      type: verticalBox
+      spacing: 2
+
+  Button
+    id: addButton
+    !text: tr('Add a line')
+    anchors.top: supplyList.bottom
+    anchors.left: parent.left
+    margin-top: 4
+    width: 100
+    height: 22
+
+  Label
+    id: itemsHeader
+    !text: tr('  NAMED ITEMS')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 8
+    height: 17
+    text-align: left
+    color: #ffffff
+    background-color: #ffffff22
+
+  Label
+    id: searchNote
+    !text: tr('type to search, or type a new name and an id to add it')
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    height: 13
+    text-align: left
+    color: #9d9d9d
+
+  TextEdit
+    id: nameEdit
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 2
+    width: 200
+    height: 20
+
+  TextEdit
+    id: idEdit
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 4
+    width: 70
+    height: 20
+
+  Button
+    id: learnButton
+    !text: tr('Add / update')
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-left: 4
+    width: 100
+    height: 20
+
+  VerticalScrollBar
+    id: itemScroll
+    anchors.top: nameEdit.bottom
+    anchors.right: parent.right
+    anchors.bottom: okButton.top
+    margin-top: 4
+    margin-bottom: 6
+    step: 15
+    pixels-scroll: true
+
+  UIScrollArea
+    id: itemList
+    anchors.top: nameEdit.bottom
+    anchors.left: parent.left
+    anchors.right: prev.left
+    anchors.bottom: okButton.top
+    margin-top: 4
+    margin-right: 3
+    margin-bottom: 6
+    vertical-scrollbar: itemScroll
+    layout:
+      type: verticalBox
+
+  Button
+    id: okButton
+    !text: tr('Save')
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 90
+    height: 22
+
+  Button
+    id: cancelButton
+    !text: tr('Close')
+    anchors.bottom: parent.bottom
+    anchors.right: prev.left
+    margin-right: 4
+    width: 90
+    height: 22

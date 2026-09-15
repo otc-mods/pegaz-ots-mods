@@ -77,7 +77,20 @@ TargetBotLootingPanel < Panel
     text-wrap: true
     text-auto-resize: true
 
+  HorizontalSeparator
+    margin-top: 5
+
   BotButton
+    id: lootManager
+    margin-top: 4
+    text: Loot manager (deposit / sell)
+
+  BotButton
+    id: supplyManager
     margin-top: 3
+    text: Supplies manager
+
+  BotButton
+    margin-top: 5
     text: Help & Tutorials
     @onClick: g_platform.openUrl("http://bot.otclient.ovh/")

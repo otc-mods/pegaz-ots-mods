@@ -342,6 +342,13 @@ local function deliver(source, text, color, name, channelName)
   if changed then refreshBangs() end
 end
 
+-- Public: a bot or another module can drop a line into the Server log source, so it shows in filter tabs
+-- that listen to it (our own BOT waypoint messages come through here as well as the stock console).
+function addServerLine(text, color)
+  if type(text) ~= 'string' then return end
+  deliver('status', text, color or TEXT.green)
+end
+
 -- keep channels open: the server only sends channel messages for channels you joined, and they drop on
 -- relog. Every tab's "Only channels" names are (re)joined on login and once a minute, without the channel window.
 local function wantedChannelNames()

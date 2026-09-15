@@ -61,7 +61,8 @@ local ghostMacro = macro(500, "Ghost watch", function()
     announced = {}                     -- let the next arrival announce itself again
   end
 end)
-ghostMacro.setOff()
+-- do not force it off on load: that would wipe the user's saved on/off every time the config reloads.
+-- The macro framework restores the switch state by name; just clear any stale tile text.
 clearMarks()
 
 Features.register{ id = "ghostwatch", name = "Ghost watch", group = "Other", order = 80, macro = ghostMacro }

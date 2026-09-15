@@ -233,9 +233,9 @@
   {
    "name": "game_pos_hud",
    "type": "module",
-   "version": "1.1.0",
+   "version": "1.2.0",
    "title": "Position HUD",
-   "description": "Your x, y, z at the top-right corner of the minimap.",
+   "description": "Your x, y, z at the top-right corner of the minimap; on the full map also the tile under the cursor, for placing waypoints by hand.",
    "screenshot": "screenshots/game_pos_hud.png",
    "screenshotSize": [
     197,
@@ -251,14 +251,14 @@
     },
     {
      "path": "modules/game_pos_hud/main.lua",
-     "sha1": "5a813be0f578d682c1257711fece152e5f62c4f3",
-     "size": 910,
+     "sha1": "a3197653c09253eac9bc81022e0f2fb9819b8e7d",
+     "size": 1802,
      "packed": false
     },
     {
      "path": "modules/game_pos_hud/pos_hud.otui",
-     "sha1": "8a7f9ca06ee3859c60f017996277e240a7b818dd",
-     "size": 196,
+     "sha1": "2f59d3e77fafd8cfd28f573ab16446fc6b49c339",
+     "size": 219,
      "packed": false
     }
    ]
@@ -266,9 +266,9 @@
   {
    "name": "game_better_chat",
    "type": "module",
-   "version": "1.0.2",
+   "version": "1.0.3",
    "title": "Better chat",
-   "description": "Split view beside the chat with coloured [!] filter tabs.",
+   "description": "Split view beside the chat with coloured [!] filter tabs. Other modules and the bot can drop their own lines into the Server log source, so bot messages show up in the tabs that listen to it.",
    "screenshot": "screenshots/game_better_chat.png",
    "screenshotSize": [
     383,
@@ -290,8 +290,8 @@
     },
     {
      "path": "modules/game_better_chat/main.lua",
-     "sha1": "0cabb95d736497c6ca81281aad7f617f7d1131e5",
-     "size": 28470,
+     "sha1": "e243b349a27c404042c0c862316c5040dd32d223",
+     "size": 28809,
      "packed": false
     }
    ]
@@ -482,9 +482,9 @@
   {
    "name": "game_bot_presets",
    "type": "module",
-   "version": "1.3.1",
+   "version": "1.4.0",
    "title": "Bot presets",
-   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying with a choice of how the colours travel - jump, hue ring or pastel fade, and a watch for gamemasters standing in ghost mode. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
+   "description": "The bot window gets preset management - copy, delete, pick which characters and vocations start on which preset - and four ready presets come with it: elite knight, royal paladin, master sorcerer and elder druid. One layout: grouped collapsible tabs, per-feature hotkeys set in a batch, buffs that learn their own duration, mwall target with a coloured countdown, pre-emptive mana shield, equip rules, per-vocation supply icons, auto tasks that take, track and claim hunting tasks over the game's own protocol, daily and weekly missions claimed the moment they are finished, outfit colour cycling and copying with a choice of how the colours travel - jump, hue ring or pastel fade, and a watch for gamemasters standing in ghost mode that keeps its on/off setting across reloads. The looting panel has Loot manager and Supplies manager buttons that open the waypoint editor's lists when that module is installed. Spell words and potions are seeded per vocation only where you have not set them; your routes, target lists and saved settings are never shipped, never overwritten, and backed up before an update.",
    "screenshot": "screenshots/game_bot_presets.png",
    "screenshotSize": [
     196,
@@ -506,14 +506,14 @@
     },
     {
      "path": "bot/ed/cavebot/cavebot.lua",
-     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
-     "size": 6011,
+     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
+     "size": 6478,
      "packed": true
     },
     {
      "path": "bot/ed/cavebot/cavebot.otui",
-     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
-     "size": 974,
+     "sha1": "322c31cb70a9901e2227bf0eb695a1223f06aecd",
+     "size": 1059,
      "packed": true
     },
     {
@@ -626,8 +626,8 @@
     },
     {
      "path": "bot/ed/features/ghost.lua",
-     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
-     "size": 2664,
+     "sha1": "78ee0950d865559c143f36038e92adf14737f129",
+     "size": 2837,
      "packed": true
     },
     {
@@ -704,14 +704,14 @@
     },
     {
      "path": "bot/ed/targetbot/looting.lua",
-     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
-     "size": 9944,
+     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
+     "size": 10694,
      "packed": true
     },
     {
      "path": "bot/ed/targetbot/looting.otui",
-     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
-     "size": 1562,
+     "sha1": "f31b693c28f4ff764d63c1e4a81a977fef4da575",
+     "size": 1774,
      "packed": true
     },
     {
@@ -752,14 +752,14 @@
     },
     {
      "path": "bot/ek/cavebot/cavebot.lua",
-     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
-     "size": 6011,
+     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
+     "size": 6478,
      "packed": true
     },
     {
      "path": "bot/ek/cavebot/cavebot.otui",
-     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
-     "size": 974,
+     "sha1": "322c31cb70a9901e2227bf0eb695a1223f06aecd",
+     "size": 1059,
      "packed": true
     },
     {
@@ -872,8 +872,8 @@
     },
     {
      "path": "bot/ek/features/ghost.lua",
-     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
-     "size": 2664,
+     "sha1": "78ee0950d865559c143f36038e92adf14737f129",
+     "size": 2837,
      "packed": true
     },
     {
@@ -950,14 +950,14 @@
     },
     {
      "path": "bot/ek/targetbot/looting.lua",
-     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
-     "size": 9944,
+     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
+     "size": 10694,
      "packed": true
     },
     {
      "path": "bot/ek/targetbot/looting.otui",
-     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
-     "size": 1562,
+     "sha1": "f31b693c28f4ff764d63c1e4a81a977fef4da575",
+     "size": 1774,
      "packed": true
     },
     {
@@ -998,14 +998,14 @@
     },
     {
      "path": "bot/ms/cavebot/cavebot.lua",
-     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
-     "size": 6011,
+     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
+     "size": 6478,
      "packed": true
     },
     {
      "path": "bot/ms/cavebot/cavebot.otui",
-     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
-     "size": 974,
+     "sha1": "322c31cb70a9901e2227bf0eb695a1223f06aecd",
+     "size": 1059,
      "packed": true
     },
     {
@@ -1118,8 +1118,8 @@
     },
     {
      "path": "bot/ms/features/ghost.lua",
-     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
-     "size": 2664,
+     "sha1": "78ee0950d865559c143f36038e92adf14737f129",
+     "size": 2837,
      "packed": true
     },
     {
@@ -1196,14 +1196,14 @@
     },
     {
      "path": "bot/ms/targetbot/looting.lua",
-     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
-     "size": 9944,
+     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
+     "size": 10694,
      "packed": true
     },
     {
      "path": "bot/ms/targetbot/looting.otui",
-     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
-     "size": 1562,
+     "sha1": "f31b693c28f4ff764d63c1e4a81a977fef4da575",
+     "size": 1774,
      "packed": true
     },
     {
@@ -1244,14 +1244,14 @@
     },
     {
      "path": "bot/rp/cavebot/cavebot.lua",
-     "sha1": "460a938b205737f21e1d919c81f3d71d1c419111",
-     "size": 6011,
+     "sha1": "97c60b65d25d96ed1e8b0051bbf54acebbe6356d",
+     "size": 6478,
      "packed": true
     },
     {
      "path": "bot/rp/cavebot/cavebot.otui",
-     "sha1": "c0175eee276dd6877f3ebd07cae8c586c8a0952b",
-     "size": 974,
+     "sha1": "322c31cb70a9901e2227bf0eb695a1223f06aecd",
+     "size": 1059,
      "packed": true
     },
     {
@@ -1364,8 +1364,8 @@
     },
     {
      "path": "bot/rp/features/ghost.lua",
-     "sha1": "1bfa0c412ce2318c0d5b0e455cafe8d61d820a05",
-     "size": 2664,
+     "sha1": "78ee0950d865559c143f36038e92adf14737f129",
+     "size": 2837,
      "packed": true
     },
     {
@@ -1442,14 +1442,14 @@
     },
     {
      "path": "bot/rp/targetbot/looting.lua",
-     "sha1": "d53d585852539c945326a143af786d8e90e03d2a",
-     "size": 9944,
+     "sha1": "5bfea1c8b9a27dc1e104e7cd00d86647c4a660ac",
+     "size": 10694,
      "packed": true
     },
     {
      "path": "bot/rp/targetbot/looting.otui",
-     "sha1": "c86d635e793c75b321353f9d9e84fe4d5b499e41",
-     "size": 1562,
+     "sha1": "f31b693c28f4ff764d63c1e4a81a977fef4da575",
+     "size": 1774,
      "packed": true
     },
     {
@@ -1504,31 +1504,101 @@
    "archives": [
     {
      "path": "bot/ek.zip",
-     "sha1": "19f385778baa152b6e8ca882e7e1d56093886bbe",
-     "size": 87129,
+     "sha1": "2964e87eb3e4d5587968665cc6e4f71fcdacde8c",
+     "size": 87695,
      "dest": "bot/ek/",
      "count": 41
     },
     {
      "path": "bot/rp.zip",
-     "sha1": "beaa4324d889ef0f6aa6659456ddae89ea7a7d02",
-     "size": 87122,
+     "sha1": "ff0f7d38ab2f5a1afddbda983ad0af4f2306492b",
+     "size": 87688,
      "dest": "bot/rp/",
      "count": 41
     },
     {
      "path": "bot/ms.zip",
-     "sha1": "529b3c7aa04cbf378daa2f1416a029ad535ffe5f",
-     "size": 87122,
+     "sha1": "44aba83e378bed3252768f22d25b7bf7960d9f48",
+     "size": 87688,
      "dest": "bot/ms/",
      "count": 41
     },
     {
      "path": "bot/ed.zip",
-     "sha1": "4175b9d9713e440a329bf19a8ef617b14eedfc1d",
-     "size": 87121,
+     "sha1": "e7bf14930ee91d41950b35f3fd32aca214a69b8d",
+     "size": 87687,
      "dest": "bot/ed/",
      "count": 41
+    }
+   ]
+  },
+  {
+   "name": "game_route_paint",
+   "type": "module",
+   "version": "1.0.0",
+   "title": "Waypoint editor",
+   "description": "Edit cavebot routes on the map instead of a list of coordinates: draw the area you hunt to get the walking waypoints, then place use, use with, say, delay, label and function waypoints by hand and edit each one in its own window. One-click jobs for the whole afk loop - deposit loot, take supplies out of the depot, buy supplies, sell loot, open the depot, wait for the fight - driven by a Loot manager (deposit / sell / keep per item, one click loads your autoloot list) and a Supplies manager (how many of each to carry; closed bags are counted before buying, so nothing is bought twice). Depot jobs walk every bag you carry and every bag in the depot, however deeply nested, one window at a time, report what they did and stop the cavebot with a reason rather than lose loot. Bot on/off from the editor, live route line, undo, templates and recipes for hand-written functions. Made for the bot presets; item names come from Autoloot when it is installed.",
+   "requires": [],
+   "files": [
+    {
+     "path": "modules/game_route_paint/README.md",
+     "sha1": "bbc517af472fcc11ba22f0f16637000c5fd5831c",
+     "size": 10584,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/bags.lua",
+     "sha1": "0b523bd95ee564f789c7558bad67084371067b97",
+     "size": 8670,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/cfg.lua",
+     "sha1": "8a74d996121bb09dc2949031287bf93e42dbc1b1",
+     "size": 2752,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/depot.lua",
+     "sha1": "435bc3a331c7efa421c6b7630f789073feeb1e31",
+     "size": 23284,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/editor.otui",
+     "sha1": "0be15206fcd28d104fb98d5090b20179f1ca4a0c",
+     "size": 19090,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/game_route_paint.otmod",
+     "sha1": "cc8fdf33ad1d07cf6bc29a4beaa149ad5b121135",
+     "size": 416,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/library.lua",
+     "sha1": "c1283ff262ca0fc1343af583db7c02b57bf5dcb4",
+     "size": 20587,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/main.lua",
+     "sha1": "b4e3e8326af5872ab3f367366ae9a6fa8e25539a",
+     "size": 131141,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/png.lua",
+     "sha1": "fb5d7e7cc3c0be11267ca70a94352ff5d3ae1df5",
+     "size": 2931,
+     "packed": false
+    },
+    {
+     "path": "modules/game_route_paint/types.lua",
+     "sha1": "00c8fd1a7fe7ce4a0576decdc9e69f0038381c66",
+     "size": 32133,
+     "packed": false
     }
    ]
   },
